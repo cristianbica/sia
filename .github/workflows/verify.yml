@@ -1,0 +1,37 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  suite:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GNU timeout on macOS
+        if: runner.os == 'macOS'
+        run: brew install coreutils
+      - name: Verify
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = macOS ]; then
+            PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+            export PATH
+          fi
+          scripts/verify
+      - name: Probe shell syntax
+        shell: sh
+        run: |
+          for file in install scripts/verify scripts/verify-hosts tests/installer/github/bootstrap.sh; do
+            sh -n "$file"
+          done

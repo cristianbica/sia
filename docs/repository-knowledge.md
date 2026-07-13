@@ -77,7 +77,8 @@ record, or a decision made during an approved workflow.
 `.ai/docs/INDEX.md` is the root router. Each created child directory has a small `INDEX.md`. Entries contain a path,
 one-line description, and when-to-load guidance; they do not duplicate document bodies.
 
-A documenting operation updates the target document and its nearest index atomically from the user's perspective.
+A documenting operation treats the target document and its nearest index as one logical change, verifies both, and
+reports any partial state accurately.
 
 ## Evidence and freshness
 
@@ -110,7 +111,7 @@ The `document` operation handles initial repository documentation and target-sco
 work. `refresh-docs` performs targeted refresh, stale-claim audit, and index repair. Neither uses the full delivery gate
 unless product/source changes become necessary.
 
-During delivery, documentation impact is handled in Build or Fix before final review. Ship is read-only, ensuring the
-final handed-off diff—including documentation—has been reviewed and validated.
+During delivery, documentation impact is handled in Build or Fix before final review. Ship writes only plan completion
+state, ensuring the final handed-off diff—including documentation—has been reviewed and validated.
 
 Approved future work belongs in `.ai/plans/`, not `.ai/docs/`.

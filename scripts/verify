@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -u
+
+ROOT=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
+SUITE=${1:-all}
+
+run_static() {
+  sh "$ROOT/tests/static/source-contracts.sh" &&
+    sh "$ROOT/tests/behavior/activation/static-contracts.sh" &&
+    sh "$ROOT/tests/behavior/workflows/static-contracts.sh" &&
+    sh "$ROOT/tests/behavior/model-routing/static-contracts.sh" &&
+    sh "$ROOT/tests/behavior/definitions/static-contracts.sh" &&
+    sh "$ROOT/tests/behavior/documentation/static-contracts.sh" &&
+    sh "$ROOT/tests/hosts/static-contracts.sh"
+}
+
+run_installer() {
+  sh "$ROOT/tests/installer/install/stage1.sh" &&
+    sh "$ROOT/tests/installer/github/bootstrap.sh"
+}
+
+case "$SUITE" in
+  all)
+    run_static && run_installer
+    ;;
+  static)
+    run_static
+    ;;
+  installer)
+    run_installer
+    ;;
+  *)
+    echo "usage: sh scripts/verify [all|static|installer]" >&2
+    exit 2
+    ;;
+esac

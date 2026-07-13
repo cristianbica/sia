@@ -1,0 +1,47 @@
+#!/bin/sh
+
+if [ "${1:-}" = --version ]; then
+  echo '1.17.18'
+  exit 0
+fi
+
+[ "${1:-}" = run ] || exit 99
+shift
+[ "${1:-}" = --pure ] || exit 98
+shift
+
+case ${OPENCODE_CONFIG_CONTENT:-} in
+  *'"edit": "deny"'*'"bash": "deny"'*'"task": "deny"'*) ;;
+  *) exit 97 ;;
+esac
+
+prompt=
+while [ "$#" -gt 0 ]
+do
+  case $1 in
+    --model)
+      shift 2
+      ;;
+    --*)
+      shift
+      ;;
+    *)
+      prompt=$1
+      shift
+      ;;
+  esac
+done
+
+case $prompt in
+  'Reply with exactly ORDINARY_OK and nothing else.') response=ORDINARY_OK ;;
+  Sia) response='SIA_PROTOCOL_CANARY_7F3D Sia help: load docs, load skills, unattended operations, resume, and stop.' ;;
+  'Sia load docs')
+    response='SIA_PROTOCOL_CANARY_7F3D Documentation is unavailable and not initialized. Run Sia document repository.'
+    ;;
+  'Sia definitely-unknown-7f3d')
+    response='SIA_PROTOCOL_CANARY_7F3D Unknown operation definitely-unknown-7f3d: it is not registered.'
+    ;;
+  *) response='unexpected prompt' ;;
+esac
+
+printf '%s\n' "$response"

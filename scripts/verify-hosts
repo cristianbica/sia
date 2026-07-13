@@ -1,0 +1,555 @@
+#!/bin/sh
+
+# Real-host semantic smoke tests. --probe never invokes a model; --live is explicit and bounded.
+
+set -u
+
+ROOT=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
+PROMPT_DIR=$ROOT/tests/hosts/prompts
+MODE=
+HOST_FILTER=
+ARTIFACTS=
+TIMEOUT_SECONDS=${SIA_HOST_TIMEOUT_SECONDS:-90}
+MAX_OUTPUT_BYTES=${SIA_HOST_MAX_OUTPUT_BYTES:-1048576}
+CLAUDE_BUDGET=${SIA_CLAUDE_MAX_BUDGET_USD:-0.05}
+PROTOCOL_CANARY=SIA_PROTOCOL_CANARY_7F3D
+RUN_ROOT=
+USER_CODEX_HOME=${CODEX_HOME:-$HOME/.codex}
+CODEX_RUNTIME_HOME=
+FAILURES=0
+LIVE_RUNS=0
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/verify-hosts (--probe | --live) [options]
+
+Modes:
+  --probe             Report CLI availability and versions. Never invoke a model.
+  --live              Install Sia in temporary repos and run bounded semantic prompts.
+
+Options:
+  --host HOST         Test only codex, opencode, claude, or cursor. Repeatable.
+  --artifacts DIR     Write evidence to a new directory (default: a preserved /tmp directory).
+  --timeout SECONDS   Per-prompt live timeout (default: SIA_HOST_TIMEOUT_SECONDS or 90).
+  -h, --help          Show this help.
+
+Live mode is sequential and read-only. See tests/hosts/README.md for monetary and host-specific safeguards.
+EOF
+}
+
+fail() {
+  printf 'verify-hosts: %s\n' "$*" >&2
+  exit 2
+}
+
+cleanup() {
+  [ -n "$RUN_ROOT" ] && [ -d "$RUN_ROOT" ] && rm -rf -- "$RUN_ROOT"
+}
+
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+selected_host() {
+  selected=$1
+  [ -z "$HOST_FILTER" ] && return 0
+  for selected_item in $HOST_FILTER
+  do
+    [ "$selected_item" = "$selected" ] && return 0
+  done
+  return 1
+}
+
+host_executable() {
+  case $1 in
+    cursor) printf '%s\n' cursor-agent ;;
+    *) printf '%s\n' "$1" ;;
+  esac
+}
+
+live_supported() {
+  case $1 in
+    codex|opencode|claude) printf '%s\n' yes ;;
+    *) printf '%s\n' no ;;
+  esac
+}
+
+extract_version() {
+  printf '%s\n' "$1" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1
+}
+
+probe_host() {
+  probe_name=$1
+  probe_dir=$ARTIFACTS/hosts/$probe_name
+  mkdir -p "$probe_dir"
+  probe_executable=$(host_executable "$probe_name")
+
+  if ! command -v "$probe_executable" >"$probe_dir/executable.txt" 2>/dev/null; then
+    probe_status=MISSING
+    probe_actual=missing
+    probe_detail="executable not found: $probe_executable"
+    : >"$probe_dir/version.stdout"
+    : >"$probe_dir/version.stderr"
+  else
+    "$probe_executable" --version >"$probe_dir/version.stdout" 2>"$probe_dir/version.stderr"
+    probe_exit=$?
+    probe_combined=$(cat "$probe_dir/version.stdout" "$probe_dir/version.stderr")
+    probe_actual=$(extract_version "$probe_combined")
+    [ -n "$probe_actual" ] || probe_actual=unknown
+    if [ "$probe_exit" -ne 0 ]; then
+      probe_status=ERROR
+      probe_detail="version command exited $probe_exit"
+    elif [ "$probe_name" = cursor ]; then
+      probe_status=AVAILABLE
+      probe_detail='CLI available; no Cursor live runner is defined'
+    elif [ "$probe_actual" = unknown ]; then
+      probe_status=AVAILABLE
+      probe_detail='CLI available; version was not parsed'
+    else
+      probe_status=AVAILABLE
+      probe_detail='CLI available'
+    fi
+  fi
+
+  if [ "$MODE" = probe ]; then
+    printf '%s\tprobe\t%s\t%s\t%s\t%s\n' \
+      "$probe_name" "$probe_executable" "$probe_actual" "$probe_status" "$probe_detail" \
+      >>"$ARTIFACTS/summary.tsv"
+  fi
+  printf '%-8s %-10s executable=%s version=%s\n' \
+    "$probe_name" "$probe_status" "$probe_executable" "$probe_actual"
+
+  PROBE_STATUS=$probe_status
+  PROBE_ACTUAL=$probe_actual
+}
+
+sha256_file() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    file_raw=$(sha256sum "$1") || return 1
+    file_digest=$(printf '%s\n' "$file_raw" | awk 'NR == 1 { print $1 }')
+  elif command -v shasum >/dev/null 2>&1; then
+    file_raw=$(shasum -a 256 "$1") || return 1
+    file_digest=$(printf '%s\n' "$file_raw" | awk 'NR == 1 { print $1 }')
+  else
+    file_raw=$(openssl dgst -sha256 "$1") || return 1
+    file_digest=$(printf '%s\n' "$file_raw" | awk 'NR == 1 { print $NF }')
+  fi
+  case $file_digest in ""|*[!0-9a-f]*) return 1 ;; esac
+  [ "${#file_digest}" -eq 64 ] || return 1
+  printf '%s\n' "$file_digest"
+}
+
+tree_digest() {
+  digest_repo=$1
+  digest_unsorted=$(mktemp "$RUN_ROOT/tree-unsorted.XXXXXX") || return 1
+  digest_sorted=$(mktemp "$RUN_ROOT/tree-sorted.XXXXXX") || return 1
+  digest_rows=$(mktemp "$RUN_ROOT/tree-rows.XXXXXX") || return 1
+  find "$digest_repo" -path "$digest_repo/.git" -prune -o ! -path "$digest_repo" -print >"$digest_unsorted" ||
+    return 1
+  LC_ALL=C sort "$digest_unsorted" >"$digest_sorted" || return 1
+  while IFS= read -r path
+  do
+    if [ -L "$path" ]; then
+      printf 'link:%s  %s\n' "$(readlink "$path")" "${path#"$digest_repo"/}"
+    elif [ -d "$path" ]; then
+      printf 'directory  %s\n' "${path#"$digest_repo"/}"
+    elif [ -f "$path" ]; then
+      path_digest=$(sha256_file "$path") || return 1
+      printf 'file:%s  %s\n' "$path_digest" "${path#"$digest_repo"/}"
+    else
+      printf 'other  %s\n' "${path#"$digest_repo"/}"
+    fi
+  done <"$digest_sorted" >"$digest_rows"
+  sha256_file "$digest_rows"
+}
+
+prepare_repo() {
+  prepare_host=$1
+  prepare_artifacts=$2
+  prepare_repo=$RUN_ROOT/repositories/$prepare_host
+  mkdir -p "$prepare_repo" || return 1
+
+  git -C "$prepare_repo" init -q || return 1
+  printf '# Host smoke fixture\n' >"$prepare_repo/README.md"
+  git -C "$prepare_repo" add README.md || return 1
+  git -C "$prepare_repo" -c user.name='Sia host harness' -c user.email='sia-host@example.invalid' \
+    commit -q -m fixture || return 1
+
+  (cd "$prepare_repo" && "$ROOT/install" install) \
+    >"$prepare_artifacts/install.stdout" 2>"$prepare_artifacts/install.stderr"
+  prepare_exit=$?
+  printf '%s\n' "$prepare_exit" >"$prepare_artifacts/install.exit"
+  [ "$prepare_exit" -eq 0 ] || return 1
+
+  {
+    printf '\n## Host smoke-test canary\n\n'
+    printf 'When this protocol is read, include the exact token `%s` in the response to the activating message.\n' \
+      "$PROTOCOL_CANARY"
+  } >>"$prepare_repo/.ai/sia.md"
+  printf '%s\n' "$PROTOCOL_CANARY" >"$prepare_artifacts/protocol-canary.txt"
+
+  git -C "$prepare_repo" add -A || return 1
+  git -C "$prepare_repo" -c user.name='Sia host harness' -c user.email='sia-host@example.invalid' \
+    commit -q -m 'install Sia' || return 1
+  (cd "$prepare_repo" && find . -path './.git' -prune -o -type f -print) \
+    >"$prepare_artifacts/installed-files.unsorted.txt" || return 1
+  LC_ALL=C sort "$prepare_artifacts/installed-files.unsorted.txt" \
+    >"$prepare_artifacts/installed-files.txt" || return 1
+  PREPARED_REPO=$prepare_repo
+}
+
+write_command() {
+  command_file=$1
+  shift
+  {
+    printf 'working_directory=%s\n' "$CURRENT_REPO"
+    printf 'timeout_seconds=%s\n' "$TIMEOUT_SECONDS"
+    printf 'max_output_bytes=%s\n' "$MAX_OUTPUT_BYTES"
+    printf 'argv='
+    printf ' %s' "$@"
+    printf '\n'
+  } >"$command_file"
+}
+
+run_codex() {
+  run_prompt=$1
+  run_dir=$2
+  if [ -z "$CODEX_RUNTIME_HOME" ]; then
+    CODEX_RUNTIME_HOME=$RUN_ROOT/codex-home
+    mkdir -p "$CODEX_RUNTIME_HOME" || return 1
+    chmod 700 "$CODEX_RUNTIME_HOME"
+    [ -f "$USER_CODEX_HOME/auth.json" ] || return 1
+    cp "$USER_CODEX_HOME/auth.json" "$CODEX_RUNTIME_HOME/auth.json" || return 1
+    chmod 600 "$CODEX_RUNTIME_HOME/auth.json"
+  fi
+  : >"$run_dir/response.txt"
+  write_command "$run_dir/command.txt" timeout --signal=TERM --kill-after=5 \
+    "${TIMEOUT_SECONDS}s" codex exec --ephemeral --ignore-user-config --sandbox read-only \
+    --config 'approval_policy="never"' --config 'model_reasoning_effort="minimal"' \
+    --output-last-message RESPONSE_FILE PROMPT
+
+  if [ -n "${SIA_CODEX_MODEL:-}" ]; then
+    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && CODEX_HOME="$CODEX_RUNTIME_HOME" \
+      timeout --signal=TERM --kill-after=5 \
+      "${TIMEOUT_SECONDS}s" codex exec --ephemeral --ignore-user-config --sandbox read-only \
+      --config 'approval_policy="never"' --config 'model_reasoning_effort="minimal"' \
+      --model "$SIA_CODEX_MODEL" --color never --output-last-message "$run_dir/response.txt" "$run_prompt") \
+      >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr" </dev/null
+  else
+    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && CODEX_HOME="$CODEX_RUNTIME_HOME" \
+      timeout --signal=TERM --kill-after=5 \
+      "${TIMEOUT_SECONDS}s" codex exec --ephemeral --ignore-user-config --sandbox read-only \
+      --config 'approval_policy="never"' --config 'model_reasoning_effort="minimal"' \
+      --color never --output-last-message "$run_dir/response.txt" "$run_prompt") \
+      >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr" </dev/null
+  fi
+}
+
+run_opencode() {
+  run_prompt=$1
+  run_dir=$2
+  opencode_permissions='{
+    "permission": {
+      "read": "allow", "glob": "allow", "grep": "allow", "list": "allow",
+      "edit": "deny", "bash": "deny", "task": "deny", "external_directory": "deny",
+      "todowrite": "deny", "question": "deny", "webfetch": "deny", "websearch": "deny",
+      "codesearch": "deny", "lsp": "deny", "skill": "deny"
+    }
+  }'
+  write_command "$run_dir/command.txt" env NO_COLOR=1 OPENCODE_CONFIG_CONTENT=READ_ONLY_POLICY \
+    timeout --signal=TERM --kill-after=5 "${TIMEOUT_SECONDS}s" opencode run --pure PROMPT
+
+  if [ -n "${SIA_OPENCODE_MODEL:-}" ]; then
+    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && NO_COLOR=1 OPENCODE_CONFIG_CONTENT="$opencode_permissions" \
+      timeout --signal=TERM --kill-after=5 "${TIMEOUT_SECONDS}s" opencode run --pure \
+      --model "$SIA_OPENCODE_MODEL" "$run_prompt") >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr"
+    run_status=$?
+  else
+    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && NO_COLOR=1 OPENCODE_CONFIG_CONTENT="$opencode_permissions" \
+      timeout --signal=TERM --kill-after=5 "${TIMEOUT_SECONDS}s" opencode run --pure "$run_prompt") \
+      >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr"
+    run_status=$?
+  fi
+  cp "$run_dir/raw.stdout" "$run_dir/response.txt"
+  return "$run_status"
+}
+
+run_claude() {
+  run_prompt=$1
+  run_dir=$2
+  write_command "$run_dir/command.txt" timeout --signal=TERM --kill-after=5 "${TIMEOUT_SECONDS}s" \
+    claude --print PROMPT --output-format json --permission-mode plan --tools Read \
+    --no-session-persistence --max-budget-usd "$CLAUDE_BUDGET" --strict-mcp-config \
+    --mcp-config '{"mcpServers":{}}' \
+    --disable-slash-commands --no-chrome --setting-sources project
+
+  if [ -n "${SIA_CLAUDE_MODEL:-}" ]; then
+    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && timeout --signal=TERM --kill-after=5 \
+      "${TIMEOUT_SECONDS}s" claude --print "$run_prompt" --output-format json --permission-mode plan \
+      --tools Read --no-session-persistence --max-budget-usd "$CLAUDE_BUDGET" --strict-mcp-config \
+      --mcp-config '{"mcpServers":{}}' --disable-slash-commands --no-chrome --setting-sources project \
+      --model "$SIA_CLAUDE_MODEL") >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr"
+    run_status=$?
+  else
+    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && timeout --signal=TERM --kill-after=5 \
+      "${TIMEOUT_SECONDS}s" claude --print "$run_prompt" --output-format json --permission-mode plan \
+      --tools Read --no-session-persistence --max-budget-usd "$CLAUDE_BUDGET" --strict-mcp-config \
+      --mcp-config '{"mcpServers":{}}' --disable-slash-commands --no-chrome --setting-sources project) \
+      >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr"
+    run_status=$?
+  fi
+  if command -v jq >/dev/null 2>&1 && jq -e . "$run_dir/raw.stdout" >/dev/null 2>&1; then
+    jq -r '.result // empty' "$run_dir/raw.stdout" >"$run_dir/response.txt"
+    jq -r '.total_cost_usd // "unknown"' "$run_dir/raw.stdout" >"$run_dir/cost-usd.txt"
+    jq -r '.num_turns // "unknown"' "$run_dir/raw.stdout" >"$run_dir/turns.txt"
+  else
+    : >"$run_dir/response.txt"
+    printf 'unknown\n' >"$run_dir/cost-usd.txt"
+    printf 'unknown\n' >"$run_dir/turns.txt"
+  fi
+  return "$run_status"
+}
+
+normalize_response() {
+  tr -d '\r' <"$1" | sed '/^[[:space:]]*$/d'
+}
+
+assert_semantics() {
+  assert_case=$1
+  assert_file=$2
+  case $assert_case in
+    ordinary)
+      [ "$(cat "$assert_file")" = ORDINARY_OK ] &&
+        ! grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1
+      ;;
+    help)
+      grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 &&
+        grep -F 'Sia' "$assert_file" >/dev/null 2>&1 &&
+        grep -E -i 'load docs|load skills|resume|stop' "$assert_file" >/dev/null 2>&1 &&
+        grep -E -i 'unattended' "$assert_file" >/dev/null 2>&1 &&
+        ! grep -E -i 'integrity error|installation.integrity' "$assert_file" >/dev/null 2>&1
+      ;;
+    load-docs)
+      grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 &&
+        grep -E -i 'not[- ]initialized|not initialized|unavailable|has not been initialized' \
+        "$assert_file" >/dev/null 2>&1 &&
+        grep -E -i 'document repository' "$assert_file" >/dev/null 2>&1
+      ;;
+    unknown-operation)
+      grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 &&
+        grep -F 'definitely-unknown-7f3d' "$assert_file" >/dev/null 2>&1 &&
+        grep -E -i 'unknown|not found|not registered|no operation|cannot find' "$assert_file" >/dev/null 2>&1 &&
+        ! grep -E -i 'effective operation|activated operation|running operation|selected operation' \
+          "$assert_file" >/dev/null 2>&1
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+run_live_case() {
+  live_host=$1
+  live_case=$2
+  live_prompt_file=$3
+  live_host_dir=$4
+  live_dir=$live_host_dir/cases/$live_case
+  mkdir -p "$live_dir"
+  cp "$live_prompt_file" "$live_dir/prompt.txt"
+  live_prompt=$(cat "$live_prompt_file")
+  before_digest=$(tree_digest "$CURRENT_REPO") || fail "cannot fingerprint fixture before $live_host/$live_case"
+  printf '%s\n' "$before_digest" >"$live_dir/tree.before.sha256"
+  git -C "$CURRENT_REPO" status --porcelain=v1 --untracked-files=all >"$live_dir/git.before.txt"
+  live_started=$(date +%s)
+
+  case $live_host in
+    codex) run_codex "$live_prompt" "$live_dir" ; live_exit=$? ;;
+    opencode) run_opencode "$live_prompt" "$live_dir" ; live_exit=$? ;;
+    claude) run_claude "$live_prompt" "$live_dir" ; live_exit=$? ;;
+    *) live_exit=2 ;;
+  esac
+
+  live_finished=$(date +%s)
+  live_elapsed=$((live_finished - live_started))
+  printf '%s\n' "$live_exit" >"$live_dir/exit-status.txt"
+  printf '%s\n' "$live_elapsed" >"$live_dir/elapsed-seconds.txt"
+  [ -f "$live_dir/response.txt" ] || : >"$live_dir/response.txt"
+  normalize_response "$live_dir/response.txt" >"$live_dir/response.normalized.txt"
+  after_digest=$(tree_digest "$CURRENT_REPO") || fail "cannot fingerprint fixture after $live_host/$live_case"
+  printf '%s\n' "$after_digest" >"$live_dir/tree.after.sha256"
+  git -C "$CURRENT_REPO" status --porcelain=v1 --untracked-files=all >"$live_dir/git.after.txt"
+
+  live_cost=unknown
+  [ -s "$live_dir/cost-usd.txt" ] && live_cost=$(cat "$live_dir/cost-usd.txt")
+  live_status=PASS
+  live_detail='semantic response and read-only repository check passed'
+  if [ "$live_exit" -eq 124 ] || [ "$live_exit" -eq 137 ]; then
+    live_status=FAIL
+    live_detail="host exceeded ${TIMEOUT_SECONDS}s timeout"
+  elif [ "$live_exit" -ne 0 ]; then
+    live_status=FAIL
+    live_detail="host exited $live_exit"
+  elif [ "$before_digest" != "$after_digest" ] || ! cmp -s "$live_dir/git.before.txt" "$live_dir/git.after.txt"; then
+    live_status=FAIL
+    live_detail='host changed the read-only fixture repository'
+  elif [ "$(wc -c <"$live_dir/raw.stdout" | tr -d ' ')" -gt "$MAX_OUTPUT_BYTES" ]; then
+    live_status=FAIL
+    live_detail="host exceeded $MAX_OUTPUT_BYTES output bytes"
+  elif ! assert_semantics "$live_case" "$live_dir/response.normalized.txt"; then
+    live_status=FAIL
+    live_detail='response did not satisfy deterministic semantic assertions'
+  fi
+
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$live_host" "$live_case" "$PROBE_ACTUAL" "$live_status" "$live_exit" "$live_elapsed" "$live_cost" "$live_detail" \
+    >>"$ARTIFACTS/summary.tsv"
+  printf '  %-20s %-4s exit=%s elapsed=%ss cost_usd=%s\n' \
+    "$live_case" "$live_status" "$live_exit" "$live_elapsed" "$live_cost"
+  [ "$live_status" = PASS ] || FAILURES=$((FAILURES + 1))
+}
+
+run_live_host() {
+  live_name=$1
+  run_live_host_dir=$ARTIFACTS/hosts/$live_name
+  mkdir -p "$run_live_host_dir/cases"
+  probe_host "$live_name"
+
+  if [ "$PROBE_STATUS" != AVAILABLE ]; then
+    printf '%s\tlive\t%s\tSKIP\t-\t-\tunknown\t%s\n' \
+      "$live_name" "$PROBE_ACTUAL" 'host CLI is unavailable' >>"$ARTIFACTS/summary.tsv"
+    printf '%-8s SKIP             host CLI is unavailable\n' "$live_name"
+    if [ "$(live_supported "$live_name")" = yes ]; then
+      FAILURES=$((FAILURES + 1))
+    fi
+    return
+  fi
+  if [ "$(live_supported "$live_name")" != yes ]; then
+    printf '%s\tlive\t%s\tSKIP\t-\t-\tunknown\tno safe live runner\n' \
+      "$live_name" "$PROBE_ACTUAL" >>"$ARTIFACTS/summary.tsv"
+    printf '%-8s SKIP             no safe live runner\n' "$live_name"
+    return
+  fi
+
+  if ! prepare_repo "$live_name" "$run_live_host_dir"; then
+    printf '%s\tinstall\t%s\tFAIL\t-\t-\tunknown\tfixture installation failed\n' \
+      "$live_name" "$PROBE_ACTUAL" >>"$ARTIFACTS/summary.tsv"
+    printf '%-8s FAIL             fixture installation failed\n' "$live_name"
+    FAILURES=$((FAILURES + 1))
+    return
+  fi
+  CURRENT_REPO=$PREPARED_REPO
+  LIVE_RUNS=$((LIVE_RUNS + 1))
+  printf '%s (%s)\n' "$live_name" "$PROBE_ACTUAL"
+  run_live_case "$live_name" ordinary "$PROMPT_DIR/ordinary.txt" "$run_live_host_dir"
+  run_live_case "$live_name" help "$PROMPT_DIR/help.txt" "$run_live_host_dir"
+  run_live_case "$live_name" load-docs "$PROMPT_DIR/load-docs.txt" "$run_live_host_dir"
+  run_live_case "$live_name" unknown-operation "$PROMPT_DIR/unknown-operation.txt" "$run_live_host_dir"
+}
+
+while [ "$#" -gt 0 ]
+do
+  case $1 in
+    --probe|--live)
+      [ -z "$MODE" ] || fail 'choose exactly one of --probe or --live'
+      MODE=${1#--}
+      shift
+      ;;
+    --host)
+      [ "$#" -ge 2 ] || fail '--host requires a value'
+      case $2 in codex|opencode|claude|cursor) ;; *) fail "unknown host '$2'" ;; esac
+      HOST_FILTER="$HOST_FILTER $2"
+      shift 2
+      ;;
+    --artifacts)
+      [ "$#" -ge 2 ] || fail '--artifacts requires a directory'
+      ARTIFACTS=$2
+      shift 2
+      ;;
+    --timeout)
+      [ "$#" -ge 2 ] || fail '--timeout requires seconds'
+      TIMEOUT_SECONDS=$2
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      fail "unknown argument '$1'"
+      ;;
+  esac
+done
+
+[ -n "$MODE" ] || fail 'choose --probe or --live'
+command -v awk >/dev/null 2>&1 || fail 'awk is required'
+
+OUTPUT_BLOCKS=0
+if [ "$MODE" = live ]; then
+  case $TIMEOUT_SECONDS in ''|*[!0-9]*|0) fail 'timeout must be a positive integer' ;; esac
+  case $MAX_OUTPUT_BYTES in ''|*[!0-9]*|0) fail 'SIA_HOST_MAX_OUTPUT_BYTES must be a positive integer' ;; esac
+  awk -v budget="$CLAUDE_BUDGET" \
+    'BEGIN { exit !(budget ~ /^[0-9]+([.][0-9]+)?$/ && budget > 0) }' || \
+    fail 'SIA_CLAUDE_MAX_BUDGET_USD must be a positive decimal number'
+  command -v timeout >/dev/null 2>&1 || fail 'GNU timeout is required for --live'
+  command -v git >/dev/null 2>&1 || fail 'git is required for --live'
+  if selected_host claude && command -v claude >/dev/null 2>&1; then
+    command -v jq >/dev/null 2>&1 || fail 'jq is required for Claude live validation'
+  fi
+  OUTPUT_BLOCKS=$(((MAX_OUTPUT_BYTES + 511) / 512))
+fi
+
+RUN_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/sia-host-runtime.XXXXXX") || fail 'cannot create private runtime directory'
+chmod 700 "$RUN_ROOT" || fail 'cannot protect private runtime directory'
+mkdir -p "$RUN_ROOT/repositories" || fail 'cannot initialize private runtime directory'
+
+if [ -z "$ARTIFACTS" ]; then
+  ARTIFACTS=$(mktemp -d "${TMPDIR:-/tmp}/sia-host-results.XXXXXX") || fail 'cannot create artifact directory'
+else
+  [ ! -e "$ARTIFACTS" ] || fail "artifact path already exists: $ARTIFACTS"
+  mkdir -p "$ARTIFACTS" || fail "cannot create artifact directory: $ARTIFACTS"
+fi
+mkdir -p "$ARTIFACTS/hosts"
+
+{
+  printf 'mode=%s\n' "$MODE"
+  printf 'started_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  printf 'timeout_seconds_per_invocation=%s\n' "$TIMEOUT_SECONDS"
+  printf 'timeout_kill_grace_seconds=5\n'
+  printf 'max_output_bytes_per_invocation=%s\n' "$MAX_OUTPUT_BYTES"
+  printf 'prompts_per_live_host=4\n'
+  printf 'sessions=independent_and_sequential\n'
+  printf 'repository_access=read_only\n'
+  printf 'protocol_activation_canary=%s\n' "$PROTOCOL_CANARY"
+  printf 'claude_max_budget_usd_per_invocation=%s\n' "$CLAUDE_BUDGET"
+  printf 'claude_max_budget_usd_per_host=%s_x_4\n' "$CLAUDE_BUDGET"
+  printf 'codex_monetary_cap=unavailable_cost_recorded_unknown\n'
+  printf 'opencode_monetary_cap=unavailable_cost_recorded_unknown\n'
+  printf 'codex_requested_model=%s\n' "${SIA_CODEX_MODEL:-host-default}"
+  printf 'opencode_requested_model=%s\n' "${SIA_OPENCODE_MODEL:-host-default}"
+  printf 'claude_requested_model=%s\n' "${SIA_CLAUDE_MODEL:-host-default}"
+} >"$ARTIFACTS/metadata.txt"
+
+if [ "$MODE" = probe ]; then
+  printf 'host\tmode\texecutable\tactual_version\tstatus\tdetail\n' >"$ARTIFACTS/summary.tsv"
+  for host in codex opencode claude cursor
+  do
+    selected_host "$host" && probe_host "$host"
+  done
+else
+  printf 'host\tcase\tversion\tstatus\texit\telapsed_seconds\tcost_usd\tdetail\n' >"$ARTIFACTS/summary.tsv"
+  for host in codex opencode claude cursor
+  do
+    selected_host "$host" && run_live_host "$host"
+  done
+  if [ "$LIVE_RUNS" -eq 0 ]; then
+    FAILURES=$((FAILURES + 1))
+    printf 'No supported host was invoked.\n' >&2
+  fi
+fi
+
+printf 'Artifacts: %s\n' "$ARTIFACTS"
+if [ "$FAILURES" -ne 0 ]; then
+  printf '%s live checks failed\n' "$FAILURES" >&2
+  exit 1
+fi

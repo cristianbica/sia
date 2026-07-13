@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ -n "${SIA_HOST_SHIM_LOG:-}" ]; then
+  printf '%s %s\n' "${0##*/}" "$*" >>"$SIA_HOST_SHIM_LOG"
+fi
+
+if [ "${1:-}" = "--version" ]; then
+  printf '%s\n' '@VERSION@'
+  exit 0
+fi
+
+echo "version shim accepts only --version" >&2
+exit 99

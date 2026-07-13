@@ -1,29 +1,17 @@
 # Source repository layout
 
-The Sia source repository separates released, upgrade-owned payloads from create-once project seeds and bounded host
-bridges. This structure is the implementation target; directories appear as their stages are built.
+The source tree separates the two managed-refresh modes from create-once project seeds.
 
 ```text
 sia/
+  .gitattributes
   README.md
   install
-
-  docs/
-    README.md
-    product.md
-    protocol.md
-    repository-knowledge.md
-    extensions.md
-    orchestration.md
-    integration.md
-    implementation.md
-    source-layout.md
 
   src/
     managed/
       .ai/
         sia.md
-        VERSION
         skills/sia/<skill>/SKILL.md
         operations/sia/<operation>.md
         workflows/sia/<workflow>.md
@@ -45,40 +33,28 @@ sia/
       claude.block.md
 
   tests/
+    installer/{install,github}/
     behavior/
-      activation/
-      operations/
-      workflows/
-      model-routing/
-    installer/
-      install/
-      update/
-      check/
-      uninstall/
-      recovery/
-    fixtures/
-      empty-repo/
-      existing-agents/
-      existing-ai/
-      custom-definitions/
-      malformed-install/
+    hosts/
 
   scripts/
     verify
+    verify-hosts
 ```
 
-## Ownership mapping
+## Mapping source to a repository
 
-- `src/managed/.ai/` contains complete files installed and replaced by compatible upgrades.
-- `src/managed/catalogs/` contains only the marked SIA fragments inserted into mixed-ownership catalog indexes.
-- `src/seed/.ai/` contains create-if-missing files. After creation, `RULES.md`, the docs index, CUSTOM catalog content,
-  and all text outside managed catalog blocks are project-owned.
-- `src/bridges/` contains only the marked activation block for root `AGENTS.md` and the optional Claude compatibility
-  import block. Neither template is a complete host instruction file.
-- `.ai/.sia-manifest` is generated during installation and written last. It is never a checked-in source template.
-- Tests use repository fixtures rather than mutating this repository. `scripts/verify` runs formatting, source/catalog
-  synchronization, behavior, and installer checks.
+- `src/managed/.ai/` is copied over the corresponding Sia-owned installed paths on every install.
+- `src/managed/catalogs/` contains complete marker-delimited SIA sections inserted into mixed-ownership indexes.
+- `src/seed/.ai/` is copied only when a project file does not yet exist. Its files are project-owned afterwards.
+- `src/bridges/` contains marker-delimited blocks, never complete user instruction files.
+- `.gitattributes` keeps the shell entrypoint and managed text usable when a clone enables automatic line-ending
+  conversion.
+- `install` uses adjacent `src/` when run from a checkout. When read from standard input for installation, it
+  temporarily shallow-clones the current GitHub source and invokes that same script against the clone.
 
-Every shipped definition must have exactly one matching SIA catalog entry. Verification fails on missing entries,
-orphaned entries, normalized-name collisions, invalid references, or source files that would install outside the layout
-defined in [Tool integration and installation](integration.md).
+The repository does not generate a release payload, distribution directory, manifest, or installer checksum. The
+installer consumes these readable source files directly.
+
+Every shipped definition must have a matching SIA catalog entry. Verification checks that mapping, prompt contracts,
+installer ownership behavior, plain GitHub bootstrap behavior, and the no-model host harness.

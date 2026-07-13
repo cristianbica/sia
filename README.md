@@ -17,8 +17,8 @@ It requires no plugin, MCP server, database, or Sia runtime. The host coding age
 commands, and starts isolated workers when it supports them.
 
 > [!IMPORTANT]
-> Sia is currently a design and implementation specification. The installer and managed payload are not implemented
-> yet. Commands below define the intended interface and will become runnable as part of the first implementation stage.
+> Sia is an early release. Its source, prompt packages, installer, and deterministic verification are implemented.
+> Live host-model certification remains separate and is reported without treating an installed CLI as proof.
 
 ## Why Sia
 
@@ -29,37 +29,44 @@ knowledge close to the code and gives different host tools the same explicit voc
 Adoption is progressive: load only the docs index, load only the skills catalog, or invoke a complete operation. Normal
 host sessions remain normal until the user asks for Sia.
 
-## Installation (planned)
+## Installation
 
-The first release will provide one pinned command to run from the root of the repository Sia should support:
-
-```sh
-# Planned command shape — OWNER and VERSION are not runnable values.
-curl -fsSL https://github.com/OWNER/sia/releases/download/VERSION/install | sh -s -- install
-```
-
-`OWNER` is a temporary placeholder because this checkout has no public repository remote configured. Before the first
-release, the project will replace both placeholders with the canonical immutable release URL. The bootstrap will verify
-the pinned payload's published integrity metadata before changing the repository.
-
-The installer will target POSIX `sh` on Linux, macOS, and Windows through WSL. It will refuse installation from a
-repository subdirectory, preserve existing instructions and project-owned `.ai` content, and report every changed or
-conflicted path.
-
-The completed installer interface will also expose lifecycle commands:
+Run the readable installer from the root of the repository Sia should support:
 
 ```sh
-# Inspect the installation without changing it.
-curl -fsSL https://github.com/OWNER/sia/releases/download/VERSION/install | sh -s -- check
-
-# Update to the explicitly selected release.
-curl -fsSL https://github.com/OWNER/sia/releases/download/NEW_VERSION/install | sh -s -- update
-
-# Remove only unchanged Sia-owned files and managed blocks.
-curl -fsSL https://github.com/OWNER/sia/releases/download/VERSION/install | sh -s -- uninstall
+curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install | sh -s -- install
 ```
 
-The installer will not inspect application source or generate repository documentation.
+When read from standard input, `install` makes a shallow temporary clone of the current
+`https://github.com/cristianbica/sia.git` default branch, runs the same readable installer against its plain `src/`
+files, and removes the clone. Review the script at the URL above before executing it. `curl`, `git`, and POSIX `sh`
+are required.
+
+The installer does not detect or install Codex, OpenCode, Claude Code, or Cursor. It installs the small repository
+entrypoints for every supported host: root `AGENTS.md` serves Codex, OpenCode, and Cursor, while a Claude import bridge
+is added when needed. Unused entrypoints are inert.
+
+### Install from a source checkout
+
+To install from a local Sia checkout, run its installer from the target repository root:
+
+```sh
+/absolute/path/to/sia/install install
+```
+
+The installer targets POSIX `sh` on Linux and macOS. The verification workflow is configured for both platforms. WSL
+is an intended compatible environment but remains uncertified until the same suite is run there. Run it from the Git
+repository root. Re-run `install` to refresh Sia from current GitHub source:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install | sh -s -- install
+```
+
+The installer does not inspect application source or generate repository documentation.
+
+After installation, review `git diff` and commit the intended `.ai/`, `AGENTS.md`, and Claude bridge changes so the
+team receives the same Sia behavior. Decide separately whether `.ai/plans/` should be committed for shared handoffs or
+ignored as local task state.
 
 ## Quick start
 
@@ -97,10 +104,32 @@ Sia fix duplicate renewal charges
 Sia review the current branch
 Sia investigate intermittent webhook failures
 Sia document the billing area
+Sia refresh-docs billing
 ```
 
-An operation selects a workflow and the relevant skills. The delivery workflow plans first, stops for approval, builds
-the approved scope, independently reviews and validates it, fixes findings, and reports a read-only Ship result.
+An operation selects a workflow and the relevant skills. Interactive delivery plans first, stops for approval, builds
+the approved scope, reviews and validates it in a separate phase, fixes findings, and reports a product-read-only Ship
+result.
+The review uses an isolated worker when the host can provide one and reports a same-context fallback truthfully.
+
+### Run an operation unattended
+
+```text
+Sia unattended implement the restocking report
+```
+
+`unattended` is an exact modifier before the operation name. It gives upfront authorization for Sia workflow gates
+within the original request, so Sia persists and digests the plan, records automatic approval, and continues through
+Build, separate Review/Validate, and in-scope Fix cycles without asking questions. It uses conservative, reversible
+assumptions or returns a blocked result when it cannot proceed safely. It does not claim that the user reviewed the
+generated plan.
+
+The plan preserves an immutable authorization ceiling and explicit external-action list across replans and resume.
+A blocked resume retries only after its recorded condition changes; identical failures and Fix cycles are bounded.
+
+Unattended mode does not bypass host or system permissions, external approval interfaces, project rules, safety checks,
+or dirty-worktree safeguards. It does not imply permission to commit, push, open a pull request, release, publish,
+deploy, perform destructive work, or take other external actions unless the initial request explicitly includes them.
 
 If delivery continues in a fresh conversation or isolated worker, Sia persists the approved plan:
 
@@ -126,13 +155,13 @@ After installation, Sia keeps its repository-local state under `.ai/`:
 
 ```text
 .ai/
-  sia.md                 # canonical activation protocol
+  sia.md                 # canonical activation protocol; replaced by Sia installs
   RULES.md               # project-owned Sia constraints
   docs/                  # maintained repository knowledge
   skills/                # Sia and project skills
   operations/            # Sia and project operations
   workflows/             # Sia and project workflows
-  plans/                 # approved resumable delivery plans
+  plans/                 # approved or pre-authorized resumable delivery plans
 ```
 
 The installer also adds a bounded activation block to root `AGENTS.md`. When necessary, it adds a Claude compatibility
@@ -149,17 +178,17 @@ Projects can extend Sia without changing shipped definitions:
 - create workflows directly under `.ai/workflows/<name>.md`;
 - register project definitions in the `CUSTOM` section of the relevant `INDEX.md`.
 
-Sia will ship `create-skill`, `create-operation`, and `create-workflow` operations so definitions and catalog entries
-are created consistently. A valid project definition overrides a same-named shipped definition and Sia announces the
-override when it is selected.
+Sia ships `create-skill`, `create-operation`, `create-workflow`, and `reconcile-catalogs` so definitions and catalog
+entries are created consistently. A valid project definition overrides a same-named shipped definition and Sia
+announces the override when selected.
 
 ## Portability and model routing
 
 Sia uses the same prompt vocabulary and workflow semantics across target hosts. Native worker isolation and model
 selection remain host capabilities, not Sia requirements.
 
-Codex, OpenCode, Claude Code, and Cursor are v1 target hosts, not currently tested support claims. A versioned support
-matrix will name the exact host versions that pass activation, artifact, and gate fixtures.
+The dated [host matrix](docs/host-matrix.md) distinguishes CLI availability, no-model harness validation, and live
+semantic certification. Never interpret an installed CLI or passing shim as proof of model behavior.
 
 Workflows may request the advisory profiles `fast` or `reasoning`. The host chooses the actual model it can provide, and
 Sia records that model when the host reports it. An unavailable profile never changes approval gates, permissions, or
@@ -168,16 +197,17 @@ correctness requirements.
 ## Safety and ownership
 
 - Sia fails closed when its activation protocol is missing, invalid, or incompatible.
-- Installation preflights the full change set and refuses ambiguous ownership or concurrent changes.
-- Upgrades replace only unchanged Sia-owned files and marked blocks.
+- Re-running install replaces `.ai/sia.md` and the reserved `sia/` definition directories.
+- It replaces only marked Sia blocks in catalog indexes, `AGENTS.md`, and Claude compatibility instructions.
 - Repository docs, rules, plans, project definitions, and `CUSTOM` catalog content remain project-owned.
-- Ship is read-only unless the user explicitly requests a commit, push, pull request, release, publish, or deploy
-  action.
+- Unattended mode pre-authorizes only in-scope Sia gates, preserves its original ceiling, and bounds automatic retries.
+- Ship may close the active plan; product, source, and external state remain read-only unless the user explicitly
+  requests another delivery action.
 - Host system, developer, user, permission, and safety rules always remain authoritative.
 
 ## Project status and documentation
 
-The repository currently contains the design contracts that guide implementation:
+The repository contains the first usable implementation and its design contracts:
 
 - [Design and implementation index](docs/README.md)
 - [Product and principles](docs/product.md)
@@ -187,7 +217,25 @@ The repository currently contains the design contracts that guide implementation
 - [Orchestration and workflows](docs/orchestration.md)
 - [Tool integration and installation](docs/integration.md)
 - [Source repository layout](docs/source-layout.md)
+- [Host validation matrix](docs/host-matrix.md)
 - [Implementation and acceptance](docs/implementation.md)
 
-The first milestone is a small end-to-end slice: safe install, explicit activation, selective docs and skills, one
-documenting operation, and one approved delivery workflow that can resume in a fresh conversation.
+Run source, prompt-contract, installer ownership, GitHub-download, and no-model host-harness verification with:
+
+```sh
+scripts/verify
+```
+
+Probe installed host versions without invoking a model:
+
+```sh
+scripts/verify-hosts --probe
+```
+
+Live host tests are deliberately separate because they send the installed fixture and prompts to external model
+services. Explicitly authorized live host certification remains external evidence and is not claimed by the local
+deterministic suite.
+
+## License
+
+[MIT](LICENSE) © 2026 Cristian Bica.

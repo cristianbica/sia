@@ -1,10 +1,29 @@
 # Implementation and acceptance
 
-## Stage 1 — Smallest vertical slice
+## Current implementation status
+
+| Stage | Repository implementation | Remaining evidence |
+| --- | --- | --- |
+| 1 | Complete payload, activation bridges, catalogs, GitHub download, and safe install | Live host semantics |
+| 2 | Complete daily operations, read-only review/investigation, docs refresh, and supporting skills | Live dogfood |
+| 3 | Complete creators, definition workflow, reconciliation, and override contracts | More project usage |
+| 4 | Complete bounded handoffs, optional parallelism, fallbacks, and advisory routing | Live host semantics |
+| 5 | Small installer, download safety, probes, and context budgets | Public-URL smoke and live certification |
+
+`scripts/verify` covers deterministic local acceptance. `scripts/verify-hosts --probe` records CLI availability without
+calling a model. Live host and comparative value evaluation intentionally remain separate because they transfer fixture
+content to external model services; see [host-matrix.md](host-matrix.md).
+
+## Implemented delivery sequence
+
+The following stages record how the first implementation was intentionally sequenced. They are retained as capability
+and scope boundaries, not as an unfinished roadmap; the status table above names the evidence still outstanding.
+
+### Stage 1 — Smallest vertical slice
 
 Implement only enough to test the core product promise:
 
-- publish a proper root README with Sia's identity, pinned installation, quick-start examples, supported hosts,
+- publish a proper root README with Sia's identity, current GitHub installation, quick-start examples, supported hosts,
   opt-in behavior, installed layout, customization, safety, project status, and links to the detailed specification;
 - establish the source/payload boundaries in [source-layout.md](source-layout.md) and verify shipped catalog entries;
 - safe first install plus root `AGENTS.md` and Claude bridges;
@@ -15,26 +34,26 @@ Implement only enough to test the core product promise:
 - one `delivery` workflow, persisted plan contract, and manual fresh-conversation resumption;
 - `implement` plus a minimal `repository-discovery` and `testing` skill;
 - advisory `fast`/`reasoning` fields with truthful host fallback reporting;
-- semantic activation tests on the four target hosts.
+- deterministic activation contracts for all target entrypoints and live runners where safely available.
 
 Do not implement native spawning, parallelism, all creator operations, or the complete v1 catalog in this stage.
 
-## Stage 2 — Useful daily workflows
+### Stage 2 — Useful daily workflows
 
 - Add `fix`, `investigate`, and `review` operations.
 - Add investigation and review workflows plus `bug-triage` and `code-review` skills.
 - Add documentation refresh and freshness auditing.
-- Move documentation impact before final review and verify Ship remains read-only.
+- Move documentation impact before final review and keep product and external state read-only during Ship.
 - Dogfood representative changes with and without docs loaded.
 
-## Stage 3 — Project extensibility
+### Stage 3 — Project extensibility
 
 - Add `create-skill`, stabilize its schema through use, then generalize to `create-operation` and `create-workflow`.
 - Add the definition workflow and `reconcile-catalogs`.
 - Verify custom-over-Sia behavior, malformed override failure, and upgrade preservation.
 - Add further core skills only in response to repeated observed needs.
 
-## Stage 4 — Host-capability isolation and parallelism
+### Stage 4 — Host-capability isolation and parallelism
 
 - Add prompt-level guidance for worker spawning already exposed by a host; install no native agent, plugin, or worker
   package.
@@ -42,11 +61,11 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Add bounded parallel investigation and independent validation where supported.
 - Preserve manual artifact resumption and same-conversation fallback on every host.
 
-## Stage 5 — v1 hardening
+### Stage 5 — first-release hardening
 
-- Complete install/update/check/uninstall behavior and recovery cases.
-- Maintain a tested host/version matrix.
-- Run cross-platform path, line-ending, permission, symlink, collision, and interruption fixtures.
+- Keep installation limited to complete Sia-path replacement and marked-block replacement.
+- Maintain a dated host matrix whose observed versions are evidence rather than execution gates.
+- Run cross-platform path, marker, symlink, and GitHub-download fixtures.
 - Audit prompt size, duplicated policy, stale documentation behavior, and catalog consistency.
 
 ## Behavioral fixtures
@@ -56,12 +75,12 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - An ordinary prompt causes no Sia-directed `.ai/**` reads.
 - Casual mentions, wrong casing, and `Sia:` do not activate Sia.
 - Every valid invocation reads `.ai/sia.md` before any index or definition.
-- Missing, empty, unreadable, structurally invalid, or version-incompatible `.ai/sia.md` fails closed without
-  improvised Sia behavior.
+- Missing, empty, unreadable, or structurally invalid `.ai/sia.md` fails closed without improvised Sia behavior.
 - `RULES.md` loads for operations, resume, and workers, but not for docs-only or skills-only activation.
 - Loading docs or skills does not activate orchestration.
 - Missing docs produce the documenting-operation suggestion.
 - `Sia stop` stops future Sia-directed loading without claiming context erasure.
+- Only exact `Sia unattended <operation> [request]` syntax selects unattended execution; unsupported forms fail clearly.
 
 ### Catalogs
 
@@ -70,21 +89,31 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Malformed custom overrides fail rather than falling back.
 - Unindexed definitions remain undiscoverable until creation or reconciliation updates CUSTOM.
 - Missing workflow or skill references fail with exact repair guidance.
-- Reserved operation names and directives with extra or missing arguments fail clearly.
+- Reserved operation names, including `unattended`, and directives with extra or missing arguments fail clearly.
 - Operation aliases parse only from the documented metadata line and alias collisions fail before invocation.
 
 ### Artifacts and workflows
 
 - Source code is unchanged during Plan.
 - Build begins only after approval of the exact shipped delivery plan revision and digest.
+- Unattended delivery persists and digests the plan, records standing authorization, and never claims user review.
+- `execution_mode` is approval-controlled, propagates through handoffs, and is inherited by `Sia resume`.
+- Unattended authorization ceiling and external-action fields remain immutable across revisions and resume.
+- In-scope unattended replans auto-approve; outcome expansion, unsafe choices, or permission blockers return `blocked`.
 - Editing an approved plan resets approval.
+- Appending valid phase evidence outside the approval-controlled block does not invalidate approval.
+- Phase-boundary sequences are scoped to `plan_revision`; prior revisions remain historical evidence.
+- Malformed approval/evidence markers, metadata mismatch, or noncanonical digest verification prevent resume.
 - `Sia resume <approved-plan>` verifies approved content and enters the recorded delivery phase rather than replanning.
 - Phase handoffs name exact current definition paths; workers do not independently reroute through catalogs.
-- A Sia version change is reported but does not by itself invalidate an approved plan.
+- A refreshed Sia definition set does not by itself invalidate an approved plan.
 - Review uses the base/dirty-worktree baseline and does not attribute pre-existing changes to Sia.
 - Documentation changes are included before final review.
-- Fixes return to independent review; material changes return to Plan and Approve.
-- Ship performs no writes or external delivery actions by default.
+- Fixes return to a separate review phase, isolated when available; material changes return to Plan and Approve.
+- Unattended Fix and Review/Validate cycles continue without questions until completion or a genuine blocker.
+- Blocked resumes require a changed observable condition; retries and unattended Fix cycles are bounded.
+- Ship writes only plan completion state and performs no product or external delivery action by default.
+- Unattended mode never weakens host permissions, project safety, dirty-work safeguards, or external-action boundaries.
 
 ### Model routing
 
@@ -97,27 +126,28 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 
 ### Installer
 
-- The README's pinned install command runs successfully against a clean repository using the published release URL.
+- The README's GitHub install command downloads current source and runs successfully against a clean repository.
 - Every README command matches the installer's tested interface; unavailable features are labeled truthfully.
-- Release verification rejects README placeholders, moving install URLs, version drift, or untested installer commands.
+- Download failure or malformed downloaded source refuses before changing the target repository.
+- Local source installation and standard-input GitHub installation use the same small implementation.
 - README invocation examples conform to the activation grammar and remain covered by behavioral fixtures.
-- Existing repository instructions and project `.ai` content survive install, update, and uninstall.
-- Check performs no writes and reports stable exit results.
-- Modified owned content, malformed markers, symlinks, case collisions, or corrupt manifests fail safely.
-- Concurrent changes to root or Claude instruction files stop replacement and preserve the newer content.
-- The manifest excludes its own digest, validates structurally, and is written only after all other changes succeed.
-- Interrupted install/update reruns accept only the documented old-or-exact-target states and preserve project content.
+- Re-running install replaces only reserved Sia paths and marked Sia blocks.
+- Project rules, docs, plans, custom definitions, CUSTOM text, and surrounding instructions survive install and
+  refresh.
+- Malformed markers and symlinked top-level Sia directories fail clearly.
+- The installer does not implement manifests, content digests, transactional recovery, or historical-layout migration.
 - Shipped definitions and SIA catalog fragments stay synchronized with the source layout.
 
 ## Value evaluation
 
-Record the prompt, repository state, host, requested profile, actual model when reported, permissions, cache state,
-timeout, scope, and allowed paths. Control them where practical, but do not require exact model matching when routing is
-advisory. Evaluate these hypotheses separately:
+Record the prompt, execution mode, repository state, host, requested profile, actual model when reported, permissions,
+cache state, timeout, scope, and allowed paths. Control them where practical, but do not require exact model matching
+when routing is advisory. Evaluate these hypotheses separately:
 
 1. `Sia load docs` versus normal host behavior.
 2. A full Sia operation versus direct host behavior.
 3. Isolated review versus same-context review.
+4. Interactive delivery versus the same task invoked with the exact unattended modifier.
 
 Judge outcome correctness, scope, approval behavior, validation, recovery, changed paths, and unsupported claims before
 efficiency. Then track:
@@ -139,11 +169,13 @@ reductions alone are not success when plans become worse.
 - Startup awareness does not deliberately load `.ai/**` or activate Sia.
 - Repository documentation is evidence-linked, selectively loaded, and safely refreshed.
 - Custom definitions override shipped definitions deterministically and survive upgrades.
-- The shipped delivery workflow requires approval, artifact resumption, a separate review phase, and read-only Ship.
+- The shipped delivery workflow requires exact digested approval or unattended standing authorization, artifact
+  resumption, a separate review phase, and product-read-only Ship.
+- Unattended execution asks no Sia questions and stops blocked rather than expanding scope or weakening permissions.
 - Each run reports whether review used isolated, new-conversation, or same-conversation context.
 - Hosts without native worker isolation can complete every required workflow using persisted artifacts.
 - Unsupported model selection falls back truthfully without changing workflow semantics or permissions.
-- Installer ownership is narrow, digest-backed, recoverable, and non-destructive to project content.
+- Installer ownership is narrow, explicit, and non-destructive to project content outside reserved Sia paths and blocks.
 
 ## Deferred until evidence supports them
 
@@ -151,4 +183,4 @@ reductions alone are not success when plans become worse.
 - A large bundled skill or operation catalog.
 - Automatic semantic search, source indexing, or scheduled docs refresh.
 - A workflow DSL or enforcement runtime.
-- Broad migration support for unknown historical Sia/Orchestra layouts.
+- Broad migration support for unknown historical layouts.

@@ -31,7 +31,9 @@ category.
 - The frontmatter `name` must equal the directory or file basename.
 - Names are unqualified: consumers use `testing`, never `sia/testing`.
 - Case-folding or normalized-name collisions are errors on every platform.
-- Operation names `load`, `resume`, and `stop` are reserved by the protocol and cannot be created or cataloged.
+- The logical name `sia` is reserved for shipped-definition directories in every category.
+- Operation names and aliases `load`, `resume`, `handoff`, `stop`, and `unattended` are reserved by the protocol and
+  cannot be created or cataloged.
 
 ## Index contract
 
@@ -40,9 +42,9 @@ Each category index follows this form:
 ```markdown
 # Skills
 
+<!-- sia:skills:start -->
 ## SIA
 
-<!-- sia:skills:start -->
 - `testing` — Select and execute proportionate verification.
 <!-- sia:skills:end -->
 
@@ -63,11 +65,19 @@ Operation index aliases use an optional nested metadata line immediately after t
 
 The literal `aliases:` key and comma-separated code spans are the machine-readable syntax; other nested text is not
 alias metadata. Alias matching occurs only after the explicit `Sia` prefix. Aliases use the same normalized naming
-rules, cannot use reserved directive names, and must resolve to exactly one effective operation. Creation and
+rules, cannot use `sia` or reserved protocol names, and must resolve to exactly one effective operation. Creation and
 reconciliation operations validate alias collisions.
+
+If CUSTOM overrides an operation, alias metadata attached to that CUSTOM entry replaces the shipped aliases for the
+same logical name. Aliases are not inherited or merged: only aliases declared by the effective CUSTOM entry remain
+available, and declaring no aliases removes every shipped alias for that operation. This keeps the operation's custom
+invocation surface deliberate and makes catalog inspection sufficient to explain resolution.
 
 Indexes are the discovery registry; definition files are authoritative for behavior. An unindexed manual definition is
 not invokable until reconciliation. Creation operations create the definition and CUSTOM entry as one logical change.
+
+Project rules and definitions may narrow unattended execution or reject it for a task. They cannot activate it without
+the exact user modifier, broaden its authorization ceiling, skip required review, or treat it as a host permission.
 
 ## Override resolution
 
@@ -142,12 +152,10 @@ paths.
 `reconcile-catalogs` compares CUSTOM entries with project definitions and proposes targeted additions, removals, or
 repairs. It preserves valid custom descriptions and never rewrites SIA blocks.
 
-## Proposed v1 definitions
+## Shipped definitions
 
 - Operations: `implement`, `fix`, `review`, `investigate`, `document`, `refresh-docs`, the three creators, and
   `reconcile-catalogs`.
 - Workflows: `delivery`, `review`, `investigation`, `documentation`, and `definition`.
 - Initial skills: `repository-discovery`, `testing`, `bug-triage`, `code-review`, `documentation`, and
   `safe-refactoring`.
-
-The first vertical slice intentionally ships a smaller subset; see [implementation.md](implementation.md).

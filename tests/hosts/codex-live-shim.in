@@ -1,0 +1,80 @@
+#!/bin/sh
+
+if [ "${1:-}" = --version ]; then
+  echo 'codex-cli 0.144.1'
+  exit 0
+fi
+
+[ "${1:-}" = exec ] || exit 99
+shift
+output=
+prompt=
+has_ephemeral=false
+has_ignore_user_config=false
+has_read_only=false
+has_never_approval=false
+has_minimal_reasoning=false
+has_no_color=false
+while [ "$#" -gt 0 ]
+do
+  case $1 in
+    --output-last-message)
+      output=$2
+      shift 2
+      ;;
+    --ephemeral)
+      has_ephemeral=true
+      shift
+      ;;
+    --ignore-user-config)
+      has_ignore_user_config=true
+      shift
+      ;;
+    --sandbox)
+      [ "${2:-}" = read-only ] && has_read_only=true
+      shift 2
+      ;;
+    --config)
+      [ "${2:-}" = 'approval_policy="never"' ] && has_never_approval=true
+      [ "${2:-}" = 'model_reasoning_effort="minimal"' ] && has_minimal_reasoning=true
+      shift 2
+      ;;
+    --color)
+      [ "${2:-}" = never ] && has_no_color=true
+      shift 2
+      ;;
+    --model)
+      shift 2
+      ;;
+    --*)
+      shift
+      ;;
+    *)
+      prompt=$1
+      shift
+      ;;
+  esac
+done
+
+[ "$has_ephemeral" = true ] || exit 98
+[ "$has_ignore_user_config" = true ] || exit 97
+[ "$has_read_only" = true ] || exit 96
+[ "$has_never_approval" = true ] || exit 95
+[ "$has_minimal_reasoning" = true ] || exit 94
+[ "$has_no_color" = true ] || exit 93
+[ -n "$output" ] || exit 92
+
+case $prompt in
+  'Reply with exactly ORDINARY_OK and nothing else.') response=ORDINARY_OK ;;
+  Sia) response='SIA_PROTOCOL_CANARY_7F3D Sia help: load docs, load skills, unattended operations, resume, and stop.' ;;
+  'Sia load docs')
+    response='SIA_PROTOCOL_CANARY_7F3D Documentation is unavailable and not initialized. Run Sia document repository.'
+    ;;
+  'Sia definitely-unknown-7f3d')
+    response='SIA_PROTOCOL_CANARY_7F3D Unknown operation definitely-unknown-7f3d: it is not registered.'
+    ;;
+  *) response='unexpected prompt' ;;
+esac
+
+printf '%s\n' "$response" >"$output"
+printf '%s\n' "$response"

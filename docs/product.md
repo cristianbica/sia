@@ -28,6 +28,7 @@ rediscovery without losing correctness or trusting stale documentation.
 - Compose Sia-provided and project-provided skills, operations, and workflows.
 - Prefer isolated phase execution so rejected ideas and builder assumptions do not steer later phases.
 - Remain usable when the host cannot spawn an isolated worker.
+- Support explicitly unattended operations without weakening workflow artifacts, review, or safety boundaries.
 - Let projects extend Sia through Sia operations rather than manual framework surgery.
 
 ## Non-goals
@@ -75,6 +76,7 @@ It may compose several skills without duplicating their contents.
 - Only an activated Sia protocol, operation, workflow, and selected skills guide Sia behavior.
 - Custom definitions may replace shipped behavior deliberately, but Sia must announce an effective custom override.
 - No Sia definition may silently widen host permissions or authorize external actions.
+- Unattended execution may pre-authorize Sia-owned gates, but cannot bypass host approval interfaces or safety rules.
 
 ## Honest limits
 

@@ -1,0 +1,65 @@
+#!/bin/sh
+
+if [ "${1:-}" = --version ]; then
+  echo '2.1.207 (Claude Code)'
+  exit 0
+fi
+
+prompt=
+has_plan=false
+has_read=false
+has_budget=false
+has_project_settings=false
+while [ "$#" -gt 0 ]
+do
+  case $1 in
+    --print)
+      prompt=$2
+      shift 2
+      ;;
+    --permission-mode)
+      [ "${2:-}" = plan ] && has_plan=true
+      shift 2
+      ;;
+    --tools)
+      [ "${2:-}" = Read ] && has_read=true
+      shift 2
+      ;;
+    --max-budget-usd)
+      has_budget=true
+      shift 2
+      ;;
+    --setting-sources)
+      [ "${2:-}" = project ] && has_project_settings=true
+      shift 2
+      ;;
+    --output-format|--mcp-config|--model)
+      shift 2
+      ;;
+    --*)
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+[ "$has_plan" = true ] || exit 98
+[ "$has_read" = true ] || exit 97
+[ "$has_budget" = true ] || exit 96
+[ "$has_project_settings" = true ] || exit 95
+
+case $prompt in
+  'Reply with exactly ORDINARY_OK and nothing else.') response=ORDINARY_OK ;;
+  Sia) response='SIA_PROTOCOL_CANARY_7F3D Sia help: load docs, load skills, unattended operations, resume, and stop.' ;;
+  'Sia load docs')
+    response='SIA_PROTOCOL_CANARY_7F3D Documentation is unavailable and not initialized. Run Sia document repository.'
+    ;;
+  'Sia definitely-unknown-7f3d')
+    response='SIA_PROTOCOL_CANARY_7F3D Unknown operation definitely-unknown-7f3d: it is not registered.'
+    ;;
+  *) response='unexpected prompt' ;;
+esac
+
+printf '{"result":"%s","total_cost_usd":0,"num_turns":1}\n' "$response"
