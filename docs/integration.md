@@ -67,18 +67,20 @@ unknown content. Re-running install deliberately replaces the known Sia-owned pa
 Run the public command from a Git repository root:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install | sh -s -- install
+curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | sh
 ```
 
 The small bootstrap script shallow-clones the current default branch of `https://github.com/cristianbica/sia.git` into
 a temporary directory, invokes the same installer against its readable `src/` tree, and removes the clone. Local
 checkout use and standard-input use therefore apply the same source layout.
 
-Run the same `install` command again to refresh Sia. There is deliberately no uninstall command: the installer is a
+Run the same `install.sh` command again to refresh Sia. Set `SIA_REF` to an advertised branch or tag when standard-input
+installation should fetch a particular remote revision. A local source checkout installs its current files; do not ask
+the installer to switch that checkout's Git revision. There is deliberately no uninstall command: the installer is a
 small one-way synchronizer, not a lifecycle manager. Remove Sia only through an explicit project change when needed.
 
-For local development, run the checkout's `install` script from a target repository root. It reads the adjacent `src/`
-tree.
+For local development, run the checkout's `install.sh` script from a target repository root. It reads the adjacent
+`src/` tree. `SIA_SOURCE_DIR` can explicitly supply such a source tree when the script is read from standard input.
 
 ## Small, explicit safety boundary
 

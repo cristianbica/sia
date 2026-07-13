@@ -6,7 +6,7 @@ umask 022
 ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 . "$ROOT/tests/lib/test.sh"
 
-INSTALL=${SIA_INSTALL:-$ROOT/install}
+INSTALL=${SIA_INSTALL:-$ROOT/install.sh}
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/sia-installer.XXXXXX") || exit 1
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
@@ -19,7 +19,7 @@ new_repo() {
 run_install() {
   target=$1
   shift
-  (cd "$target" && "$INSTALL" install "$@") >/dev/null 2>&1
+  (cd "$target" && "$INSTALL" "$@") >/dev/null 2>&1
 }
 
 file_permissions() {
@@ -123,7 +123,7 @@ test_existing_claude_import_is_left_alone() {
 
 test_new_files_honor_restrictive_umask() {
   repo=$(new_repo) || return 1
-  (umask 077; cd "$repo" && "$INSTALL" install) >/dev/null 2>&1 || return 1
+  (umask 077; cd "$repo" && "$INSTALL") >/dev/null 2>&1 || return 1
   for path in AGENTS.md .claude/CLAUDE.md .ai/sia.md .ai/RULES.md .ai/docs/INDEX.md .ai/skills/INDEX.md; do
     assert_equal '-rw-------' "$(file_permissions "$repo/$path")" \
       "new repository file ignored restrictive umask: $path" || return 1
@@ -192,14 +192,14 @@ test_concurrent_install_lock_fails_without_writing() {
   [ -d "$repo/$git_dir/sia-install.lock" ] || fail 'refusal removed the active installer lock'
 }
 
-test_uninstall_is_not_a_supported_command() {
+test_arguments_are_not_supported() {
   repo=$(new_repo) || return 1
-  if (cd "$repo" && "$INSTALL" uninstall) >"$TMP_ROOT/uninstall.log" 2>&1; then
-    fail 'uninstall is still accepted'
+  if (cd "$repo" && "$INSTALL" install) >"$TMP_ROOT/arguments.log" 2>&1; then
+    fail 'installer accepted a command argument'
     return 1
   fi
-  assert_contains "$TMP_ROOT/uninstall.log" 'Usage: install [install]' || return 1
-  [ ! -e "$repo/.ai" ] || fail 'unsupported uninstall changed the repository'
+  assert_contains "$TMP_ROOT/arguments.log" 'Usage: install.sh' || return 1
+  [ ! -e "$repo/.ai" ] || fail 'unsupported command argument changed the repository'
 }
 
 run_case 'clean install creates Sia-owned files, shared blocks, and project seeds' \
@@ -214,6 +214,6 @@ run_case 'new repository files honor a restrictive umask' test_new_files_honor_r
 run_case 'malformed markers fail before Sia writes' test_malformed_blocks_refuse_before_installing
 run_case 'invalid create-once seed layouts fail before Sia writes' test_invalid_seed_layouts_fail_before_installing
 run_case 'a concurrent installer is refused before Sia writes' test_concurrent_install_lock_fails_without_writing
-run_case 'uninstall is not an installer command' test_uninstall_is_not_a_supported_command
+run_case 'installer accepts no command arguments' test_arguments_are_not_supported
 
 finish_tests

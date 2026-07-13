@@ -298,9 +298,10 @@ check_prompt_sizes() {
 }
 
 check_plain_github_install() {
-  assert_contains "$ROOT/install" 'https://github.com/cristianbica/sia.git' || return 1
-  assert_not_contains "$ROOT/install" 'decode_base64' || return 1
-  assert_contains "$ROOT/README.md" 'raw.githubusercontent.com/cristianbica/sia/HEAD/install'
+  assert_contains "$ROOT/install.sh" 'https://github.com/cristianbica/sia.git' || return 1
+  assert_contains "$ROOT/install.sh" 'SIA_REF' || return 1
+  assert_not_contains "$ROOT/install.sh" 'decode_base64' || return 1
+  assert_contains "$ROOT/README.md" 'raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh'
 }
 
 run_case "Markdown lines are at most 120 characters" check_markdown_width

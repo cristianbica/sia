@@ -34,10 +34,10 @@ host sessions remain normal until the user asks for Sia.
 Run the readable installer from the root of the repository Sia should support:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install | sh -s -- install
+curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | sh
 ```
 
-When read from standard input, `install` makes a shallow temporary clone of the current
+When read from standard input, `install.sh` makes a shallow temporary clone of the current
 `https://github.com/cristianbica/sia.git` default branch, runs the same readable installer against its plain `src/`
 files, and removes the clone. Review the script at the URL above before executing it. `curl`, `git`, and POSIX `sh`
 are required.
@@ -51,15 +51,22 @@ is added when needed. Unused entrypoints are inert.
 To install from a local Sia checkout, run its installer from the target repository root:
 
 ```sh
-/absolute/path/to/sia/install install
+/absolute/path/to/sia/install.sh
 ```
 
 The installer targets POSIX `sh` on Linux and macOS. WSL is an intended compatible environment but remains uncertified
-until the same suite is run there. Run it from the Git repository root. Re-run `install` to refresh Sia from current
+until the same suite is run there. Run it from the Git repository root. Re-run `install.sh` to refresh Sia from current
 GitHub source:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install | sh -s -- install
+curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | sh
+```
+
+To install a particular remote branch or tag, set `SIA_REF`; a local checkout always installs the files currently in
+that checkout:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | SIA_REF=v0.1.0 sh
 ```
 
 The installer does not inspect application source or generate repository documentation.

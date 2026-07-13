@@ -5,6 +5,7 @@
 set -eu
 
 GITHUB_URL=${SIA_GITHUB_URL:-https://github.com/cristianbica/sia.git}
+REF=${SIA_REF:-}
 SOURCE_DIR=${SIA_SOURCE_DIR:-}
 DOWNLOAD_ROOT=
 LOCK_DIR=
@@ -20,15 +21,19 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 fail() {
-  printf 'install: %s\n' "$*" >&2
+  printf 'install.sh: %s\n' "$*" >&2
   exit 1
 }
 
 usage() {
   cat <<EOF
-Usage: install [install]
+Usage: install.sh
 
-Re-run install to refresh Sia.
+Run from the Git repository that should receive Sia. Re-run to refresh it.
+
+Optional environment variables:
+  SIA_REF=<branch-or-tag>  Git ref to download when this script is read from standard input
+  SIA_SOURCE_DIR=<path>    Local Sia source root; its checked-out files are installed as-is
 EOF
 }
 
@@ -50,12 +55,18 @@ source_from_script() {
 
 download_source() {
   DOWNLOAD_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/sia.XXXXXX") || fail 'cannot create temporary directory'
-  printf 'Downloading Sia from %s\n' "$GITHUB_URL"
-  GIT_TERMINAL_PROMPT=0 git clone --depth 1 --quiet -- "$GITHUB_URL" "$DOWNLOAD_ROOT/source" </dev/null || \
-    fail 'cannot download Sia from GitHub'
-  [ -f "$DOWNLOAD_ROOT/source/install" ] || fail 'downloaded source has no install script'
+  if [ -n "$REF" ]; then
+    printf 'Downloading Sia from %s at %s\n' "$GITHUB_URL" "$REF"
+    GIT_TERMINAL_PROMPT=0 git clone --depth 1 --quiet --branch "$REF" -- "$GITHUB_URL" "$DOWNLOAD_ROOT/source" \
+      </dev/null || fail 'cannot download Sia from GitHub'
+  else
+    printf 'Downloading Sia from %s\n' "$GITHUB_URL"
+    GIT_TERMINAL_PROMPT=0 git clone --depth 1 --quiet -- "$GITHUB_URL" "$DOWNLOAD_ROOT/source" </dev/null || \
+      fail 'cannot download Sia from GitHub'
+  fi
+  [ -f "$DOWNLOAD_ROOT/source/install.sh" ] || fail 'downloaded source has no install script'
   [ -d "$DOWNLOAD_ROOT/source/src" ] || fail 'downloaded source has no src directory'
-  SIA_SOURCE_DIR="$DOWNLOAD_ROOT/source" sh "$DOWNLOAD_ROOT/source/install" install </dev/null
+  SIA_SOURCE_DIR="$DOWNLOAD_ROOT/source" sh "$DOWNLOAD_ROOT/source/install.sh" </dev/null
   exit $?
 }
 
@@ -308,14 +319,12 @@ install_sia() {
   printf '%s\n' 'Sia installed. Invoke it explicitly with: Sia load docs'
 }
 
-if [ "$#" -gt 0 ]; then
-  case $1 in
-    install) shift ;;
-    -h|--help) usage; exit 0 ;;
-    *) usage >&2; exit 2 ;;
-  esac
+if [ "${1:-}" = -h ] || [ "${1:-}" = --help ]; then
+  [ "$#" -eq 1 ] || { usage >&2; exit 2; }
+  usage
+  exit 0
 fi
-[ "$#" -eq 0 ] || fail "unknown argument: $1"
+[ "$#" -eq 0 ] || { usage >&2; exit 2; }
 
 repository_root
 [ -n "$SOURCE_DIR" ] || source_from_script || download_source

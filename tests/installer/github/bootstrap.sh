@@ -16,13 +16,13 @@ new_repo() {
 
 new_source_repo() {
   source_repo=$(mktemp -d "$TMP_ROOT/source.XXXXXX") || return 1
-  cp "$ROOT/install" "$source_repo/install" || return 1
+  cp "$ROOT/install.sh" "$source_repo/install.sh" || return 1
   cp "$ROOT/.gitattributes" "$source_repo/.gitattributes" || return 1
   cp -R "$ROOT/src" "$source_repo/src" || return 1
   git -C "$source_repo" init -q || return 1
   git -C "$source_repo" config user.name 'Sia Test' || return 1
   git -C "$source_repo" config user.email 'sia-test@example.invalid' || return 1
-  git -C "$source_repo" add .gitattributes install src || return 1
+  git -C "$source_repo" add .gitattributes install.sh src || return 1
   git -C "$source_repo" commit -qm 'Sia fixture' || return 1
   git -C "$source_repo" branch -M fixture-default || return 1
   printf '%s\n' "$source_repo"
@@ -42,7 +42,7 @@ test_stdin_install_downloads_and_cleans_up() {
   download_tmp=$TMP_ROOT/downloads
   mkdir -p "$download_tmp" || return 1
   (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
-    sh -s -- install <"$ROOT/install") >/dev/null 2>&1 || return 1
+    sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md" || return 1
   assert_nonempty "$repo/AGENTS.md" || return 1
   assert_downloads_cleaned "$download_tmp"
@@ -51,7 +51,7 @@ test_stdin_install_downloads_and_cleans_up() {
 test_clone_failure_writes_nothing() {
   repo=$(new_repo) || return 1
   if (cd "$repo" && SIA_GITHUB_URL="file://$TMP_ROOT/missing" \
-    sh -s -- install <"$ROOT/install") >"$TMP_ROOT/failure.log" 2>&1; then
+    sh -s <"$ROOT/install.sh") >"$TMP_ROOT/failure.log" 2>&1; then
     fail 'accepted a missing GitHub source'
     return 1
   fi
@@ -66,7 +66,7 @@ test_autocrlf_checkout_keeps_installer_payload_usable() {
   mkdir -p "$download_tmp" || return 1
   (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
     GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=true \
-    sh -s -- install <"$ROOT/install") >/dev/null 2>&1 || return 1
+    sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md" || return 1
   assert_nonempty "$repo/AGENTS.md" || return 1
   assert_downloads_cleaned "$download_tmp"
@@ -74,17 +74,17 @@ test_autocrlf_checkout_keeps_installer_payload_usable() {
 
 test_malformed_source_writes_nothing() {
   source_repo=$(mktemp -d "$TMP_ROOT/malformed.XXXXXX") || return 1
-  cp "$ROOT/install" "$source_repo/install" || return 1
+  cp "$ROOT/install.sh" "$source_repo/install.sh" || return 1
   git -C "$source_repo" init -q || return 1
   git -C "$source_repo" config user.name Test || return 1
   git -C "$source_repo" config user.email test@example.invalid || return 1
-  git -C "$source_repo" add install || return 1
+  git -C "$source_repo" add install.sh || return 1
   git -C "$source_repo" commit -qm malformed || return 1
   repo=$(new_repo) || return 1
   download_tmp=$TMP_ROOT/malformed-downloads
   mkdir -p "$download_tmp" || return 1
   if (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
-    sh -s -- install <"$ROOT/install") >"$TMP_ROOT/malformed.log" 2>&1; then
+    sh -s <"$ROOT/install.sh") >"$TMP_ROOT/malformed.log" 2>&1; then
     fail 'accepted a malformed GitHub source'
     return 1
   fi
@@ -102,7 +102,7 @@ test_incomplete_payload_writes_nothing() {
   download_tmp=$TMP_ROOT/incomplete-downloads
   mkdir -p "$download_tmp" || return 1
   if (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
-    sh -s -- install <"$ROOT/install") >"$TMP_ROOT/incomplete.log" 2>&1; then
+    sh -s <"$ROOT/install.sh") >"$TMP_ROOT/incomplete.log" 2>&1; then
     fail 'accepted an incomplete Sia payload'
     return 1
   fi
@@ -121,7 +121,7 @@ test_invalid_payload_type_writes_nothing() {
   download_tmp=$TMP_ROOT/invalid-type-downloads
   mkdir -p "$download_tmp" || return 1
   if (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
-    sh -s -- install <"$ROOT/install") >"$TMP_ROOT/invalid-type.log" 2>&1; then
+    sh -s <"$ROOT/install.sh") >"$TMP_ROOT/invalid-type.log" 2>&1; then
     fail 'accepted an invalid Sia source type'
     return 1
   fi
@@ -132,15 +132,34 @@ test_invalid_payload_type_writes_nothing() {
 
 test_local_checkout_never_downloads() {
   repo=$(new_repo) || return 1
-  (cd "$repo" && SIA_GITHUB_URL="file://$TMP_ROOT/missing" "$ROOT/install" install) \
+  (cd "$repo" && SIA_GITHUB_URL="file://$TMP_ROOT/missing" "$ROOT/install.sh") \
     >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md"
 }
 
+test_ref_install_uses_requested_remote_ref() {
+  source_repo=$(new_source_repo) || return 1
+  git -C "$source_repo" branch fixture-ref || return 1
+  printf '\nREF-SENTINEL\n' >>"$source_repo/src/managed/.ai/sia.md"
+  git -C "$source_repo" add src/managed/.ai/sia.md || return 1
+  git -C "$source_repo" commit -qm 'default-branch change' || return 1
+  repo=$(new_repo) || return 1
+  (cd "$repo" && SIA_GITHUB_URL="file://$source_repo" SIA_REF=fixture-ref \
+    sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
+  assert_not_contains "$repo/.ai/sia.md" 'REF-SENTINEL'
+}
+
+test_explicit_source_dir_never_downloads() {
+  repo=$(new_repo) || return 1
+  (cd "$repo" && SIA_GITHUB_URL="file://$TMP_ROOT/missing" SIA_SOURCE_DIR="$ROOT" \
+    sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
+  assert_nonempty "$repo/.ai/sia.md"
+}
+
 test_bootstrap_is_plain_github_source() {
-  assert_contains "$ROOT/install" 'https://github.com/cristianbica/sia.git' || return 1
-  assert_contains "$ROOT/install" 'git clone --depth 1 --quiet --' || return 1
-  assert_not_contains "$ROOT/install" 'decode_base64'
+  assert_contains "$ROOT/install.sh" 'https://github.com/cristianbica/sia.git' || return 1
+  assert_contains "$ROOT/install.sh" 'git clone --depth 1 --quiet --branch' || return 1
+  assert_not_contains "$ROOT/install.sh" 'decode_base64'
 }
 
 run_case 'stdin install downloads a shallow GitHub source and cleans it up' test_stdin_install_downloads_and_cleans_up
@@ -151,6 +170,8 @@ run_case 'malformed GitHub source changes nothing' test_malformed_source_writes_
 run_case 'incomplete GitHub payload changes nothing' test_incomplete_payload_writes_nothing
 run_case 'invalid GitHub payload types change nothing' test_invalid_payload_type_writes_nothing
 run_case 'local checkout install never downloads GitHub' test_local_checkout_never_downloads
+run_case 'remote ref selects the requested Git branch' test_ref_install_uses_requested_remote_ref
+run_case 'explicit source directory never downloads GitHub' test_explicit_source_dir_never_downloads
 run_case 'bootstrap names a plain GitHub source and embeds no payload' test_bootstrap_is_plain_github_source
 
 finish_tests

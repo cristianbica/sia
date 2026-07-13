@@ -6,7 +6,7 @@ The source tree separates the two managed-refresh modes from create-once project
 sia/
   .gitattributes
   README.md
-  install
+  install.sh
 
   src/
     managed/
@@ -50,7 +50,7 @@ sia/
 - `src/bridges/` contains marker-delimited blocks, never complete user instruction files.
 - `.gitattributes` keeps the shell entrypoint and managed text usable when a clone enables automatic line-ending
   conversion.
-- `install` uses adjacent `src/` when run from a checkout. When read from standard input for installation, it
+- `install.sh` uses adjacent `src/` when run from a checkout. When read from standard input for installation, it
   temporarily shallow-clones the current GitHub source and invokes that same script against the clone.
 
 The repository does not generate a release payload, distribution directory, manifest, or installer checksum. The

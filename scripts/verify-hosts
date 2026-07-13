@@ -176,7 +176,7 @@ prepare_repo() {
   git -C "$prepare_repo" -c user.name='Sia host harness' -c user.email='sia-host@example.invalid' \
     commit -q -m fixture || return 1
 
-  (cd "$prepare_repo" && "$ROOT/install" install) \
+  (cd "$prepare_repo" && "$ROOT/install.sh") \
     >"$prepare_artifacts/install.stdout" 2>"$prepare_artifacts/install.stderr"
   prepare_exit=$?
   printf '%s\n' "$prepare_exit" >"$prepare_artifacts/install.exit"
