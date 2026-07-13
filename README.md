@@ -54,9 +54,9 @@ To install from a local Sia checkout, run its installer from the target reposito
 /absolute/path/to/sia/install install
 ```
 
-The installer targets POSIX `sh` on Linux and macOS. The verification workflow is configured for both platforms. WSL
-is an intended compatible environment but remains uncertified until the same suite is run there. Run it from the Git
-repository root. Re-run `install` to refresh Sia from current GitHub source:
+The installer targets POSIX `sh` on Linux and macOS. WSL is an intended compatible environment but remains uncertified
+until the same suite is run there. Run it from the Git repository root. Re-run `install` to refresh Sia from current
+GitHub source:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install | sh -s -- install
