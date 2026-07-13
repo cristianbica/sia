@@ -24,6 +24,8 @@
 Project operations registered here override same-named Sia operations. Place each definition at
 `.ai/operations/<name>.md`. Use this entry form; omit the second line when the operation has no aliases:
 
+- `benchmark` — Compare current Sia with a hidden actual implementation and one optional comparator.
+
 ```markdown
 - `name` — Description.
   - aliases: `one`, `two`

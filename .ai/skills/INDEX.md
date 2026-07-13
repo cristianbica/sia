@@ -16,6 +16,8 @@
 Project skills registered here override same-named Sia skills. Place each definition at
 `.ai/skills/<name>/SKILL.md` and use this entry form:
 
+- `benchmark` — Design and evaluate clean-room coding-agent benchmarks against hidden actual implementations.
+
 ```markdown
 - `name` — Description.
 ```

@@ -1,0 +1,190 @@
+schema: sia-benchmark-corpus-1
+name: initial-diverse-ruby-go
+status: frozen-pins-pending-setup-validation
+created: "2026-07-13"
+
+policy:
+  one_task_per_repository: true
+  actual_required: true
+  actual_hidden_from_candidates: true
+  current_sia_is_primary_candidate: true
+  comparator: omitted-or-vanilla-or-one-sia-ref
+  rails_application_database: sqlite-only
+  external_runtime_services: []
+  candidate_prompt_must_exclude:
+    - source_url
+    - actual_revision
+    - evaluator_oracle
+    - other_candidate_workspace
+    - sibling_solution
+    - later_git_objects
+
+execution_defaults:
+  workspace_root: /tmp/sia-benchmark/<run-id>/
+  timeout_minutes: 30
+  tools: [codex, claude]
+  model: host-default-when-omitted
+  model_profile: advisory-only
+  setup_cost_reported_separately: true
+  sia_candidate_bootstrap: Sia document repository
+  network_approval: required
+  dependency_install_approval: required
+  model_approval: required
+  cleanup_approval: required
+
+# `actual_revision`, `source_url`, and `evaluator` are coordinator-only fields. Do not pass them to candidates.
+tasks:
+  - id: community-foundation-allocation-summary
+    difficulty: medium
+    category: cross-layer-rails-feature
+    repository: rubyforgood/community_foundation
+    source_url: https://github.com/rubyforgood/community_foundation/pull/70
+    base_revision: 2d41feed93591eaa5a49d8d109bde91ecd5e248c
+    actual_revision: 23d638e072e140fbccae7ec4785d64baf25261b6
+    task_prompt: tasks/community-foundation-allocation-summary.md
+    language: ruby
+    framework: rails
+    runtime: ruby-4.0.2-and-rails-8.1
+    database: sqlite
+    external_services: []
+    prerequisites:
+      - ruby 4.0.2
+      - libvips
+    timeout_minutes: 40
+    setup:
+      - bin/setup --skip-server
+    checks:
+      - bin/rails test test/models/allocation/one_time_test.rb test/models/allocation/ongoing_test.rb
+      - bin/rails test
+    evaluator:
+      method: task-contract-plus-checks
+      oracle: actual_revision
+
+  - id: globalid-per-class-app
+    difficulty: medium
+    category: rails-ecosystem-feature
+    repository: rails/globalid
+    source_url: https://github.com/rails/globalid/pull/208
+    base_revision: c81267b4ca2eb41aa1d39178e281fbf38b6e5685
+    actual_revision: c6c7ac61ff17e7af5df89352c6bd934c89e88975
+    task_prompt: tasks/globalid-per-class-app.md
+    language: ruby
+    framework: rails-library
+    runtime: repository-declared-ruby
+    external_services: []
+    timeout_minutes: 20
+    setup:
+      - bundle install
+    checks:
+      - bundle exec rake test
+    evaluator:
+      method: task-contract-plus-checks
+      oracle: actual_revision
+
+  - id: dry-monads-right-biased-or
+    difficulty: light
+    category: ruby-feature
+    repository: dry-rb/dry-monads
+    source_url: https://github.com/dry-rb/dry-monads/pull/153
+    base_revision: db31ca5242a3d68e27cd5f16fd60e95aa85df589
+    actual_revision: 22fe1e7bc850bab02a5019fa5464191571c7185a
+    task_prompt: tasks/dry-monads-right-biased-or.md
+    language: ruby
+    framework: ruby-library
+    runtime: repository-declared-ruby
+    external_services: []
+    timeout_minutes: 20
+    setup:
+      - bundle install
+    checks:
+      - bundle exec rspec spec/unit/maybe_spec.rb spec/unit/result_spec.rb
+      - bundle exec rspec
+    evaluator:
+      method: task-contract-plus-checks
+      oracle: actual_revision
+
+  - id: rake-direct-loader-options
+    difficulty: light
+    category: bugfix
+    repository: ruby/rake
+    source_url: https://github.com/ruby/rake/pull/746
+    base_revision: f7e9df5ac0ebae1c4c46383ead9d963dfec1b57f
+    actual_revision: 3ec8c35c64187501c01c85e8980d74caea62546e
+    task_prompt: tasks/rake-direct-loader-options.md
+    language: ruby
+    framework: ruby-library
+    runtime: repository-declared-ruby
+    external_services: []
+    timeout_minutes: 20
+    setup:
+      - bundle install
+    checks:
+      - bundle exec rake test
+    evaluator:
+      method: task-contract-plus-checks
+      oracle: actual_revision
+
+  - id: faraday-stubs-clear
+    difficulty: medium
+    category: ruby-library-feature
+    repository: lostisland/faraday
+    source_url: https://github.com/lostisland/faraday/pull/1675
+    base_revision: 469f25c793f25bcfdd416a54edeb454d045c08d6
+    actual_revision: 329484e09248a2bac99eb67c6b45ca50abaadd8f
+    task_prompt: tasks/faraday-stubs-clear.md
+    language: ruby
+    framework: ruby-library
+    runtime: repository-declared-ruby
+    external_services: []
+    timeout_minutes: 20
+    setup:
+      - bundle install
+    checks:
+      - bundle exec rspec spec/faraday/adapter/test_spec.rb
+      - bundle exec rspec
+    evaluator:
+      method: task-contract-plus-checks
+      oracle: actual_revision
+
+  - id: irb-history-test-setup
+    difficulty: medium
+    category: refactor
+    repository: ruby/irb
+    source_url: https://github.com/ruby/irb/pull/1220
+    base_revision: 30036fc12cbe8a3cee9f3456ef0693a701cd37b2
+    actual_revision: d52a03298c623f1c7daa7c280351e893d8a77944
+    task_prompt: tasks/irb-history-test-setup.md
+    language: ruby
+    framework: ruby-library
+    runtime: repository-declared-ruby
+    external_services: []
+    timeout_minutes: 20
+    setup:
+      - bundle install
+      - env WITH_LATEST_RELINE=false bundle exec rake test
+    checks:
+      - env WITH_LATEST_RELINE=false bundle exec rake test
+    evaluator:
+      method: task-contract-plus-checks
+      oracle: actual_revision
+
+  - id: go-chi-no-color-panic
+    difficulty: light
+    category: go-bugfix
+    repository: go-chi/chi
+    source_url: https://github.com/go-chi/chi/pull/1050
+    base_revision: 903cff2596eac0f72538ac46d696058351f1c3fb
+    actual_revision: 988cc0f8cc17ed99864a1d2f0a8f8cb779417867
+    task_prompt: tasks/go-chi-no-color-panic.md
+    language: go
+    framework: go-library
+    runtime: go-1.22-or-newer
+    external_services: []
+    timeout_minutes: 20
+    setup:
+      - go mod download
+    checks:
+      - go test ./...
+    evaluator:
+      method: task-contract-plus-checks
+      oracle: actual_revision

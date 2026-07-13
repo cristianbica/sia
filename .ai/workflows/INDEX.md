@@ -15,6 +15,8 @@
 Project workflows registered here override same-named Sia workflows. Place each definition at
 `.ai/workflows/<name>.md` and use this entry form:
 
+- `benchmark` — Compare current Sia with a hidden actual implementation and one optional comparator.
+
 ```markdown
 - `name` — Description.
 ```
