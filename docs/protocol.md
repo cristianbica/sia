@@ -93,8 +93,9 @@ approved only while it remains a faithful interpretation of the original outcome
 cycles remain required.
 
 For delivery, persist `execution_mode: unattended`, an immutable `authorization_ceiling`, and the exact
-`authorized_external_actions` in frontmatter and approval-controlled content. Compute the revision and digest before
-Build. Automatic approval identifies the plan bytes accepted under standing authorization; it does not prove user
+`authorized_external_actions` in frontmatter and approval-controlled content. Sia computes and verifies the revision
+and digest before Build; an interactive user approves the displayed draft in plain language and never supplies a
+digest. Automatic approval identifies the plan bytes accepted under standing authorization; it does not prove user
 review. Handoffs carry the same fields, and `Sia resume <approved-plan>` inherits them.
 
 Unattended mode never expands host permissions, bypasses system or external approval interfaces, weakens project rules

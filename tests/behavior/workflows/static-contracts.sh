@@ -45,7 +45,8 @@ check_unattended_delivery() {
   assert_contains "$DELIVERY" 'plan_revision: 1' || return 1
   assert_contains "$DELIVERY" 'authorization_source: explicit-user' || return 1
   assert_contains "$DELIVERY" 'up-front unattended authorization' || return 1
-  assert_contains "$DELIVERY" 'exact plan revision and digest' || return 1
+  assert_contains "$DELIVERY" 'plain-language approval' || return 1
+  assert_contains "$DELIVERY" 'Never ask the user to copy, repeat, inspect, or compare a digest' || return 1
   assert_contains "$DELIVERY" 'Review/Validate' || return 1
   assert_contains "$DELIVERY" 'blocks instead of asking' || return 1
   assert_contains "$DELIVERY" 'host permissions or external actions' || return 1

@@ -95,7 +95,8 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 ### Artifacts and workflows
 
 - Source code is unchanged during Plan.
-- Build begins only after approval of the exact shipped delivery plan revision and digest.
+- Build begins only after plain-language approval of the displayed delivery plan; Sia itself binds it to the stored
+  revision and digest.
 - Unattended delivery persists and digests the plan, records standing authorization, and never claims user review.
 - `execution_mode` is approval-controlled, propagates through handoffs, and is inherited by `Sia resume`.
 - Unattended authorization ceiling and external-action fields remain immutable across revisions and resume.
@@ -169,8 +170,8 @@ reductions alone are not success when plans become worse.
 - Startup awareness does not deliberately load `.ai/**` or activate Sia.
 - Repository documentation is evidence-linked, selectively loaded, and safely refreshed.
 - Custom definitions override shipped definitions deterministically and survive upgrades.
-- The shipped delivery workflow requires exact digested approval or unattended standing authorization, artifact
-  resumption, a separate review phase, and product-read-only Ship.
+- The shipped delivery workflow requires plain-language approval bound internally to the displayed plan or unattended
+  standing authorization, artifact resumption, a separate review phase, and product-read-only Ship.
 - Unattended execution asks no Sia questions and stops blocked rather than expanding scope or weakening permissions.
 - Each run reports whether review used isolated, new-conversation, or same-conversation context.
 - Hosts without native worker isolation can complete every required workflow using persisted artifacts.

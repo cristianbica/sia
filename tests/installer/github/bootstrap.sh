@@ -41,7 +41,7 @@ test_stdin_install_downloads_and_cleans_up() {
   repo=$(new_repo) || return 1
   download_tmp=$TMP_ROOT/downloads
   mkdir -p "$download_tmp" || return 1
-  (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
+  (cd "$repo" && TMPDIR="$download_tmp" GITHUB_URL="file://$source_repo" \
     sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md" || return 1
   assert_nonempty "$repo/AGENTS.md" || return 1
@@ -50,7 +50,7 @@ test_stdin_install_downloads_and_cleans_up() {
 
 test_clone_failure_writes_nothing() {
   repo=$(new_repo) || return 1
-  if (cd "$repo" && SIA_GITHUB_URL="file://$TMP_ROOT/missing" \
+  if (cd "$repo" && GITHUB_URL="file://$TMP_ROOT/missing" \
     sh -s <"$ROOT/install.sh") >"$TMP_ROOT/failure.log" 2>&1; then
     fail 'accepted a missing GitHub source'
     return 1
@@ -64,7 +64,7 @@ test_autocrlf_checkout_keeps_installer_payload_usable() {
   repo=$(new_repo) || return 1
   download_tmp=$TMP_ROOT/autocrlf-downloads
   mkdir -p "$download_tmp" || return 1
-  (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
+  (cd "$repo" && TMPDIR="$download_tmp" GITHUB_URL="file://$source_repo" \
     GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=true \
     sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md" || return 1
@@ -83,7 +83,7 @@ test_malformed_source_writes_nothing() {
   repo=$(new_repo) || return 1
   download_tmp=$TMP_ROOT/malformed-downloads
   mkdir -p "$download_tmp" || return 1
-  if (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
+  if (cd "$repo" && TMPDIR="$download_tmp" GITHUB_URL="file://$source_repo" \
     sh -s <"$ROOT/install.sh") >"$TMP_ROOT/malformed.log" 2>&1; then
     fail 'accepted a malformed GitHub source'
     return 1
@@ -101,7 +101,7 @@ test_incomplete_payload_writes_nothing() {
   repo=$(new_repo) || return 1
   download_tmp=$TMP_ROOT/incomplete-downloads
   mkdir -p "$download_tmp" || return 1
-  if (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
+  if (cd "$repo" && TMPDIR="$download_tmp" GITHUB_URL="file://$source_repo" \
     sh -s <"$ROOT/install.sh") >"$TMP_ROOT/incomplete.log" 2>&1; then
     fail 'accepted an incomplete Sia payload'
     return 1
@@ -120,7 +120,7 @@ test_invalid_payload_type_writes_nothing() {
   repo=$(new_repo) || return 1
   download_tmp=$TMP_ROOT/invalid-type-downloads
   mkdir -p "$download_tmp" || return 1
-  if (cd "$repo" && TMPDIR="$download_tmp" SIA_GITHUB_URL="file://$source_repo" \
+  if (cd "$repo" && TMPDIR="$download_tmp" GITHUB_URL="file://$source_repo" \
     sh -s <"$ROOT/install.sh") >"$TMP_ROOT/invalid-type.log" 2>&1; then
     fail 'accepted an invalid Sia source type'
     return 1
@@ -132,7 +132,7 @@ test_invalid_payload_type_writes_nothing() {
 
 test_local_checkout_never_downloads() {
   repo=$(new_repo) || return 1
-  (cd "$repo" && SIA_GITHUB_URL="file://$TMP_ROOT/missing" "$ROOT/install.sh") \
+  (cd "$repo" && GITHUB_URL="file://$TMP_ROOT/missing" "$ROOT/install.sh") \
     >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md"
 }
@@ -144,14 +144,14 @@ test_ref_install_uses_requested_remote_ref() {
   git -C "$source_repo" add src/managed/.ai/sia.md || return 1
   git -C "$source_repo" commit -qm 'default-branch change' || return 1
   repo=$(new_repo) || return 1
-  (cd "$repo" && SIA_GITHUB_URL="file://$source_repo" SIA_REF=fixture-ref \
+  (cd "$repo" && GITHUB_URL="file://$source_repo" REF=fixture-ref \
     sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_not_contains "$repo/.ai/sia.md" 'REF-SENTINEL'
 }
 
 test_explicit_source_dir_never_downloads() {
   repo=$(new_repo) || return 1
-  (cd "$repo" && SIA_GITHUB_URL="file://$TMP_ROOT/missing" SIA_SOURCE_DIR="$ROOT" \
+  (cd "$repo" && GITHUB_URL="file://$TMP_ROOT/missing" SOURCE_DIR="$ROOT" \
     sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md"
 }

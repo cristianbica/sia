@@ -152,9 +152,13 @@ CRLF to LF, excluding a UTF-8 BOM, and ensuring exactly one final LF. The marker
 Refuse missing, duplicate, nested, reversed, or malformed marker pairs. Changing approved content resets status to
 `draft`, clears approval, increments the revision in frontmatter and the approval block, and returns to approval.
 
-In interactive mode, approval waits for the user to accept the exact revision and digest. In unattended mode, Sia may
-record automatic approval immediately after persisting and verifying them. A material replan may be revised, digested,
-and automatically approved only when it remains within the original requested outcome. Otherwise, return `blocked`.
+In interactive mode, Sia presents the current draft's outcome, scope, non-goals, criteria, validation, risks, and plan
+path/revision, then accepts a plain-language approval such as `approved` or `go ahead`. The digest is an internal
+integrity check: Sia computes, records, and verifies it; it never asks the user to copy, repeat, inspect, or compare
+one. An affirmative applies only to the one current displayed draft. If it changed or no such draft is unambiguous,
+Sia presents the current draft and asks again. In unattended mode, Sia may record automatic approval immediately after
+persisting and verifying the plan. A material replan may be revised, digested, and automatically approved only when it
+remains within the original requested outcome. Otherwise, return `blocked`.
 
 A blocked plan appends a `sia-blocker` record with the revision, phase, prior status, attempt, reason, and an observable
 `resume_when` condition. Resume does no phase work while that condition is unchanged. If the same phase
@@ -205,10 +209,11 @@ produce an executable plan. Do not edit product/source code.
 
 ### Approve
 
-Interactive mode stops for explicit approval of the exact plan revision. Unattended mode verifies and automatically
-approves the exact revision under the original request's standing authorization. Material scope or approach changes
-require a revised plan; unattended mode may auto-approve it only when it remains within the original outcome. Approval
-never expands host permissions or authorizes unrelated external actions.
+Interactive mode stops for a plain-language approval of its one current displayed plan. Sia binds that approval to the
+current stored revision and digest itself. Unattended mode verifies and automatically approves the exact revision under
+the original request's standing authorization. Material scope or approach changes require a revised plan; unattended
+mode may auto-approve it only when it remains within the original outcome. Approval never expands host permissions or
+authorizes unrelated external actions.
 
 ### Build
 

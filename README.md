@@ -62,11 +62,11 @@ GitHub source:
 curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | sh
 ```
 
-To install a particular remote branch or tag, set `SIA_REF`; a local checkout always installs the files currently in
+To install a particular remote branch or tag, set `REF`; a local checkout always installs the files currently in
 that checkout:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | SIA_REF=v0.1.0 sh
+curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | REF=v0.1.0 sh
 ```
 
 The installer does not inspect application source or generate repository documentation.
@@ -118,6 +118,8 @@ An operation selects a workflow and the relevant skills. Interactive delivery pl
 the approved scope, reviews and validates it in a separate phase, fixes findings, and reports a product-read-only Ship
 result.
 The review uses an isolated worker when the host can provide one and reports a same-context fallback truthfully.
+Sia asks for ordinary approval such as `approved` or `go ahead`; its plan digest is an internal stale-plan check, never
+something the user must copy or compare.
 
 ### Run an operation unattended
 

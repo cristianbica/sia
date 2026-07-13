@@ -4,9 +4,9 @@
 
 set -eu
 
-GITHUB_URL=${SIA_GITHUB_URL:-https://github.com/cristianbica/sia.git}
-REF=${SIA_REF:-}
-SOURCE_DIR=${SIA_SOURCE_DIR:-}
+GITHUB_URL=${GITHUB_URL:-https://github.com/cristianbica/sia.git}
+REF=${REF:-}
+SOURCE_DIR=${SOURCE_DIR:-}
 DOWNLOAD_ROOT=
 LOCK_DIR=
 
@@ -32,8 +32,8 @@ Usage: install.sh
 Run from the Git repository that should receive Sia. Re-run to refresh it.
 
 Optional environment variables:
-  SIA_REF=<branch-or-tag>  Git ref to download when this script is read from standard input
-  SIA_SOURCE_DIR=<path>    Local Sia source root; its checked-out files are installed as-is
+  REF=<branch-or-tag>      Git ref to download when this script is read from standard input
+  SOURCE_DIR=<path>        Local Sia source root; its checked-out files are installed as-is
 EOF
 }
 
@@ -66,7 +66,7 @@ download_source() {
   fi
   [ -f "$DOWNLOAD_ROOT/source/install.sh" ] || fail 'downloaded source has no install script'
   [ -d "$DOWNLOAD_ROOT/source/src" ] || fail 'downloaded source has no src directory'
-  SIA_SOURCE_DIR="$DOWNLOAD_ROOT/source" sh "$DOWNLOAD_ROOT/source/install.sh" </dev/null
+  SOURCE_DIR="$DOWNLOAD_ROOT/source" sh "$DOWNLOAD_ROOT/source/install.sh" </dev/null
   exit $?
 }
 

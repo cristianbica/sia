@@ -15,9 +15,9 @@ authorizes a new exact revision through the current interactive or unattended ex
 - Isolation: active session or bounded read-only scout.
 - Model profile: request `reasoning` unless the user or project rules choose otherwise.
 - Inputs: request, project rules, relevant docs, repository evidence, operation, and declared skills.
-- Output: outcome, scope, non-goals, acceptance criteria, steps, validation, documentation impact, risks, assumptions,
-  exclusions, immutable authorization ceiling, explicitly authorized external actions, execution mode, permissions,
-  base commit, and the initial staged, unstaged, and untracked path baseline.
+- Output: a persisted plan plus a concise user-facing summary of outcome, scope, non-goals, criteria, steps,
+  validation, risks, assumptions, external actions, path, and revision. The digest is internal and is not shown as an
+  approval token.
 - Transition: persist the draft plan under `.ai/plans/`, then enter Approve.
 
 Every delivery plan is persisted before authorization, even when all phases remain in one conversation.
@@ -33,10 +33,16 @@ copy untracked contents into the plan. Discovery may create only that artifact a
 - Writes: approval metadata in the plan artifact only.
 - Transition: Build after approval; Plan after any material change.
 
-Interactive mode stops for user approval of the exact plan revision and digest. The up-front unattended authorization
-records `execution_mode: unattended`, verifies the plan is the smallest faithful interpretation of the activating
-request, and continues without claiming the user reviewed it. The approval-controlled outcome, scope, non-goals,
-criteria, assumptions, and exclusions must all remain within the immutable unattended authorization ceiling.
+Interactive mode presents the current draft plan summary and asks for plain-language approval. Accept `approve`,
+`approved`, `go ahead`, `proceed`, or an equally unambiguous affirmative only for that one current displayed draft.
+Never ask the user to copy, repeat, inspect, or compare a digest. After approval, Sia computes and records the digest
+itself and verifies it matches the displayed revision before Build. If the plan, baseline, or scope changes—or there is
+no one current displayed draft—keep or return it to `draft`, present the revised plan, and request fresh plain approval.
+
+The up-front unattended authorization records `execution_mode: unattended`, verifies the plan is the smallest faithful
+interpretation of the activating request, and continues without claiming the user reviewed it. The approval-controlled
+outcome, scope, non-goals, criteria, assumptions, and exclusions must all remain within the immutable unattended
+authorization ceiling.
 
 Editing approval-controlled content increments the revision, clears approval, and returns to Plan. An unattended
 replan may be automatically authorized only inside that ceiling and without changing either authorization field;
