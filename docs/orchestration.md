@@ -1,7 +1,23 @@
 # Orchestration and workflows
 
 Operations select workflows. Workflows coordinate phases and load only the documentation and skills needed for the
-current phase. A phase may use an isolated worker, a fresh user-started session, or the active session.
+current phase. Route triage chooses the smallest safe execution path before writes: planless trivial work, compact
+lightweight delivery, or standard delivery. A phase may use an isolated worker, a fresh user-started session, or the
+active session.
+
+## Adaptive delivery routes
+
+Sia's `implement` operation uses the following route contract:
+
+- `trivial`: exact-file, non-behavioral wording/formatting/comment correction; no plan, approval artifact, or worker.
+- `lightweight`: narrow project-owned definition or documentation change; compact plan and approval, one bounded Build
+  handoff, focused validation, and no mandatory independent reviewer.
+- `standard`: product/source behavior, operations/workflows, public contracts, migrations, security, external or
+  destructive work, broad scope, unsafe attribution, or uncertainty; use the complete delivery lifecycle.
+
+Line count is supporting evidence only. An explicit request for a full/thorough workflow selects `standard`; uncertain
+classification promotes to `standard`. Unattended mode selects `trivial` or `lightweight` only when eligibility is
+unambiguous, otherwise it selects `standard` or blocks. A route promotion is recorded before newly unauthorized writes.
 
 ## Isolation model
 
@@ -19,10 +35,11 @@ Native spawning is an optimization. Every required workflow must remain semantic
 ## Advisory model routing
 
 Sia uses only two logical model profiles: `fast` and `reasoning`. They express the kind of work, not a vendor, concrete
-model, or guaranteed capability.
+model, price tier, or guaranteed capability. `fast` is a latency hint, not a cost guarantee.
 
-- Plan, synthesis, ambiguous diagnosis, architecture or security work, and Review/Validate request `reasoning`.
-- Bounded scouts and mechanical Build or Fix work may request `fast`.
+- Plan, synthesis, ambiguous diagnosis, architecture or security work, and standard Review/Validate request `reasoning`.
+- Bounded scouts and mechanical Build or Fix work may request `fast`; lightweight work may inherit the host default or
+  request `fast` without implying cheaper execution.
 - A risky or complex Build/Fix phase may elevate its request to `reasoning`.
 
 An explicit user choice takes precedence, followed by project guidance in `.ai/RULES.md`, then the workflow's profile
@@ -40,10 +57,11 @@ in `unattended` mode. `unattended` is a modifier, not an operation or alias, and
 existing interactive artifact.
 
 Unattended mode provides standing authorization for Sia-owned workflow gates that remain within the original operation
-request. Sia still plans, persists the artifact, computes its digest, performs separate Review/Validate, fixes in-scope
-findings, and records evidence. It does not ask questions: it uses conservative, reversible assumptions or returns a
-blocked result when a necessary decision would expand scope or cannot be made safely. A generated plan accepted this way
-is automatically approved under standing authorization, not represented as a plan the user reviewed.
+request. Sia applies the selected route: trivial work stays planless, lightweight work persists and digests a compact
+artifact with focused validation, and standard work performs separate Review/Validate and bounded Fix cycles. It does
+not ask questions: it uses conservative, reversible assumptions or returns a blocked result when a necessary decision
+would expand scope or cannot be made safely. A generated plan accepted this way is automatically approved under standing
+authorization, not represented as a plan the user reviewed.
 
 The initial plan stores an immutable authorization ceiling and explicit external-action list. Replans may narrow or
 reinterpret implementation details inside that ceiling but cannot edit either authorization field. Workers receive the
@@ -78,14 +96,31 @@ explicit opt-in grammar as a user invocation while allowing planless scouts and 
 phase. The host may supply hidden context that Sia cannot inspect. Sia promises a bounded explicit handoff, not control
 over host internals.
 
+When a coordinator waits for a worker, prefer one event-driven or longest-safe host wait. Do not poll every few seconds
+or emit progress turns while no new evidence exists; each polling turn may resend the full conversation context. If the
+host exposes only polling, use its longest safe interval and report the actual wait behavior.
+
+## Context budget
+
+Keep the stable, cacheable prefix byte-for-byte stable: project rules, route contract, and durable documentation
+pointers come first. Put the variable suffix last: the active plan, focused diff, current evidence, constraints, and one
+final ask.
+Reference canonical files by path, load only the current phase's excerpts, and name broad or historical paths in
+`do_not_load`. Never paste a complete repository, catalog, or prior plan into a bounded handoff.
+
 Every envelope contains `execution_mode: interactive` or `execution_mode: unattended`. An unattended worker performs
 only its assignment and returns `blocked` to the coordinator instead of asking the user for approval or clarification.
 
+When the host reports usage, a handoff result may include `elapsed_ms`, `input_tokens`, `cached_input_tokens`,
+`output_tokens`, and `reasoning_output_tokens`. Record `unknown` when a field is unavailable; never estimate
+child-worker usage from coordinator counters. These fields are telemetry, not workflow gates.
+
 ## Plan artifacts
 
-Persist every delivery plan under `.ai/plans/` before approval. This gives same-context work, isolated workers, fresh
-conversations, approval, and resume one artifact contract. Planless investigation, review, and documentation workers
-use the bounded handoff envelope but do not create a delivery plan merely because the host can isolate them.
+Persist every non-trivial delivery plan under `.ai/plans/` before approval. This gives same-context work, isolated
+workers, fresh conversations, approval, and resume one artifact contract. Planless trivial, investigation, review, and
+documentation workers use the bounded handoff envelope but do not create a delivery plan merely because the host can
+isolate them.
 
 A persisted plan under `.ai/plans/` includes at least:
 
@@ -96,6 +131,7 @@ operation: implement
 workflow: delivery
 execution_mode: interactive
 authorization_ceiling: [exact-plan-revision]
+execution_route: standard
 authorized_external_actions: []
 status: draft
 revision: 1
@@ -133,19 +169,22 @@ After Approval and each completed Build, Review/Validate, Fix, or Ship phase, ap
 its execution mode: `explicit-user` or `unattended-invocation`. Sequence starts at 1 for each plan revision; invalid
 current-revision records prevent resume.
 
-The approval block starts with `id`, `operation`, `workflow`, `execution_mode`, and `revision`, followed by `base_ref`,
-`staged_paths`, `unstaged_paths`, `untracked_paths`, `docs`, and `skills`. Those values must match frontmatter. The
-`status`, approval fields, and `next_phase` are mutable routing fields and are excluded from the digest. Evidence may
-be appended without invalidating approval. A material deviation changes the approval block and therefore requires a
-revised plan and renewed approval or unattended authorization. Prior-revision records remain historical evidence; the
-new revision starts its boundary sequence at 1.
+The approval block starts with `id`, `operation`, `workflow`, `execution_mode`, `execution_route`, and `revision`,
+followed by `base_ref`, `staged_paths`, `unstaged_paths`, `untracked_paths`, `docs`, and `skills`. Those values must
+match frontmatter. An older plan may omit `execution_route` and is treated as `standard`. The route is `lightweight` or
+`standard` in planned artifacts; `trivial` is planless. The `status`, approval fields, and `next_phase` are mutable
+routing fields and are excluded from the digest. Evidence may be appended without invalidating approval. A material
+deviation, including route promotion, changes the approval block and therefore requires a revised plan and renewed
+approval or unattended authorization. Prior-revision records remain historical evidence; the new revision starts its
+boundary sequence at 1.
 
 For unattended mode, `authorization_ceiling` and `authorized_external_actions` occur in frontmatter and the approval
 block and remain byte-for-byte unchanged across revisions. Any mismatch prevents resume.
 
 The delivery state table is canonical: Plan is `draft/approval`, authorization is `approved/build`, active phases are
 `in-progress/<phase>`, an unattended blocker is `blocked/<current-phase>`, successful Ship is `complete/none`, and
-cancellation is `cancelled/none`.
+cancellation is `cancelled/none`. Lightweight uses the same artifact states but focused Review/Validate may transition
+directly to Ship; trivial uses no delivery artifact.
 
 Compute `approved_digest` as lowercase SHA-256 over only the bytes between the approval marker lines after converting
 CRLF to LF, excluding a UTF-8 BOM, and ensuring exactly one final LF. The marker lines are not part of the digest.

@@ -37,7 +37,8 @@ This directory is the canonical product, protocol, and implementation specificat
 - Operations express user intent; workflows own phases and gates; skills provide reusable expertise.
 - Delivery crossing a conversation boundary uses its persisted approved plan. Native workers receive a bounded handoff
   envelope appropriate to their phase.
-- The shipped delivery workflow is Plan → Approve → Build → Review/Validate → Fix → Ship.
+- `Sia implement` chooses a conservative trivial, lightweight, or standard delivery route; uncertain work promotes to
+  standard. Standard delivery is Plan → Approve → Build → Review/Validate → Fix → Ship.
 - Documentation changes happen before final review. Ship changes only plan completion state by default and offers
   explicit interactive cleanup of the exact completed plan; unattended runs retain it.
 - Sia upgrades never overwrite project documentation, plans, custom catalog sections, or project definitions.

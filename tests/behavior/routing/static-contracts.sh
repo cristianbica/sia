@@ -1,0 +1,71 @@
+#!/bin/sh
+
+set -u
+
+ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
+. "$ROOT/tests/lib/test.sh"
+
+DELIVERY="$ROOT/src/managed/.ai/workflows/sia/delivery.md"
+IMPLEMENT="$ROOT/src/managed/.ai/operations/sia/implement.md"
+ORCHESTRATION="$ROOT/docs/orchestration.md"
+LIGHTWEIGHT_FIXTURE="$ROOT/tests/behavior/routing/fixtures/lightweight-skill.md"
+STANDARD_FIXTURE="$ROOT/tests/behavior/routing/fixtures/standard-feature.md"
+TRIVIAL_FIXTURE="$ROOT/tests/behavior/routing/fixtures/trivial-wording.md"
+LEGACY_FIXTURE="$ROOT/tests/behavior/routing/fixtures/legacy-plan.md"
+
+check_route_contract() {
+  for route in trivial lightweight standard; do
+    assert_contains "$DELIVERY" "\`$route\`" || return 1
+  done
+  assert_contains "$DELIVERY" 'execution_route' || return 1
+  assert_contains "$DELIVERY" 'Size is supporting evidence' || return 1
+  assert_contains "$DELIVERY" 'promotes it to `lightweight` or `standard`' || return 1
+  assert_contains "$IMPLEMENT" 'Announce the selected execution route' || return 1
+  assert_contains "$IMPLEMENT" 'full or thorough' || return 1
+}
+
+check_trivial_contract() {
+  assert_contains "$DELIVERY" 'no plan or approval artifact' || return 1
+  assert_contains "$DELIVERY" 'do not create a' || return 1
+  assert_contains "$DELIVERY" 'spawn a worker solely' || return 1
+  assert_contains "$TRIVIAL_FIXTURE" 'expected_route: trivial' || return 1
+  assert_contains "$TRIVIAL_FIXTURE" 'behavior_change: false' || return 1
+}
+
+check_lightweight_contract() {
+  assert_contains "$DELIVERY" 'compact plan' || return 1
+  assert_contains "$DELIVERY" 'one bounded Build handoff' || return 1
+  assert_contains "$DELIVERY" 'independent review worker' || return 1
+  assert_contains "$DELIVERY" 'promote to standard' || return 1
+  assert_contains "$LIGHTWEIGHT_FIXTURE" 'expected_route: lightweight' || return 1
+  assert_contains "$LIGHTWEIGHT_FIXTURE" '.ai/skills/example/SKILL.md' || return 1
+}
+
+check_standard_and_backward_compatibility() {
+  assert_contains "$DELIVERY" 'missing route metadata' || return 1
+  assert_contains "$DELIVERY" 'optional for backward compatibility' || return 1
+  assert_contains "$DELIVERY" '`standard`: product/source behavior' || return 1
+  assert_contains "$STANDARD_FIXTURE" 'expected_route: standard' || return 1
+  assert_contains "$STANDARD_FIXTURE" 'product/source' || return 1
+  assert_contains "$LEGACY_FIXTURE" 'expected_route: standard' || return 1
+  assert_not_contains "$LEGACY_FIXTURE" 'execution_route:' || return 1
+}
+
+check_wait_and_telemetry_contract() {
+  assert_contains "$ORCHESTRATION" 'Do not poll every few seconds' || return 1
+  assert_contains "$DELIVERY" 'longest-safe wait' || return 1
+  assert_contains "$DELIVERY" 'never poll without new evidence' || return 1
+  assert_contains "$ORCHESTRATION" 'input_tokens' || return 1
+  assert_contains "$ORCHESTRATION" 'cached_input_tokens' || return 1
+  assert_contains "$ORCHESTRATION" 'never estimate' || return 1
+  assert_contains "$ORCHESTRATION" 'child-worker usage' || return 1
+  assert_contains "$ORCHESTRATION" 'not a cost guarantee' || return 1
+}
+
+run_case "adaptive route contract is explicit and conservative" check_route_contract
+run_case "trivial work remains planless and exact-file scoped" check_trivial_contract
+run_case "lightweight work keeps approval but removes mandatory extra agents" check_lightweight_contract
+run_case "standard routing and old-plan compatibility remain explicit" check_standard_and_backward_compatibility
+run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract
+
+finish_tests

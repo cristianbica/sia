@@ -5,15 +5,41 @@ description: Deliver authorized changes through planning, review, validation, fi
 
 # Delivery workflow
 
-Follow `Plan → Approve → Build → Review/Validate → Fix → Review/Validate → Ship`. Replanning returns to Plan and
-authorizes a new exact revision through the current interactive or unattended execution mode.
+Triage before choosing a path. Standard follows `Plan → Approve → Build → Review/Validate → Fix → Review/Validate →
+Ship`; lightweight follows `Plan → Approve → Build → focused Review/Validate → Ship`; trivial work is planless.
+Replanning returns to Plan and authorizes a new exact revision through the current execution mode.
+
+## Route triage
+
+Record `execution_route` as `trivial`, `lightweight`, or `standard`; missing route metadata on an older plan means
+`standard`. Announce the route and its evidence before writes.
+
+- `trivial`: an obvious typo, formatting, comment, or wording-only correction in the requested file, with no behavior,
+  policy, permission, schema, command, or public-contract change. It needs no plan or approval artifact; do not create a
+  plan or spawn a worker solely because the host supports one. Doubt promotes it to `lightweight` or `standard`.
+- `lightweight`: narrow project-owned `.ai/docs/**` or definition paths, with no product/source, managed SIA, lifecycle,
+  permission, external-action, or unresolved-assumption risk. Prompt behavior may change, so approve exact scope and use
+  one bounded Build handoff, focused validation, and no mandatory independent review worker or Fix loop.
+- `standard`: product/source behavior, operations/workflows, public contracts, migrations, security, destructive or
+  external work, broad scope, dirty attribution risk, or uncertainty. Keep the complete lifecycle.
+
+Size is supporting evidence, never proof of eligibility. A request saying `full` or `thorough` selects `standard`.
+
+Unattended classification is conservative: select `trivial` or `lightweight` only when request and repository evidence
+make eligibility unambiguous; otherwise select `standard` or return `blocked`. Record a route promotion before newly
+unauthorized writes.
+
+For trivial work, report diff, check, skips, and route; promote before writing if behavior or policy could change. For
+lightweight work, persist a compact plan with exact paths, non-goals, focused checks, route evidence, and promotion
+conditions; do not copy transcripts. When waiting, use one longest-safe wait; never poll without new evidence.
 
 ## Plan
 
 - Purpose: produce an executable, evidence-based delivery plan.
 - Gate: none on entry; product and source writes are forbidden.
 - Isolation: active session or bounded read-only scout.
-- Model profile: request `reasoning` unless the user or project rules choose otherwise.
+- Model profile: request `reasoning` for ambiguous/risky planning; lightweight may inherit the host default or request
+  advisory `fast` for latency, not a price guarantee.
 - Inputs: request, project rules, relevant docs, repository evidence, operation, and declared skills.
 - Output: a persisted plan plus a concise user-facing summary of outcome, scope, non-goals, criteria, steps,
   validation, risks, assumptions, external actions, path, and revision. The digest is internal and is not shown as an
@@ -51,8 +77,10 @@ otherwise it blocks instead of asking. Neither mode expands host permissions or 
 ## Build
 
 - Purpose: implement only approved scope, including tests and affected repository documentation.
-- Isolation: prefer an isolated worker, then a fresh conversation, then bounded same-context execution.
-- Model profile: request `fast` for mechanical work and `reasoning` for risky or complex work.
+- Isolation: standard prefers an isolated worker, then a fresh conversation, then bounded same-context execution.
+  Lightweight uses one bounded Build handoff and no second worker.
+- Model profile: standard requests `fast` for mechanical work and `reasoning` for risky work; lightweight may request
+  advisory `fast` for latency, never as a cost guarantee.
 - Inputs: approved plan, exact resolved definition paths, baseline, relevant docs, rules, and bounded handoff.
 - Writes: approved repository scope, relevant tests, `.ai/docs/**`, and plan evidence.
 - Transition: Review/Validate when complete; Plan for material scope or approach changes.
@@ -68,13 +96,15 @@ override and put the exact resolved path in the handoff; do not load either skil
 
 ## Review/Validate
 
-- Purpose: assess the complete implementation and verification evidence in a separate phase.
-- Gate: Build or Fix has produced a reviewable change.
-- Isolation: prefer a worker that did not build the change; report the actual isolation mechanism.
-- Model profile: request `reasoning`.
+- Purpose: assess the implementation and evidence. Lightweight uses focused coordinator validation with no independent
+  review worker.
+- Isolation: standard prefers a worker that did not build the change; lightweight may use the coordinator and must
+  report.
+- Model profile: standard requests `reasoning`; lightweight does not request a new review model by default.
 - Inputs: approved plan, complete diff, dirty baseline, docs changes, tests, and command evidence.
 - Writes: review evidence in the active plan only; do not modify product or source files.
-- Transition: Fix for in-scope findings, Plan for material findings, or Ship when acceptance criteria are satisfied.
+- Transition: Fix standard findings, Plan for material findings, or Ship when route-appropriate criteria are satisfied.
+  Lightweight material findings promote to standard before Fix or Ship.
 
 Inspect correctness, scope, regressions, security and operational risk, documentation, and the truthfulness of command
 claims. Do not claim that an uninspected command passed.
@@ -85,10 +115,9 @@ CUSTOM overrides, record the exact resolved paths, and use the selected definiti
 ## Fix
 
 - Purpose: resolve review findings without broadening approved scope.
-- Isolation: use a bounded build/fix worker when available.
-- Model profile: request `fast` for mechanical remediation or `reasoning` for complex findings.
-- Writes: same scope as Build.
-- Transition: always return to the separate Review/Validate phase; return to Plan for material changes.
+- Isolation: standard may use a bounded build/fix worker; lightweight has no Fix loop and promotes when remediation is
+  material.
+- Transition: standard Fix always returns to separate Review/Validate; return to Plan for material changes.
 
 Allow at most three unattended Review/Validate → Fix cycles per plan revision. If material findings remain, record a
 blocker instead of looping or weakening acceptance criteria. Interactive mode may request new direction.
@@ -97,7 +126,6 @@ blocker instead of looping or weakening acceptance criteria. Interactive mode ma
 
 - Purpose: hand off the final reviewed result.
 - Gate: acceptance criteria satisfied and validation evidence reviewed.
-- Model profile: inherit the final review context; no new model capability is required.
 - Writes: active plan status and completion evidence only; no product, source, or external state by default.
 - Output: behavior, changed paths, verification, isolation used, approved deviations, and remaining risks.
 
@@ -122,6 +150,7 @@ execution_mode: interactive
 authorization_ceiling: [exact-plan-revision]
 authorized_external_actions: []
 status: draft
+execution_route: standard
 revision: 1
 approved_revision:
 approved_digest:
@@ -148,6 +177,7 @@ workflow: delivery
 execution_mode: interactive
 authorization_ceiling: [exact-plan-revision]
 authorized_external_actions: []
+execution_route: standard
 revision: 1
 base_ref: 4d3f...
 staged_paths: []
@@ -194,7 +224,8 @@ authorization_source: explicit-user
 approved revision; earlier revisions remain historical evidence. An Approval record requires an authorization source
 matching its mode: `explicit-user` for interactive or `unattended-invocation` for unattended. Legal transitions are
 Approval → Build, Build → Review/Validate, Review/Validate → Fix, Fix → Review/Validate, Review/Validate → Ship, and
-Ship → none. A missing, duplicated, out-of-order, or contradictory current-revision record prevents resume.
+Ship → none. Lightweight Review/Validate may go directly to Ship after focused validation. A missing, duplicated,
+out-of-order, or contradictory current-revision record prevents resume.
 
 An unattended blocker appends this separate record without pretending the phase completed:
 
@@ -232,6 +263,9 @@ Product,
 source, and external delivery state remain read-only unless the user explicitly requests and authorizes another action.
 
 The approval metadata must match frontmatter, and `execution_mode` must be exactly `interactive` or `unattended`.
+`execution_route` is optional for backward compatibility and, when present, must be `lightweight` or `standard` in a
+planned artifact. `trivial` never creates a delivery plan. Route is approval-controlled; changing it materially resets
+approval and requires a new revision.
 For unattended plans, `authorization_ceiling` and `authorized_external_actions` are immutable across revisions and
 resume; any mismatch is an integrity error.
 Compute the lowercase SHA-256 digest over only the bytes between the approval marker lines after converting CRLF to LF,

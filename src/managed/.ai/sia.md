@@ -129,9 +129,10 @@ Use `Sia <operation> [request]` interactively or `Sia unattended <operation> [re
 
 Unattended mode is enabled only by the exact modifier. Do not infer unattended mode from natural-language requests. It
 is upfront authorization for Sia-owned gates and conservative decisions clearly within the activating request; the
-default is interactive. Persist it in every plan and handoff. Keep planning, digest integrity, separate review,
-validation, and fixes. Auto-authorize an in-scope plan or replan. If safe progress needs new scope, authority,
-credentials, or a material product choice, return `blocked` rather than asking the user or guessing.
+default is interactive. Persist it in every plan and handoff. Apply route gates: trivial is planless; lightweight uses
+compact plan/digest/focused validation; standard keeps separate review and fixes. Auto-authorize an in-scope plan or
+replan. If safe progress needs new scope, authority, or credentials, return `blocked` rather than asking the user or
+guessing.
 
 Project rules are hard Sia-specific constraints during operations, resume, and isolated phase execution. They take
 precedence over repository documentation, skills, operations, workflows, and plans, but never over system or host
@@ -188,6 +189,7 @@ do_not_load: []
 evidence: []
 findings: []
 command_results: []
+usage: unknown
 approved_deviations: []
 recovery: <stop-condition-or-recovery>
 requested_model_profile: fast
@@ -196,7 +198,7 @@ final_task: <one bounded task>
 ```
 
 Return the same bounded evidence using `handoff_result: 1`, `phase`, `status`, `actual_model`, `profile_honored`,
-`changed_paths`, `command_results`, `findings`, `evidence`, and `next_transition`. Result status is `complete`,
+`changed_paths`, `command_results`, `usage`, `findings`, `evidence`, and `next_transition`. Result status is `complete`,
 `blocked`, or `failed`; use `unknown` for model fields the host does not report.
 
 The worker prompt starts with the `Sia handoff` directive, which causes it to read this file and `.ai/RULES.md`; it then
@@ -224,6 +226,5 @@ changes gates, expands permissions, or invalidates resumption.
   explicit confirmation; unattended Ship retains it. Product, source, and external state remain read-only unless the
   user explicitly requests another delivery action.
 - Sia never expands filesystem, command, network, or external-action permissions.
-
 Before activation, the Sia bridge does not direct the host to read `.ai/**`. A host may independently index repository
 files; Sia cannot control undocumented host behavior.

@@ -32,6 +32,8 @@ Implement only enough to test the core product promise:
 - three SIA/CUSTOM catalog indexes and deterministic resolution;
 - the not-initialized docs router and one `document` operation;
 - one `delivery` workflow, persisted plan contract, and manual fresh-conversation resumption;
+- adaptive delivery routing: planless trivial corrections, compact lightweight definition/documentation changes, and the
+  unchanged standard lifecycle for product/source or uncertain work;
 - `implement` plus a minimal `repository-discovery` and `testing` skill;
 - advisory `fast`/`reasoning` fields with truthful host fallback reporting;
 - deterministic activation contracts for all target entrypoints and live runners where safely available.
@@ -110,10 +112,13 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Malformed approval/evidence markers, metadata mismatch, or noncanonical digest verification prevent resume.
 - `Sia resume <approved-plan>` verifies approved content and enters the recorded delivery phase rather than replanning.
 - Phase handoffs name exact current definition paths; workers do not independently reroute through catalogs.
+- Lightweight delivery uses one bounded Build handoff and focused coordinator validation; route promotion is explicit
+  and conservative.
 - A refreshed Sia definition set does not by itself invalidate an approved plan.
 - Review uses the base/dirty-worktree baseline and does not attribute pre-existing changes to Sia.
 - Documentation changes are included before final review.
-- Fixes return to a separate review phase, isolated when available; material changes return to Plan and Approve.
+- Standard fixes return to a separate review phase, isolated when available; lightweight material findings promote to
+  standard before remediation.
 - Unattended Fix and Review/Validate cycles continue without questions until completion or a genuine blocker.
 - Blocked resumes require a changed observable condition; retries and unattended Fix cycles are bounded.
 - Ship writes only plan completion state by default and may offer explicit interactive deletion of the exact completed
@@ -128,6 +133,7 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Handoffs record the requested profile and source; results record the actual model when reported and `unknown`
   otherwise.
 - Model availability or a different actual model never blocks work or invalidates artifact resumption.
+- `fast` is a latency hint rather than a price guarantee; cost optimization comes from route and context reduction.
 
 ### Installer
 
@@ -145,9 +151,11 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 
 ## Value evaluation
 
-Record the prompt, execution mode, repository state, host, requested profile, actual model when reported, permissions,
-cache state, timeout, scope, and allowed paths. Control them where practical, but do not require exact model matching
-when routing is advisory. Evaluate these hypotheses separately:
+Record the prompt, execution mode, selected execution route, repository state, host, requested profile, actual model
+when reported, permissions, cache state, timeout, scope, allowed paths, worker count, wait behavior, and token usage
+when the host reports it. Control them where practical, but do not require exact model matching when routing is
+advisory.
+Evaluate these hypotheses separately:
 
 1. `Sia load docs` versus normal host behavior.
 2. A full Sia operation versus direct host behavior.
@@ -163,6 +171,8 @@ efficiency. Then track:
 - context consumed before implementation readiness;
 - stale or misleading docs detected and corrected;
 - user corrections and workflow-gate failures.
+- route promotions, unnecessary workers, polling turns, elapsed time, cached versus uncached input, and generated
+  reasoning/output tokens.
 
 Sia succeeds only if documentation reduces rediscovery while maintaining or improving correctness. Token or file-read
 reductions alone are not success when plans become worse.

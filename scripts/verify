@@ -9,6 +9,7 @@ run_static() {
   sh "$ROOT/tests/static/source-contracts.sh" &&
     sh "$ROOT/tests/behavior/activation/static-contracts.sh" &&
     sh "$ROOT/tests/behavior/workflows/static-contracts.sh" &&
+    sh "$ROOT/tests/behavior/routing/static-contracts.sh" &&
     sh "$ROOT/tests/behavior/model-routing/static-contracts.sh" &&
     sh "$ROOT/tests/behavior/definitions/static-contracts.sh" &&
     sh "$ROOT/tests/behavior/documentation/static-contracts.sh" &&

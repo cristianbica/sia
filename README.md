@@ -121,9 +121,11 @@ Sia document the billing area
 Sia refresh-docs billing
 ```
 
-An operation selects a workflow and the relevant skills. Interactive delivery plans first, stops for approval, builds
-the approved scope, reviews and validates it in a separate phase, fixes findings, and reports a product-read-only Ship
-result.
+An operation selects a workflow and the relevant skills. `Sia implement` chooses a conservative route: trivial wording
+or formatting corrections are planless, narrow project-definition or documentation edits use a compact approved plan
+and focused validation, and product/source or uncertain work uses the full delivery lifecycle. The standard lifecycle
+plans first, stops for approval, builds the approved scope, reviews and validates it separately, fixes findings, and
+reports a product-read-only Ship result. An explicit request for a full or thorough workflow selects standard delivery.
 The review uses an isolated worker when the host can provide one and reports a same-context fallback truthfully.
 Sia asks for ordinary approval such as `approved` or `go ahead`; its plan digest is an internal stale-plan check, never
 something the user must copy or compare.
@@ -135,10 +137,10 @@ Sia unattended implement the restocking report
 ```
 
 `unattended` is an exact modifier before the operation name. It gives upfront authorization for Sia workflow gates
-within the original request, so Sia persists and digests the plan, records automatic approval, and continues through
-Build, separate Review/Validate, and in-scope Fix cycles without asking questions. It uses conservative, reversible
-assumptions or returns a blocked result when it cannot proceed safely. It does not claim that the user reviewed the
-generated plan.
+within the original request. Sia uses the same conservative route triage: trivial work remains planless, lightweight
+work persists and digests a compact plan, and standard work continues through separate Review/Validate and bounded
+Fix cycles. It asks no questions, uses conservative reversible assumptions, or returns a blocked result when it cannot
+proceed safely. It does not claim that the user reviewed a generated plan.
 
 The plan preserves an immutable authorization ceiling and explicit external-action list across replans and resume.
 A blocked resume retries only after its recorded condition changes; identical failures and Fix cycles are bounded.
@@ -206,8 +208,9 @@ selection remain host capabilities, not Sia requirements.
 The dated [host matrix](docs/host-matrix.md) distinguishes CLI availability, no-model harness validation, and live
 semantic certification. Never interpret an installed CLI or passing shim as proof of model behavior.
 
-Workflows may request the advisory profiles `fast` or `reasoning`. The host chooses the actual model it can provide, and
-Sia records that model when the host reports it. An unavailable profile never changes approval gates, permissions, or
+Workflows may request the advisory profiles `fast` or `reasoning`. `fast` is a latency hint, not a price tier. The host
+chooses the actual model it can provide, and Sia records that model when the host reports it. An unavailable profile
+never changes approval gates, permissions, or
 correctness requirements.
 
 ## Safety and ownership

@@ -130,7 +130,9 @@ After resolution:
 3. Resolve its primary workflow and declared skills.
 4. Report malformed or missing references rather than silently substituting another definition.
 5. Load only the workflow, skills, and documentation required for intake and the current phase.
-6. Follow the workflow until completion, cancellation, or an explicit operation replacement.
+6. Let the workflow triage the smallest safe execution route before writes; do not infer a low-risk route from size
+   alone.
+7. Follow the selected workflow route until completion, cancellation, or an explicit operation replacement.
 
 ## Project rules
 

@@ -16,6 +16,13 @@ check_routing_fields() {
   assert_contains "$PROTOCOL" 'unknown' || return 1
 }
 
+check_profiles_are_not_cost_promises() {
+  orchestration="$ROOT/docs/orchestration.md"
+  assert_contains "$orchestration" 'price tier' || return 1
+  assert_contains "$orchestration" 'not a cost guarantee' || return 1
+  assert_contains "$orchestration" 'lightweight work may inherit the host default' || return 1
+}
+
 check_host_fallback() {
   assert_contains "$PROTOCOL" 'The host chooses the available model' || return 1
   assert_contains "$PROTOCOL" 'never blocks work' || return 1
@@ -49,6 +56,7 @@ check_no_vendor_agent_payload() {
 }
 
 run_case "model routing records advisory requested and actual fields" check_routing_fields
+run_case "model profiles remain advisory rather than cost promises" check_profiles_are_not_cost_promises
 run_case "host model fallback never changes workflow semantics" check_host_fallback
 run_case "workflows use only fast and reasoning profiles" check_workflow_profiles
 run_case "the managed payload contains no vendor agent package" check_no_vendor_agent_payload

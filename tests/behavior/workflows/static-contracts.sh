@@ -30,6 +30,7 @@ check_bounded_handoff() {
     'definition_paths:' \
     'do_not_load:' \
     'command_results:' \
+    'usage:' \
     'requested_model_profile:' \
     'final_task:' \
     'handoff_result: 1'; do
