@@ -94,6 +94,8 @@ check_delivery_is_resumable() {
   assert_contains "$DELIVERY" '## Lifecycle state' || return 1
   assert_contains "$DELIVERY" 'Approval → Build' || return 1
   assert_contains "$DELIVERY" 'Ship → none' || return 1
+  assert_contains "$DELIVERY" 'explicit affirmative response' || return 1
+  assert_contains "$DELIVERY" 'Unattended execution always' || return 1
   for baseline in staged_paths unstaged_paths untracked_paths; do
     assert_contains "$DELIVERY" "$baseline" || return 1
   done

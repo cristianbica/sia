@@ -115,7 +115,8 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Fixes return to a separate review phase, isolated when available; material changes return to Plan and Approve.
 - Unattended Fix and Review/Validate cycles continue without questions until completion or a genuine blocker.
 - Blocked resumes require a changed observable condition; retries and unattended Fix cycles are bounded.
-- Ship writes only plan completion state and performs no product or external delivery action by default.
+- Ship writes only plan completion state by default and may offer explicit interactive deletion of the exact completed
+  plan; unattended runs retain it. It performs no product or external delivery action by default.
 - Unattended mode never weakens host permissions, project safety, dirty-work safeguards, or external-action boundaries.
 
 ### Model routing
@@ -173,7 +174,8 @@ reductions alone are not success when plans become worse.
 - Repository documentation is evidence-linked, selectively loaded, and safely refreshed.
 - Custom definitions override shipped definitions deterministically and survive upgrades.
 - The shipped delivery workflow requires plain-language approval bound internally to the displayed plan or unattended
-  standing authorization, artifact resumption, a separate review phase, and product-read-only Ship.
+  standing authorization, artifact resumption, a separate review phase, product-read-only Ship, and optional confirmed
+  cleanup of completed plans.
 - Unattended execution asks no Sia questions and stops blocked rather than expanding scope or weakening permissions.
 - Each run reports whether review used isolated, new-conversation, or same-conversation context.
 - Hosts without native worker isolation can complete every required workflow using persisted artifacts.

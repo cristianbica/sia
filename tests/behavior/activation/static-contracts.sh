@@ -76,6 +76,8 @@ check_workflow_contract() {
   assert_contains "$delivery" 'lowercase SHA-256' || return 1
   assert_contains "$delivery" 'sia-phase-boundary' || return 1
   assert_contains "$delivery" 'initial staged, unstaged, and untracked path baseline' || return 1
+  assert_contains "$delivery" 'delete this plan file' || return 1
+  assert_contains "$delivery" 'Unattended Ship never asks and always keeps' || return 1
 }
 
 check_seed_indexes() {

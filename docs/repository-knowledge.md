@@ -112,6 +112,7 @@ work. `refresh-docs` performs targeted refresh, stale-claim audit, and index rep
 unless product/source changes become necessary.
 
 During delivery, documentation impact is handled in Build or Fix before final review. Ship writes only plan completion
-state, ensuring the final handed-off diff—including documentation—has been reviewed and validated.
+state by default, then may offer explicit interactive deletion of the exact completed plan; unattended runs retain it.
+The final handed-off diff—including documentation—has been reviewed and validated.
 
 Approved future work belongs in `.ai/plans/`, not `.ai/docs/`.

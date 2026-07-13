@@ -36,7 +36,8 @@ This directory is the canonical product, protocol, and implementation specificat
 - Delivery crossing a conversation boundary uses its persisted approved plan. Native workers receive a bounded handoff
   envelope appropriate to their phase.
 - The shipped delivery workflow is Plan → Approve → Build → Review/Validate → Fix → Ship.
-- Documentation changes happen before final review. Ship changes only plan completion state by default.
+- Documentation changes happen before final review. Ship changes only plan completion state by default and offers
+  explicit interactive cleanup of the exact completed plan; unattended runs retain it.
 - Sia upgrades never overwrite project documentation, plans, custom catalog sections, or project definitions.
 
 ## Design test

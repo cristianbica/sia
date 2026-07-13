@@ -216,8 +216,9 @@ changes gates, expands permissions, or invalidates resumption.
   writes.
 - Unattended mode does not expand host permissions or authorize external actions, including destructive actions, that
   the user did not explicitly request. It cannot suppress permission prompts imposed by the host.
-- Ship may write active-plan completion metadata. Product, source, and external state remain read-only unless the user
-  explicitly requests another delivery action.
+- Ship may write active-plan completion metadata. Interactive Ship may delete that exact completed plan only after an
+  explicit confirmation; unattended Ship retains it. Product, source, and external state remain read-only unless the
+  user explicitly requests another delivery action.
 - Sia never expands filesystem, command, network, or external-action permissions.
 
 Before activation, the Sia bridge does not direct the host to read `.ai/**`. A host may independently index repository

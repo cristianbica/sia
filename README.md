@@ -214,8 +214,9 @@ correctness requirements.
 - It replaces only marked Sia blocks in catalog indexes, `AGENTS.md`, and Claude compatibility instructions.
 - Repository docs, rules, plans, project definitions, and `CUSTOM` catalog content remain project-owned.
 - Unattended mode pre-authorizes only in-scope Sia gates, preserves its original ceiling, and bounds automatic retries.
-- Ship may close the active plan; product, source, and external state remain read-only unless the user explicitly
-  requests another delivery action.
+- Ship may close the active plan and offer to delete that exact completed plan after explicit confirmation; unattended
+  runs retain it. Product, source, and external state remain read-only unless the user explicitly requests another
+  delivery action.
 - Host system, developer, user, permission, and safety rules always remain authoritative.
 
 ## Project status and documentation

@@ -101,6 +101,11 @@ blocker instead of looping or weakening acceptance criteria. Interactive mode ma
 - Writes: active plan status and completion evidence only; no product, source, or external state by default.
 - Output: behavior, changed paths, verification, isolation used, approved deviations, and remaining risks.
 
+After recording `complete`, interactive Ship offers: “Keep the completed plan for history, or delete this plan file?”
+Delete only the exact active plan after explicit affirmative response. Do not infer deletion from approval, completion,
+or a general cleanup request. Unattended Ship never asks and always keeps the completed plan. If deletion is declined
+or fails, report that the completed plan was retained and still complete the delivery report.
+
 Commit, push, pull request, release, publish, and deploy require explicit user intent. Never infer them from approval of
 the implementation plan or from unattended mode.
 
@@ -221,8 +226,10 @@ Update frontmatter and append the required phase-boundary record as one logical 
 | Ship report completes | `complete` | `none` | Ship → none |
 | User cancels | `cancelled` | `none` | Record the reason outside a phase-boundary record |
 
-Ship may close the plan artifact as shown above. It remains read-only for product, source, and external delivery state
-unless the user explicitly requests and authorizes another action.
+Ship closes the plan artifact as shown above. By default it remains available as history and evidence. Interactive
+cleanup may delete only that exact completed plan after explicit confirmation. Unattended execution always retains it.
+Product,
+source, and external delivery state remain read-only unless the user explicitly requests and authorizes another action.
 
 The approval metadata must match frontmatter, and `execution_mode` must be exactly `interactive` or `unattended`.
 For unattended plans, `authorization_ceiling` and `authorized_external_actions` are immutable across revisions and

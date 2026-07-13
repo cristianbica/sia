@@ -235,9 +235,12 @@ Allow at most three unattended Fix cycles per plan revision; then return a block
 
 ### Ship
 
-Ship writes only plan completion status and evidence by default. Product, source, and external delivery state remain
-read-only. Confirm the final reviewed artifact and report behavior, files, verification, deviations, and remaining
-risks. Commit, push, pull request, release, publish, and deploy actions require explicit user intent.
+Ship writes only plan completion status and evidence by default. After recording `complete`, interactive Ship offers to
+keep the exact plan for history or delete it. Deletion requires an explicit affirmative response and is never inferred
+from completion or a general cleanup request; unattended Ship always retains the plan. Product, source, and external
+delivery state remain read-only. Confirm the final reviewed artifact and report behavior, files, verification,
+deviations, and remaining risks. Commit, push, pull request, release, publish, and deploy actions require explicit user
+intent.
 
 In unattended mode, continue through in-scope Fix and Review/Validate cycles without asking questions. Use conservative,
 reversible assumptions or return a blocked result when no safe in-scope path remains.
