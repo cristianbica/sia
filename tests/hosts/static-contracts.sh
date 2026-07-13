@@ -66,7 +66,7 @@ records_the_four_semantic_cases() {
   assert_contains "$ROOT/tests/hosts/prompts/ordinary.txt" 'ORDINARY_OK' || return 1
   assert_contains "$ROOT/tests/hosts/prompts/help.txt" 'Sia' || return 1
   assert_contains "$ROOT/tests/hosts/prompts/load-docs.txt" 'Sia load docs' || return 1
-  assert_contains "$ROOT/tests/hosts/prompts/unknown-operation.txt" 'definitely-unknown-7f3d' || return 1
+  assert_contains "$ROOT/tests/hosts/prompts/reload.txt" 'Sia reload' || return 1
 }
 
 live_mode_exercises_all_hosts_without_a_model() {
@@ -95,7 +95,7 @@ live_mode_exercises_all_hosts_without_a_model() {
     assert_contains "$TMP/live-$host/metadata.txt" 'repository_access=read_only' || return 1
     assert_contains "$TMP/live-$host/metadata.txt" "${host}_requested_model=host-default" || return 1
     assert_nonempty "$TMP/live-$host/hosts/$host/cases/help/command.txt" || return 1
-    assert_nonempty "$TMP/live-$host/hosts/$host/cases/unknown-operation/response.normalized.txt" || return 1
+    assert_nonempty "$TMP/live-$host/hosts/$host/cases/reload/response.normalized.txt" || return 1
   done
 
   if find "$TMP/runtime root" ! -path "$TMP/runtime root" -print | grep . >/dev/null 2>&1; then

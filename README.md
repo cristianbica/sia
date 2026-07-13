@@ -75,6 +75,9 @@ After installation, review `git diff` and commit the intended `.ai/`, `AGENTS.md
 team receives the same Sia behavior. Decide separately whether `.ai/plans/` should be committed for shared handoffs or
 ignored as local task state.
 
+After refreshing Sia in an existing conversation, use `Sia reload`. It rereads the current protocol without restarting
+the host, preserves persisted plans, and does not start work.
+
 ## Quick start
 
 Sia is inactive during ordinary use of the host tool. Activate only the part you want by making `Sia` the exact first

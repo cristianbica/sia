@@ -28,7 +28,7 @@ Implement only enough to test the core product promise:
 - establish the source/payload boundaries in [source-layout.md](source-layout.md) and verify shipped catalog entries;
 - safe first install plus root `AGENTS.md` and Claude bridges;
 - canonical `.ai/sia.md`, project-owned `.ai/RULES.md`, `Sia load docs`, `Sia load skills`, delivery-plan resume, and
-  `Sia stop`;
+  `Sia stop`/`Sia reload`;
 - three SIA/CUSTOM catalog indexes and deterministic resolution;
 - the not-initialized docs router and one `document` operation;
 - one `delivery` workflow, persisted plan contract, and manual fresh-conversation resumption;
@@ -79,7 +79,8 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - `RULES.md` loads for operations, resume, and workers, but not for docs-only or skills-only activation.
 - Loading docs or skills does not activate orchestration.
 - Missing docs produce the documenting-operation suggestion.
-- `Sia stop` stops future Sia-directed loading without claiming context erasure.
+- `Sia stop` stops future Sia-directed loading without claiming context erasure; `Sia reload` rereads the current
+  protocol without restarting the host and preserves persisted plans.
 - Only exact `Sia unattended <operation> [request]` syntax selects unattended execution; unsupported forms fail clearly.
 
 ### Catalogs

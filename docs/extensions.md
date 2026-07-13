@@ -32,8 +32,8 @@ category.
 - Names are unqualified: consumers use `testing`, never `sia/testing`.
 - Case-folding or normalized-name collisions are errors on every platform.
 - The logical name `sia` is reserved for shipped-definition directories in every category.
-- Operation names and aliases `load`, `resume`, `handoff`, `stop`, and `unattended` are reserved by the protocol and
-  cannot be created or cataloged.
+- Operation names and aliases `load`, `resume`, `handoff`, `stop`, `reload`, and `unattended` are reserved by the
+  protocol and cannot be created or cataloged.
 
 ## Index contract
 

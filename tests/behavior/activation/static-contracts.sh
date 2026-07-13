@@ -34,7 +34,7 @@ check_claude_bridge() {
 
 check_protocol_directives() {
   assert_nonempty "$PROTOCOL" || return 1
-  for directive in 'Sia load docs' 'Sia load skills' 'Sia resume' 'Sia handoff' 'Sia stop'; do
+  for directive in 'Sia load docs' 'Sia load skills' 'Sia resume' 'Sia handoff' 'Sia stop' 'Sia reload'; do
     assert_contains "$PROTOCOL" "$directive" || return 1
   done
   assert_contains "$PROTOCOL" '.ai/RULES.md' || return 1

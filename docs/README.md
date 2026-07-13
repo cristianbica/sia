@@ -24,6 +24,8 @@ This directory is the canonical product, protocol, and implementation specificat
   `.ai/sia.md` then resolves or rejects the remainder.
 - Every recognized Sia invocation loads `.ai/sia.md` before any catalog, definition, or repository document.
 - `Sia load docs` and `Sia load skills` augment the host's normal workflow without activating Sia orchestration.
+- `Sia reload` rereads the current protocol without restarting the host, stops active Sia orchestration, and preserves
+  persisted plans.
 - Exact operation names always win; clear free-form action requests may infer one operation, while ambiguous or advisory
   requests stay read-only direct Sia conversations.
 - Full operations and resume load project-owned `.ai/RULES.md`; partial docs/skills loading does not.

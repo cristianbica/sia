@@ -326,7 +326,7 @@ assert_semantics() {
     help)
       grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 &&
         grep -F 'Sia' "$assert_file" >/dev/null 2>&1 &&
-        grep -E -i 'load docs|load skills|resume|stop' "$assert_file" >/dev/null 2>&1 &&
+        grep -E -i 'load docs|load skills|resume|stop|reload' "$assert_file" >/dev/null 2>&1 &&
         grep -E -i 'unattended' "$assert_file" >/dev/null 2>&1 &&
         ! grep -E -i 'integrity error|installation.integrity' "$assert_file" >/dev/null 2>&1
       ;;
@@ -336,12 +336,10 @@ assert_semantics() {
         "$assert_file" >/dev/null 2>&1 &&
         grep -E -i 'document repository' "$assert_file" >/dev/null 2>&1
       ;;
-    unknown-operation)
+    reload)
       grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 &&
-        grep -F 'definitely-unknown-7f3d' "$assert_file" >/dev/null 2>&1 &&
-        grep -E -i 'unknown|not found|not registered|no operation|cannot find' "$assert_file" >/dev/null 2>&1 &&
-        ! grep -E -i 'effective operation|activated operation|running operation|selected operation' \
-          "$assert_file" >/dev/null 2>&1
+        grep -E -i 'reload|reread|current protocol' "$assert_file" >/dev/null 2>&1 &&
+        ! grep -E -i 'start work|running operation|selected operation' "$assert_file" >/dev/null 2>&1
       ;;
     *)
       return 1
@@ -444,7 +442,7 @@ run_live_host() {
   run_live_case "$live_name" ordinary "$PROMPT_DIR/ordinary.txt" "$run_live_host_dir"
   run_live_case "$live_name" help "$PROMPT_DIR/help.txt" "$run_live_host_dir"
   run_live_case "$live_name" load-docs "$PROMPT_DIR/load-docs.txt" "$run_live_host_dir"
-  run_live_case "$live_name" unknown-operation "$PROMPT_DIR/unknown-operation.txt" "$run_live_host_dir"
+  run_live_case "$live_name" reload "$PROMPT_DIR/reload.txt" "$run_live_host_dir"
 }
 
 while [ "$#" -gt 0 ]

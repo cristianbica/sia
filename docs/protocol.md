@@ -84,14 +84,21 @@ documented `handoff_result: 1` shape. Hosts must not invent a looser envelope.
 Stop active Sia orchestration for subsequent turns in the conversation. This cannot remove text the host has already put
 in model context; it means Sia no longer deliberately loads definitions or applies workflow behavior.
 
-Public reserved directives require exact arity. `Sia load docs extra`, `Sia load skills extra`, `Sia resume`, and
-`Sia stop extra` are errors rather than operation invocations. `Sia handoff` instead requires its structured body.
+### `Sia reload`
+
+Validate and reread the current `.ai/sia.md` without restarting the host. Stop active Sia orchestration for subsequent
+turns while preserving any persisted plan. Do not load catalogs, docs, or skills or start work. Reload cannot erase old
+model context; the current valid protocol takes precedence.
+
+Public reserved directives require exact arity. `Sia load docs extra`, `Sia load skills extra`, `Sia resume`, `Sia stop
+extra`, and `Sia reload extra` are errors rather than operation invocations. `Sia handoff` instead requires its
+structured body.
 
 ## Unattended operation invocation
 
 `Sia unattended <operation> [request]` is the only unattended invocation form. The modifier is case-sensitive and must
-appear immediately after `Sia`. It requires a valid operation and cannot wrap help, `load`, `resume`, `handoff`, or
-`stop`. Protocol 1 does not switch an existing interactive plan to unattended mode.
+appear immediately after `Sia`. It requires a valid operation and cannot wrap help, `load`, `resume`, `handoff`, `stop`,
+or `reload`. Protocol 1 does not switch an existing interactive plan to unattended mode.
 
 Unattended mode is the user's upfront authorization for Sia-owned workflow gates within the original operation request.
 Sia does not ask approval or clarification questions: it makes conservative, reversible assumptions and records them,
@@ -128,8 +135,8 @@ After resolution:
 ## Project rules
 
 `.ai/RULES.md` is project-owned and contains hard Sia-specific constraints. Load it for operation execution, delivery
-resume, and any isolated phase execution. Do not load it for `Sia load docs`, `Sia load skills`, help, or an unresolved
-activation attempt, because those paths intentionally leave the host's normal workflow in control.
+resume, and any isolated phase execution. Do not load it for `Sia load docs`, `Sia load skills`, `Sia reload`, help, or
+a direct conversation, because those paths intentionally leave the host's normal workflow in control.
 
 Within an active Sia operation, project rules take precedence over documentation, skills, operations, workflows, and
 plans. They cannot override host/system safety, permissions, or the user's current explicit instruction. When those
@@ -140,13 +147,13 @@ Operation keywords do not belong in `RULES.md`. They are cataloged aliases and a
 prefix, preserving opt-in behavior.
 
 Help, docs loading, skills loading, a direct conversation, and an invalid handoff do not replace an active operation.
-Only successful completion, `Sia stop`, or a successfully resolved new operation ends or replaces it.
+Only successful completion, `Sia stop`, `Sia reload`, or a successfully resolved new operation ends or replaces it.
 
 ## Activation duration
 
 - Loaded docs and skill catalogs remain available for the current conversation.
-- An operation remains active until its workflow completes, the user invokes `Sia stop`, or another operation replaces
-  it.
+- An operation remains active until its workflow completes, the user invokes `Sia stop` or `Sia reload`, or another
+  operation replaces it.
 - A new conversation starts with Sia inactive unless it begins with a recognized Sia invocation.
 - After compaction, reread the entrypoint and `.ai/sia.md`. For an active operation, also reload `.ai/RULES.md`, the
   named active plan when one exists, and only the exact current definition paths needed for the phase. Never scan

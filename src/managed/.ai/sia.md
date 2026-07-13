@@ -25,9 +25,10 @@ Do not reconstruct Sia behavior from other files, prior conversations, or genera
 
 Resolve the remainder after `Sia` in this order:
 
-1. An empty remainder shows concise help covering docs, skills, interactive and unattended operations, resume, and
-   stop; it does nothing else.
-2. An exact `unattended` first token sets unattended mode and requires the next token to be an operation or alias.
+1. An empty remainder shows concise help covering docs, skills, interactive and unattended operations, resume, stop, and
+   reload; it does nothing else.
+2. An exact `unattended` first token sets unattended mode and requires the next token to be an operation or alias. It
+   accepts an operation, not a reserved directive.
 3. A valid reserved directive form runs only that directive.
 4. A reserved directive name in an invalid form reports an arity or syntax error and does not fall back.
 5. An exact operation or alias resolves in interactive mode and receives the remaining tokens as its request.
@@ -88,11 +89,13 @@ contradictory, or permission-expanding handoff.
 
 ### `Sia stop`
 
-Stop active Sia orchestration for later turns in this conversation. Do not claim that already loaded context has been
-erased.
+Stop active Sia orchestration for later turns; do not claim already loaded context was erased. `Sia reload` rereads
+current `.ai/sia.md`, stops active orchestration while preserving persisted plans, and applies it later. It does not
+load catalogs, docs, or skills or start work; old context cannot be erased, and the current valid protocol takes
+precedence.
 
-The public reserved directives have exact arity. Extra or missing arguments are errors. `Sia handoff` instead requires
-the structured body above. `unattended` accepts an operation, not a reserved directive, and is invalid without one.
+The public reserved directives require exact arity; `Sia handoff` requires its structured body and `unattended` requires
+an operation. Extra or missing arguments are errors.
 
 ## Catalogs and resolution
 
@@ -138,7 +141,8 @@ Rules and custom definitions may narrow unattended work but cannot activate it o
 Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or a direct Sia conversation.
 
 Help, docs loading, skills loading, a direct conversation, and an invalid handoff do not replace an already active
-operation. Only successful completion, `Sia stop`, or successful resolution of a new operation ends or replaces it.
+operation. Only successful completion, `Sia stop`, `Sia reload`, or successful resolution of a new operation ends or
+replaces it.
 
 ## Context, workers, and model profiles
 

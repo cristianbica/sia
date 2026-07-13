@@ -43,6 +43,6 @@ hard USD 0.05 per-invocation limit. Codex and OpenCode do not expose a portable 
 recorded as `unknown`.
 
 The four cases verify that an ordinary prompt does not load the protocol, `Sia` returns help including unattended mode,
-`Sia load docs` reports the seed router as uninitialized, and an unknown operation fails without selecting another.
+`Sia load docs` reports the seed router as uninitialized, and `Sia reload` rereads the protocol without starting work.
 Detailed artifacts contain versions, commands, prompts, raw output, normalized responses, timing, reported cost,
 repository fingerprints, and the semantic result.

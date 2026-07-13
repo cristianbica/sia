@@ -248,7 +248,7 @@ check_operation_aliases() {
       failed=1
     fi
     case "$alias" in
-      sia|unattended|load|resume|handoff|stop)
+      sia|unattended|load|resume|handoff|stop|reload)
         echo "$catalog: alias uses reserved protocol name: $alias" >&2
         failed=1
         ;;
@@ -281,7 +281,7 @@ check_source_boundaries() {
 
 check_prompt_sizes() {
   protocol_lines=$(wc -l <"$ROOT/src/managed/.ai/sia.md" | tr -d ' ')
-  [ "$protocol_lines" -le 225 ] || fail "canonical protocol exceeds 225 lines" || return 1
+  [ "$protocol_lines" -le 230 ] || fail "canonical protocol exceeds 230 lines" || return 1
 
   for file in "$ROOT"/src/managed/.ai/skills/sia/*/SKILL.md; do
     lines=$(wc -l <"$file" | tr -d ' ')

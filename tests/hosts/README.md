@@ -28,9 +28,9 @@ noninteractive prompts in a newly installed temporary repository:
 Live mode requires GNU `timeout`. The Claude runner also requires `jq` to extract its structured response and cost.
 
 1. an ordinary prompt must remain unaffected by Sia;
-2. `Sia` must activate concise help that includes unattended operations;
+2. `Sia` must activate concise help that includes unattended operations and reload;
 3. `Sia load docs` must report that repository documentation is not initialized;
-4. an unknown operation must fail explicitly and must not select or run another operation.
+4. `Sia reload` must reload the current protocol without starting work.
 
 After installation, the harness appends a unique test-only canary instruction to `.ai/sia.md` and commits that fixture
 state before invoking a host. Every activating response must repeat the canary; the ordinary response must not. This

@@ -34,12 +34,12 @@ done
 
 case $prompt in
   'Reply with exactly ORDINARY_OK and nothing else.') response=ORDINARY_OK ;;
-  Sia) response='SIA_PROTOCOL_CANARY_7F3D Sia help: load docs, load skills, unattended operations, resume, and stop.' ;;
+  Sia) response='SIA_PROTOCOL_CANARY_7F3D Sia help: load docs, load skills, unattended operations, resume, stop, and reload.' ;;
   'Sia load docs')
     response='SIA_PROTOCOL_CANARY_7F3D Documentation is unavailable and not initialized. Run Sia document repository.'
     ;;
-  'Sia definitely-unknown-7f3d')
-    response='SIA_PROTOCOL_CANARY_7F3D Unknown operation definitely-unknown-7f3d: it is not registered.'
+  'Sia reload')
+    response='SIA_PROTOCOL_CANARY_7F3D Sia reloaded the current protocol; no work started and persisted plans were retained.'
     ;;
   *) response='unexpected prompt' ;;
 esac
