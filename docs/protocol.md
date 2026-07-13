@@ -28,16 +28,23 @@ have a nonempty body. This lets activation fail closed without relying on instru
 
 Sia activation is attempted only when `Sia` is the first non-whitespace token and is followed by whitespace or the end
 of the message. The token is case-sensitive. `sia`, `SIA`, `Sia:`, and a sentence that merely mentions Sia do not
-attempt activation. An unknown remainder is still an explicit attempt: load `.ai/sia.md`, report the resolution error,
-and do not activate an operation.
+attempt activation. Every other remainder is an explicit Sia request; it may select an operation or become a direct,
+read-only conversation.
 
 After reading `.ai/sia.md`, resolve the remainder in this order:
 
 1. Empty remainder: show concise help covering docs, skills, interactive/unattended operations, resume, and stop.
 2. Exact `unattended` modifier: resolve the following logical operation in unattended mode.
 3. Reserved directive: execute its narrowly defined behavior.
-4. Logical operation name: resolve and activate that operation in interactive mode.
-5. No match: report the unknown name and suggest catalog matches without choosing a materially different operation.
+4. Reserved directive name with invalid arity or syntax: report an error and do not use conversational fallback.
+5. Logical operation name: resolve and activate that operation in interactive mode.
+6. No exact match: infer an operation only when the request clearly asks for a change and one effective operation fits
+   with high confidence. Announce the inferred operation; never infer unattended mode.
+7. Otherwise: answer directly as Sia, loading only relevant context and making no edits or workflow transition.
+
+Free-form action cues such as “work on”, “fix this”, or “adjust” may select the best matching operation when the request
+and effective catalog make the choice clear. “What do you think”, “explain”, and other advisory wording remain direct
+conversation unless the user explicitly asks for a change.
 
 ## Reserved directives
 
@@ -132,8 +139,8 @@ unattended execution returns a blocked result.
 Operation keywords do not belong in `RULES.md`. They are cataloged aliases and activate only after the explicit `Sia`
 prefix, preserving opt-in behavior.
 
-Help, docs loading, skills loading, an invalid handoff, and an unresolved invocation do not replace an active
-operation. Only successful completion, `Sia stop`, or a successfully resolved new operation ends or replaces it.
+Help, docs loading, skills loading, a direct conversation, and an invalid handoff do not replace an active operation.
+Only successful completion, `Sia stop`, or a successfully resolved new operation ends or replaces it.
 
 ## Activation duration
 

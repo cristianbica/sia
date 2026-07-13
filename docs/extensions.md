@@ -125,7 +125,9 @@ skills:
 ```
 
 The body defines intake, operation-specific constraints, and expected outcome. The workflow owns phases and gates.
-Operation trigger keywords are aliases in the operations index, not free-form rules or always-on semantic matching.
+Operation aliases remain deterministic triggers. After the explicit `Sia` prefix, a free-form request may select one
+operation only when its action intent and the effective catalog make the match high-confidence; it is never an always-on
+keyword system.
 
 ## Workflow contract
 

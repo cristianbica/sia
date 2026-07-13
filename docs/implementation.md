@@ -91,6 +91,8 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Missing workflow or skill references fail with exact repair guidance.
 - Reserved operation names, including `unattended`, and directives with extra or missing arguments fail clearly.
 - Operation aliases parse only from the documented metadata line and alias collisions fail before invocation.
+- Free-form Sia requests infer an operation only on high-confidence action intent; otherwise they remain read-only
+  conversations.
 
 ### Artifacts and workflows
 

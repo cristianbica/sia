@@ -80,6 +80,10 @@ ignored as local task state.
 Sia is inactive during ordinary use of the host tool. Activate only the part you want by making `Sia` the exact first
 non-whitespace token of the prompt.
 
+You can also talk to Sia directly. Clear action language such as `Sia work on the billing export`, `Sia fix this`, or
+`Sia adjust the retry behavior` may select the best matching operation when the intent is unambiguous. Questions such as
+`Sia what do you think about this design?` remain read-only Sia conversations and do not start a workflow.
+
 ### Make repository documentation available
 
 ```text

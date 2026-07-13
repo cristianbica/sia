@@ -41,6 +41,10 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" '.ai/operations/INDEX.md' || return 1
   assert_contains "$PROTOCOL" 'handoff_protocol: 1' || return 1
   assert_contains "$PROTOCOL" 'interactive and unattended operations' || return 1
+  assert_contains "$PROTOCOL" 'direct Sia conversation' || return 1
+  assert_contains "$PROTOCOL" 'high confidence' || return 1
+  assert_contains "$PROTOCOL" 'Never infer unattended mode' || return 1
+  assert_contains "$PROTOCOL" 'invalid form reports an arity or syntax error' || return 1
 }
 
 check_unattended_directive() {

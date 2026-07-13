@@ -29,8 +29,11 @@ Resolve the remainder after `Sia` in this order:
    stop; it does nothing else.
 2. An exact `unattended` first token sets unattended mode and requires the next token to be an operation or alias.
 3. A valid reserved directive form runs only that directive.
-4. Otherwise, treat the first token as an operation or alias, use interactive mode, and pass the rest as its request.
-5. An unknown name reports the failure and may suggest close catalog matches, but must not select another operation.
+4. A reserved directive name in an invalid form reports an arity or syntax error and does not fall back.
+5. An exact operation or alias resolves in interactive mode and receives the remaining tokens as its request.
+6. Without an exact match, infer one operation only when the request clearly asks for an action and one effective
+   operation fits with high confidence; announce the inference before running it. Never infer unattended mode.
+7. Otherwise, answer as a direct Sia conversation: load only relevant context, do not start a workflow, and do not edit.
 
 ## Reserved directives
 
@@ -132,9 +135,9 @@ precedence over repository documentation, skills, operations, workflows, and pla
 safety, permissions, or the user's current explicit instruction. Report material conflicts instead of guessing.
 Rules and custom definitions may narrow unattended work but cannot activate it or expand its authorization ceiling.
 
-Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or unresolved invocation attempts.
+Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or a direct Sia conversation.
 
-Help, docs loading, skills loading, an invalid handoff, and an unresolved invocation do not replace an already active
+Help, docs loading, skills loading, a direct conversation, and an invalid handoff do not replace an already active
 operation. Only successful completion, `Sia stop`, or successful resolution of a new operation ends or replaces it.
 
 ## Context, workers, and model profiles
