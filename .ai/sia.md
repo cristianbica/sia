@@ -25,8 +25,8 @@ Do not reconstruct Sia behavior from other files, prior conversations, or genera
 
 Resolve the remainder after `Sia` in this order:
 
-1. An empty remainder shows concise help covering docs, skills, interactive and unattended operations, resume, stop, and
-   reload; it does nothing else.
+1. An empty remainder shows concise help covering docs, skills, Forge, interactive and unattended operations, resume,
+   stop, and reload; it does nothing else.
 2. An exact `unattended` first token sets unattended mode and requires the next token to be an operation or alias. It
    accepts an operation, not a reserved directive.
 3. A valid reserved directive form runs only that directive.
@@ -51,6 +51,14 @@ Read `.ai/skills/INDEX.md`, merge its SIA and CUSTOM entries, and expose the eff
 body. Load a skill body only when a later task needs it or the user explicitly requests it. This does not activate an
 operation.
 
+### `Sia forge on` and `Sia forge off`
+`Sia forge on` enables conversation-scoped Forge only when no operation is active. It ends on `Sia forge off`,
+`Sia stop`, `Sia reload`, or a new conversation; it creates no artifact and cannot be resumed.
+While enabled, unqualified questions receive direct answers; actions route only to trivial or lightweight delivery with
+an inline receipt.
+If standard delivery is needed, explain why; ask to switch or narrow to an independently eligible increment.
+Never silently switch or bypass route gates. Explicit operations, `unattended`, and directives resolve normally.
+`Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
 ### `Sia resume <approved-plan>`
 
 Read only the named delivery artifact under `.ai/plans/`. New artifacts are named
@@ -87,13 +95,12 @@ contradictory, or permission-expanding handoff.
 
 ### `Sia stop`
 
-Stop active Sia orchestration for later turns; do not claim already loaded context was erased. `Sia reload` rereads
-current `.ai/sia.md`, stops active orchestration while preserving persisted plans, and applies it later. It does not
-load catalogs, docs, or skills or start work; old context cannot be erased, and the current valid protocol takes
-precedence.
+Stop active Sia orchestration and disable Forge for later turns; do not claim already loaded context was erased.
+`Sia reload` rereads current `.ai/sia.md`, stops orchestration and Forge while preserving plans, and applies it later.
+It loads no catalogs, docs, skills, or work; old context remains, and the current valid protocol takes precedence.
 
-The public reserved directives require exact arity; `Sia handoff` requires its structured body and `unattended` requires
-an operation. Extra or missing arguments are errors.
+The public reserved directives require exact arity; `Sia handoff` requires its structured body, `unattended` requires
+an operation, and Forge requires exactly `on` or `off`. Extra or missing arguments are errors.
 
 ## Catalogs and resolution
 
@@ -107,11 +114,9 @@ For an indexed logical name, a CUSTOM entry resolves to the project definition a
 resolve the SIA definition. Announce a selected project override. A missing, malformed, duplicated, mismatched, or
 ambiguous CUSTOM definition is an error and never falls back to SIA. Unindexed files are not discoverable.
 
-Operation aliases are recognized only from the `aliases:` metadata line immediately below an operation index entry.
-Aliases use the same naming rules, cannot be `sia`, `unattended`, or a reserved directive name, and resolve uniquely.
-Alias matching occurs only after the explicit `Sia` prefix. When CUSTOM overrides an operation, its metadata replaces
-the complete shipped alias set for that logical name; aliases are never inherited from the SIA entry. An omitted alias
-is therefore unavailable for the effective custom operation.
+Operation aliases appear only in the `aliases:` metadata line below an operation index entry. They use the same naming
+rules, cannot be `sia`, `unattended`, or a reserved directive name, and resolve uniquely after the explicit `Sia`
+prefix. A CUSTOM override replaces the complete shipped alias set; an omitted alias is unavailable.
 
 ## Operation execution
 
@@ -126,11 +131,10 @@ Use `Sia <operation> [request]` interactively or `Sia unattended <operation> [re
 7. Follow the workflow until completion, cancellation, or explicit operation replacement.
 
 Unattended mode is enabled only by the exact modifier. Do not infer unattended mode from natural-language requests.
-It authorizes Sia-owned gates and conservative decisions within the activating request; the default is interactive.
-Persist mode in every artifact and handoff. Trivial is planless; lightweight is directly authorized.
-standard uses one intent-envelope approval and separate review/fixes. Unattended auto-authorizes in-ceiling artifacts or
-replans. If progress needs new scope, authority, or credentials,
-return `blocked` rather than asking the user or guessing.
+Default is interactive. Persist mode in artifacts and handoffs. Trivial is planless; lightweight directly authorized;
+standard uses one intent-envelope approval and separate review/fixes. Unattended auto-authorizes in-ceiling artifacts
+or replans. If progress needs new scope, authority, or credentials, return `blocked` rather than asking the user
+or guessing.
 
 Project rules are hard Sia-specific constraints during operations, resume, and isolated phase execution. They take
 precedence over repository documentation, skills, operations, workflows, and plans, but never over system or host
@@ -139,17 +143,16 @@ Rules and custom definitions may narrow unattended work but cannot activate it o
 
 Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or a direct Sia conversation.
 
-Help, docs loading, skills loading, a direct conversation, and an invalid handoff do not replace an already active
-operation. Only successful completion, `Sia stop`, `Sia reload`, or successful resolution of a new operation ends or
-replaces it.
+Help, docs loading, skills loading, Forge, a direct conversation, and an invalid handoff do not replace an already
+active operation. Only successful completion, `Sia stop`, `Sia reload`, or successful resolution of a new operation
+ends or replaces it.
 
 ## Context, workers, and model profiles
 
 Loaded docs and the skill catalog remain available for the current conversation. An operation and its execution mode
-remain active until its workflow completes, `Sia stop` is invoked, or another operation replaces it. A new conversation
-starts inactive. After context compaction, reread this protocol. For an active operation, reload `.ai/RULES.md`, the
-active plan when one exists, material documentation, and only exact current definition paths. Never scan catalogs or
-historical plans to reconstruct compacted state, or replay successful bulk command output into active context.
+remain active until its workflow completes, `Sia stop`, or replacement; a new conversation starts inactive. After
+compaction, reread this protocol. For an active operation reload `.ai/RULES.md`, its plan and material docs, and exact
+current definitions only. Never scan catalogs or historical plans, or replay successful bulk output into active context.
 
 An isolated worker must receive this canonical YAML-shaped envelope. Every key is required; use `none`, `unknown`, or
 `[]` explicitly when a field does not apply. `final_task` is last and contains one bounded ask.

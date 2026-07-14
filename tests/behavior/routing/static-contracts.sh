@@ -93,6 +93,16 @@ check_wait_and_telemetry_contract() {
   assert_contains "$ORCHESTRATION" 'not a cost guarantee' || return 1
 }
 
+check_forge_contract() {
+  assert_contains "$ORCHESTRATION" '## Forge mode' || return 1
+  assert_contains "$ORCHESTRATION" 'Sia forge on' || return 1
+  assert_contains "$ORCHESTRATION" 'Sia forge off' || return 1
+  assert_contains "$ORCHESTRATION" 'questions receive direct answers' || return 1
+  assert_contains "$ORCHESTRATION" 'triaged only to trivial or' || return 1
+  assert_contains "$ORCHESTRATION" 'asks whether to switch to standard delivery' || return 1
+  assert_contains "$ORCHESTRATION" 'never silently switches routes' || return 1
+}
+
 run_case "adaptive route contract is explicit and conservative" check_route_contract
 run_case "trivial work remains planless and exact-file scoped" check_trivial_contract
 run_case "lightweight work is directly authorized and remains bounded" check_lightweight_contract
@@ -100,5 +110,6 @@ run_case "standard intent envelopes distinguish evidence from boundary changes" 
 run_case "standard routing and old-plan compatibility remain explicit" check_standard_and_backward_compatibility
 run_case "lightweight context and benchmark validation remain bounded" check_context_and_benchmark_contract
 run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract
+run_case "Forge keeps rapid iteration within explicit route boundaries" check_forge_contract
 
 finish_tests

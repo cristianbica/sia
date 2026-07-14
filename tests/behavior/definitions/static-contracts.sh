@@ -59,8 +59,8 @@ check_skills_remain_prompt_packages() {
 }
 
 check_custom_alias_replacement() {
-  assert_contains "$PROTOCOL" 'aliases are never inherited from the SIA entry' || return 1
-  assert_contains "$PROTOCOL" 'is therefore unavailable for the effective custom operation' || return 1
+  assert_contains "$PROTOCOL" 'CUSTOM override replaces the complete shipped alias set' || return 1
+  assert_contains "$PROTOCOL" 'an omitted alias is unavailable' || return 1
   assert_contains "$EXTENSIONS" 'Aliases are not inherited or merged' || return 1
   assert_contains "$EXTENSIONS" 'declaring no aliases removes every shipped alias' || return 1
 }

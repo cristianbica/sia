@@ -34,7 +34,7 @@ check_claude_bridge() {
 
 check_protocol_directives() {
   assert_nonempty "$PROTOCOL" || return 1
-  for directive in 'Sia load docs' 'Sia load skills' 'Sia resume' 'Sia handoff' 'Sia stop' 'Sia reload'; do
+  for directive in 'Sia load docs' 'Sia load skills' 'Sia forge on' 'Sia forge off' 'Sia resume' 'Sia handoff' 'Sia stop' 'Sia reload'; do
     assert_contains "$PROTOCOL" "$directive" || return 1
   done
   assert_contains "$PROTOCOL" '.ai/RULES.md' || return 1
@@ -47,6 +47,10 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'invalid form reports an arity or syntax error' || return 1
   assert_contains "$PROTOCOL" 'YYYY-MM-DD-NN-<slug>.md' || return 1
   assert_contains "$PROTOCOL" 'filenames only' || return 1
+  assert_contains "$PROTOCOL" 'only when no operation is active' || return 1
+  assert_contains "$PROTOCOL" 'cannot be resumed' || return 1
+  assert_contains "$PROTOCOL" 'independently eligible increment' || return 1
+  assert_contains "$PROTOCOL" 'disables Forge' || return 1
 }
 
 check_unattended_directive() {

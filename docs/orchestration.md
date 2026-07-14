@@ -79,6 +79,18 @@ dirty-worktree safeguards, or authorize unrequested destructive or external acti
 release, publish, and deploy remain unavailable unless the initial request explicitly includes them. Host permission,
 credential, safety, attribution, or material-scope blockers end unattended work with an exact blocked result.
 
+## Forge mode
+
+`Sia forge on` enables a conversation-scoped iterative mode when no operation is active; `Sia forge off`, `Sia stop`,
+`Sia reload`, or a new conversation ends it. Forge creates no artifact and cannot be resumed. It applies to unqualified
+later questions and action requests: questions receive direct answers, while actions are triaged only to trivial or
+lightweight delivery. Lightweight work still shows its required inline receipt and focused validation.
+
+When an action needs standard delivery, Forge explains the reason and asks whether to switch to standard delivery or to
+stay in Forge by narrowing the next request to an independently eligible increment. It never silently switches routes
+or bypasses route, approval, permission, or external-action gates. An explicit operation, `unattended`, or another
+reserved directive uses normal Sia resolution.
+
 ## Handoff envelope
 
 Every isolated or resumed phase receives only the information needed to execute its assignment:

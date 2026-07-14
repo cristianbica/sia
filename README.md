@@ -130,6 +130,18 @@ approval, then builds, reviews, fixes, and reports. In-envelope implementation d
 expanded scope, risk, permissions, or external actions do. An explicit request for a full or thorough workflow selects
 standard delivery.
 
+For rapid, conversation-scoped iteration, use Forge:
+
+```text
+Sia forge on
+Sia forge off
+```
+
+Forge answers unqualified questions directly and routes only trivial or lightweight changes, including the inline
+receipt and focused validation. A request that needs standard delivery explains why and asks whether to switch routes or
+narrow the next increment. Forge creates no plan artifact and ends with `Sia forge off`, `Sia stop`, `Sia reload`, or a
+new conversation.
+
 ### Run an operation unattended
 
 ```text
