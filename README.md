@@ -145,7 +145,8 @@ Unattended mode does not bypass host or system permissions, external approval in
 or dirty-worktree safeguards. It does not imply permission to commit, push, open a pull request, release, publish,
 deploy, perform destructive work, or take other external actions unless the initial request explicitly includes them.
 
-If delivery continues in a fresh conversation or isolated worker, Sia persists the approved plan:
+If delivery continues in a fresh conversation or isolated worker, Sia persists the approved plan. New plans use
+`YYYY-MM-DD-NN-<slug>.md`: the UTC date followed by the next zero-padded daily sequence, so they sort chronologically:
 
 ```text
 Sia resume .ai/plans/2026-07-13-01-subscription-pausing.md

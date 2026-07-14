@@ -83,6 +83,9 @@ check_delivery_is_resumable() {
   assert_contains "$DELIVERY" 'directly authorizes a compact receipt' || return 1
   assert_contains "$DELIVERY" 'matching approval digest' || return 1
   assert_contains "$DELIVERY" 'optional `base` and `dirty` comments' || return 1
+  assert_contains "$DELIVERY" 'YYYY-MM-DD-NN-<slug>.md' || return 1
+  assert_contains "$DELIVERY" 'UTC creation date' || return 1
+  assert_contains "$DELIVERY" 'filenames only' || return 1
 }
 
 check_parallel_work_is_bounded() {

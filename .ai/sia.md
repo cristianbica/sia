@@ -53,7 +53,9 @@ operation.
 
 ### `Sia resume <approved-plan>`
 
-Read only the named delivery artifact under `.ai/plans/`. New compact artifacts have only `operation`, `workflow`, and
+Read only the named delivery artifact under `.ai/plans/`. New artifacts are named
+`YYYY-MM-DD-NN-<slug>.md`, using the UTC creation date and a zero-padded daily sequence; allocating `NN` may inspect
+filenames only and never historical plan contents. New compact artifacts have only `operation`, `workflow`, and
 `skills` frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments. Existing valid
 legacy artifacts remain resumable without rewriting. Refuse ambiguous, missing, unapproved, or contradictory plans.
 

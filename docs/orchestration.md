@@ -122,8 +122,12 @@ child-worker usage from coordinator counters. These fields are telemetry, not wo
 
 ## Plan artifacts
 
-Persist every non-trivial delivery artifact under `.ai/plans/` before Build. Planless trivial, investigation, review,
-and documentation workers use the bounded handoff envelope but do not create an artifact merely for isolation.
+Persist every non-trivial delivery artifact under `.ai/plans/` before Build. Name every new artifact
+`YYYY-MM-DD-NN-<slug>.md`, using its UTC creation date and the next zero-padded daily sequence.
+To allocate `NN`, inspect filenames only; do not read historical plan contents. This makes lexicographic directory order
+chronological. Planless
+trivial, investigation, review, and documentation workers use the bounded handoff envelope but do not create an
+artifact merely for isolation.
 
 New plans keep only the information a reader needs in their header and visible body:
 
@@ -145,8 +149,9 @@ skills: [repository-discovery, testing]
 <!-- sia:base 4d3f... -->
 ```
 
-The filename is the identity. Frontmatter has no ID, revision, route, status, digest, baseline, permissions, or empty
-lists. Only `status` is required after the approval block. Optional one-line comments appear only when relevant:
+The filename is the identity; for example, `.ai/plans/2026-07-14-06-short-outcome.md`. Frontmatter has no ID,
+revision, route, status, digest, baseline, permissions, or empty lists. Only `status` is required after the approval
+block. Optional one-line comments appear only when relevant:
 `approved`, `base`, `dirty`, `mode`, `route`, `ceiling`, `external`, `progress`, and `blocker`.
 
 The digest is lowercase SHA-256 over normalized bytes between approval markers. An approved standard plan adds

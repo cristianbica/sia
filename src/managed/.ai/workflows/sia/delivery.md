@@ -31,6 +31,9 @@ When waiting, use one longest-safe wait; never poll without new evidence.
 
 - Purpose: produce a readable, executable standard plan; no product/source writes.
 - Output: the visible plan states only outcome, scope, non-goals, acceptance, checks, risks, and external actions.
+- Filename: every new artifact is `.ai/plans/YYYY-MM-DD-NN-<slug>.md`, using the UTC creation date and a two-digit,
+  zero-padded daily sequence. Inspect filenames only (never prior plan contents) to select the next unused `NN` for that
+  date; this makes directory order chronological and deterministic.
 - Header: exactly `operation`, `workflow`, and declared `skills`; the filename is the plan identity.
 - Footer: state is optional one-line `<!-- sia:<name> <value> -->` comments after the approval block. `status` is
   required; all other comments appear only when relevant.
@@ -92,7 +95,7 @@ Commit, push, pull request, release, publish, and deploy require explicit user i
 
 ## Compact plan artifact
 
-New plans use this shape:
+New plans use this shape (for example, `.ai/plans/2026-07-14-06-short-outcome.md`):
 
 ```markdown
 ---

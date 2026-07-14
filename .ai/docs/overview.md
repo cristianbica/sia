@@ -29,6 +29,8 @@ documentation, and deterministic verification. The root `README.md` is the publi
 - **Workflows:** phase and gate contracts used by operations.
 - **Skills:** reusable prompt guidance loaded only when relevant; project skills may be added beside Sia's skills.
 - **Repository knowledge:** `.ai/docs/` is a concise, evidence-linked routing layer maintained by documentation work.
+- **Delivery artifacts:** new standard plans use `.ai/plans/YYYY-MM-DD-NN-<slug>.md`, with a UTC date and daily
+  zero-padded sequence so plan directories sort chronologically.
 - **Installer ownership:** Sia replaces only its reserved paths and marked blocks; project content survives refreshes.
 
 ## Dogfood boundary
@@ -37,4 +39,3 @@ The Sia source of truth is `src/`, `install.sh`, `scripts/`, `tests/`, `docs/`, 
 `.ai/` files in this repository let us exercise Sia against itself. They are generated or project-owned runtime
 content, not an alternate implementation. Change `src/` when changing Sia; run `./install.sh` to refresh the reserved
 `.ai/*/sia` projection.
-
