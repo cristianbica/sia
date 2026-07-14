@@ -106,10 +106,9 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - `execution_mode` is approval-controlled, propagates through handoffs, and is inherited by `Sia resume`.
 - Unattended authorization ceiling and external-action fields remain immutable across revisions and resume.
 - In-scope unattended replans auto-approve; outcome expansion, unsafe choices, or permission blockers return `blocked`.
-- Editing an approved plan resets approval.
-- Appending valid phase evidence outside the approval-controlled block does not invalidate approval.
-- Phase-boundary sequences are scoped to `plan_revision`; prior revisions remain historical evidence.
-- Malformed approval/evidence markers, metadata mismatch, or noncanonical digest verification prevent resume.
+- Editing approved visible plan content resets approval; short footer progress comments do not.
+- New plans use minimal operation/workflow/skills frontmatter and optional one-line status comments at EOF.
+- Malformed approval markers, conflicting status comments, or a nonmatching digest prevent resume.
 - `Sia resume <approved-plan>` verifies approved content and enters the recorded delivery phase rather than replanning.
 - Phase handoffs name exact current definition paths; workers do not independently reroute through catalogs.
 - Lightweight delivery uses one bounded Build handoff and focused coordinator validation. An internal source change

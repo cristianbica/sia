@@ -53,23 +53,19 @@ operation.
 
 ### `Sia resume <approved-plan>`
 
-Read only the named file. It must be a delivery artifact under `.ai/plans/` with an intact approved revision and
-digest. Load `.ai/RULES.md` when present and verify the plan before entering its recorded next phase. Refuse ambiguous,
-stale, missing, unapproved, or internally inconsistent plans. Never scan `.ai/plans/` for alternatives.
+Read only the named delivery artifact under `.ai/plans/`. New compact artifacts have only `operation`, `workflow`, and
+`skills` frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments. Existing valid
+legacy artifacts remain resumable without rewriting. Refuse ambiguous, missing, unapproved, or contradictory plans.
 
-Verify exactly one ordered, nonnested `sia:approval` marker pair and one `sia:evidence` pair. Approval metadata inside
-the approval block—including `execution_mode`, `authorization_ceiling`, `authorized_external_actions`, `base_ref`, and
-the dirty baseline—must match frontmatter. Recompute the lowercase SHA-256 using the delivery workflow's normalization;
-require matching `approved_digest` and `approved_revision`. Mutable evidence never repairs invalid approved content.
+For compact artifacts, recompute the lowercase SHA-256 from normalized approval-block bytes. Status beyond
+`pending-approval` requires one matching `sia:approved` comment; progress never repairs invalid approval content. Derive
+the next phase from status. `mode`, `route`, `base`, `dirty`, `ceiling`, `external`, and `blocker` comments apply only
+when present. A blocked unattended plan retries only after an observable condition changes. Refuse complete or
+cancelled artifacts; Ship also requires passing final Review/Validate evidence.
 
-Resume `approved` or `in-progress` plans, or a blocked unattended plan with a valid `sia-blocker` record. Require
-`execution_mode`; status, `next_phase`, and current-revision records must match the lifecycle table. A blocked plan
-retries only after its `resume_when` condition changes. Refuse draft, complete, cancelled, or contradictory state. Ship
-also requires a passing final Review/Validate record.
-
-Compare the current HEAD and changed paths with `base_ref`, the recorded dirty baseline, and the latest phase evidence.
-In unattended mode, unsafe overlap or attribution returns `blocked`; never auto-authorize around it. Otherwise,
-boundary drift returns standard work to Plan. Record nonmaterial drift without rewriting the base.
+Compare current HEAD and changed paths with optional base/dirty comments and progress evidence. In unattended mode,
+unsafe overlap or attribution returns `blocked`; never auto-authorize around it. Otherwise, boundary drift returns
+standard work to Plan. Record nonmaterial drift without rewriting the base.
 
 At the phase boundary, resolve the current effective operation, workflow, and skills. Put their exact paths in the
 handoff. A definition-path or resolution change is reported; a material conflict with approved scope returns to Plan and

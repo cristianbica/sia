@@ -72,10 +72,9 @@ check_workflow_contract() {
   assert_contains "$delivery" 'fast' || return 1
   assert_contains "$delivery" 'do_not_load' || return 1
   assert_contains "$delivery" '<!-- sia:approval:start -->' || return 1
-  assert_contains "$delivery" '<!-- sia:evidence:start -->' || return 1
   assert_contains "$delivery" 'lowercase SHA-256' || return 1
-  assert_contains "$delivery" 'sia-phase-boundary' || return 1
-  assert_contains "$delivery" 'initial staged, unstaged, and untracked path baseline' || return 1
+  assert_contains "$delivery" '<!-- sia:status pending-approval -->' || return 1
+  assert_contains "$delivery" 'frontmatter has no ID, status, revision' || return 1
   assert_contains "$delivery" 'retain the plan for history without asking' || return 1
   assert_contains "$delivery" 'separate explicit user request' || return 1
 }

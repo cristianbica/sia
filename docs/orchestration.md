@@ -122,117 +122,44 @@ child-worker usage from coordinator counters. These fields are telemetry, not wo
 
 ## Plan artifacts
 
-Persist every non-trivial delivery artifact under `.ai/plans/` before Build. This gives same-context work, isolated
-workers, fresh conversations, authorization, and resume one artifact contract. Planless trivial, investigation, review,
-and documentation workers use the bounded handoff envelope but do not create a delivery artifact merely for isolation.
+Persist every non-trivial delivery artifact under `.ai/plans/` before Build. Planless trivial, investigation, review,
+and documentation workers use the bounded handoff envelope but do not create an artifact merely for isolation.
 
-A persisted plan under `.ai/plans/` includes at least:
-
-```yaml
----
-id: 2026-07-12-01-subscription-pausing
-operation: implement
-workflow: delivery
-execution_mode: interactive
-authorization_ceiling: [approved-intent-envelope]
-execution_route: standard
-authorized_external_actions: []
-status: draft
-revision: 1
-approved_revision:
-approved_digest:
-approved_at:
-base_ref: 4d3f...
-staged_paths: []
-unstaged_paths: []
-untracked_paths: []
-next_phase: approval
-blocked_phase:
-blocker_attempt: 0
-docs: []
-skills: [repository-discovery, testing]
----
-```
-
-The body has exactly one approval-controlled block and one mutable evidence block:
+New plans keep only the information a reader needs in their header and visible body:
 
 ```markdown
+---
+operation: implement
+workflow: delivery
+skills: [repository-discovery, testing]
+---
+
+# Outcome
+
 <!-- sia:approval:start -->
-Approval metadata matching the frontmatter, followed by outcome, context, scope, non-goals, acceptance criteria,
-steps, validation, documentation impact, risks, assumptions, and permissions or exclusions.
+## Scope and acceptance
+...
 <!-- sia:approval:end -->
 
-<!-- sia:evidence:start -->
-Phase transitions, baseline, resolved definition paths, model reporting, command results, findings, and deviations.
-<!-- sia:evidence:end -->
+<!-- sia:status pending-approval -->
+<!-- sia:base 4d3f... -->
 ```
 
-After Approval and each completed Build, Review/Validate, Fix, or Ship phase, append one ordered fenced
-`sia-phase-boundary` record. It contains `sequence`, `plan_revision`, `completed_phase`, `next_phase`, `head_ref`,
-`changed_paths`, and `unresolved_material_findings`. An Approval record uses `explicit-user` for standard interactive
-work, `activating-request` for lightweight interactive work, or `unattended-invocation` for unattended work. Sequence
-starts at 1 for each plan revision; invalid current-revision records prevent resume.
+The filename is the identity. Frontmatter has no ID, revision, route, status, digest, baseline, permissions, or empty
+lists. Only `status` is required after the approval block. Optional one-line comments appear only when relevant:
+`approved`, `base`, `dirty`, `mode`, `route`, `ceiling`, `external`, `progress`, and `blocker`.
 
-The approval block starts with `id`, `operation`, `workflow`, `execution_mode`, `execution_route`, and `revision`,
-followed by `base_ref`, `staged_paths`, `unstaged_paths`, `untracked_paths`, `docs`, and `skills`. Those values must
-match frontmatter. An older plan may omit `execution_route` and is treated as `standard`. The route is `lightweight` or
-`standard` in planned artifacts; `trivial` is planless. The `status`, approval fields, and `next_phase` are mutable
-routing fields and are excluded from the digest. Evidence may record implementation details inside an approved intent
-envelope without another prompt. A boundary expansion or route promotion changes the approval block and requires a
-revised standard plan and approval, or unattended authorization. Prior-revision records remain historical evidence; the
-new revision starts its boundary sequence at 1.
+The digest is lowercase SHA-256 over normalized bytes between approval markers. An approved standard plan adds
+`<!-- sia:approved <sha256> -->`; changing approved bytes removes that comment and restores
+`<!-- sia:status pending-approval -->`. Progress comments never repair an invalid digest.
 
-For unattended mode, `authorization_ceiling` and `authorized_external_actions` occur in frontmatter and the approval
-block and remain byte-for-byte unchanged across revisions. Any mismatch prevents resume.
+The status comment determines resume: `pending-approval`, `build`, `review-validate`, `fix`, `ship`, `blocked`,
+`complete`, or `cancelled`. A blocked unattended plan adds one concise blocker comment with an observable resume
+condition. Resume reads only the named artifact, rejects contradictory/complete/cancelled state, and preserves legacy
+artifacts without migration. Base and dirty comments protect attribution when present; unattended ceiling and external
+comments are immutable. Handoff-only details stay in the handoff envelope, not the plan.
 
-The delivery state table is canonical: Plan is `draft/approval`, authorization is `approved/build`, active phases are
-`in-progress/<phase>`, an unattended blocker is `blocked/<current-phase>`, successful Ship is `complete/none`, and
-cancellation is `cancelled/none`. Lightweight uses the same artifact states but focused Review/Validate may transition
-directly to Ship; trivial uses no delivery artifact.
-
-Compute `approved_digest` as lowercase SHA-256 over only the bytes between the approval marker lines after converting
-CRLF to LF, excluding a UTF-8 BOM, and ensuring exactly one final LF. The marker lines are not part of the digest.
-Refuse missing, duplicate, nested, reversed, or malformed marker pairs. Changing approved content resets status to
-`draft`, clears approval, increments the revision in frontmatter and the approval block, and returns to approval.
-
-An eligible interactive lightweight request is directly authorized and records a compact receipt. For standard work,
-Sia presents outcome, scope, non-goals, criteria, risks, external actions, and path/revision, then accepts one
-plain-language approval. The digest is internal: Sia computes, records, and verifies it without asking the user to
-compare it. Implementation approach, steps, focused checks, and in-scope documentation may change as evidence. Ask
-again only when outcome, scope, non-goals, criteria, risk, permissions, or external actions expand. In unattended mode,
-Sia automatically authorizes an in-ceiling plan; otherwise, return `blocked`.
-
-A blocked plan appends a `sia-blocker` record with the revision, phase, prior status, attempt, reason, and an observable
-`resume_when` condition. Resume does no phase work while that condition is unchanged. If the same phase
-blocks again, increment its persisted attempt. Clear the blocked phase only when continuing, reset attempts after phase
-completion or a new revision, and require new user instruction after three attempts in one phase/revision.
-
-`Sia resume` verifies the plan's approval-controlled revision and digest and inherits its stored `execution_mode`. A Sia
-refresh alone does not invalidate an approved plan. At each phase boundary, resolve the current effective definitions
-and put their exact paths in the handoff; the receiving worker loads those paths without rerouting. Announce a changed
-resolution. If current rules or definitions conflict materially with approved scope, return to Plan and Approve rather
-than silently changing the work.
-
-Resume accepts `approved` or `in-progress`, plus `blocked` for unattended plans with a valid latest blocker. Status and
-`next_phase` must match the approved revision's records. Legal phase transitions remain Approval → Build, Build →
-Review/Validate, Review/Validate → Fix, Fix → Review/Validate, Review/Validate → Ship, and Ship → none. Ship requires
-passing final review evidence. Refuse draft, complete, cancelled, or contradictory artifacts.
-
-On resume, compare current HEAD and changed paths with the approved `base_ref`, initial dirty baseline, and latest phase
-evidence. Record nonmaterial drift without changing approved content. Drift that overlaps approved scope, invalidates
-evidence, or makes attribution unsafe returns interactive work to Plan and Approve. Unattended unsafe overlap or
-attribution is blocked and cannot be auto-replanned.
-
-Capture the base commit and initial staged, unstaged, and untracked path baseline during Plan and include it in the
-approval-controlled artifact before approval. Do not copy patches or untracked contents into the artifact. If Sia
-later touches a path that was already dirty, report the attribution as ambiguous rather than claiming the complete
-change.
-
-Avoid a five-report task directory. Persist only artifacts needed for approval, resumption, or durable evidence.
-
-The current protocol implements `Sia resume` only for delivery plans. Lightweight investigation, review,
-documentation, and definition workflows should normally finish in one context; if interrupted, persist their current
-report or scope and restart the operation explicitly until that workflow defines its own resumable envelope.
+Avoid a report directory. Persist only the visible authorization and the few comments needed to resume safely.
 
 ## Delivery workflow
 

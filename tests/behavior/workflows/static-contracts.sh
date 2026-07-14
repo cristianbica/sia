@@ -41,66 +41,48 @@ check_bounded_handoff() {
 }
 
 check_unattended_delivery() {
-  assert_contains "$DELIVERY" 'execution_mode: interactive' || return 1
-  assert_contains "$DELIVERY" '`execution_mode: unattended`' || return 1
-  assert_contains "$DELIVERY" 'plan_revision: 1' || return 1
-  assert_contains "$DELIVERY" 'authorization_source: explicit-user' || return 1
-  assert_contains "$DELIVERY" 'up-front unattended authorization' || return 1
-  assert_contains "$DELIVERY" 'plain-language approval' || return 1
-  assert_contains "$DELIVERY" 'Never ask the user to copy, repeat, inspect, or compare a digest' || return 1
+  assert_contains "$DELIVERY" 'mode: unattended' || return 1
+  assert_contains "$DELIVERY" '`ceiling` immutable' || return 1
+  assert_contains "$DELIVERY" 'one interactive approval for standard work' || return 1
+  assert_contains "$DELIVERY" 'never ask users to compare a digest' || return 1
   assert_contains "$DELIVERY" 'Review/Validate' || return 1
   assert_contains "$DELIVERY" 'blocks instead of asking' || return 1
-  assert_contains "$DELIVERY" 'host permissions or external actions' || return 1
+  assert_contains "$DELIVERY" 'Neither mode expands host' || return 1
 }
 
-fixture_field() {
-  sed -n "s/^$1: //p" "$2" | sed -n '1p'
+comment_value() {
+  sed -n "s/^<!-- sia:$1 \(.*\) -->$/\1/p" "$2" | sed -n '1p'
 }
 
 check_unattended_artifact_fixtures() {
   for fixture in "$INITIAL_FIXTURE" "$BLOCKED_FIXTURE"; do
     assert_nonempty "$fixture" || return 1
-    assert_fixed_count "$fixture" 'execution_mode: unattended' 2 || return 1
-    assert_fixed_count "$fixture" 'authorization_ceiling:' 2 || return 1
-    assert_fixed_count "$fixture" 'authorized_external_actions: []' 2 || return 1
-    assert_contains "$fixture" 'authorization_source: unattended-invocation' || return 1
+    assert_fixed_count "$fixture" '<!-- sia:status ' 1 || return 1
+    assert_fixed_count "$fixture" '<!-- sia:mode unattended -->' 1 || return 1
+    assert_fixed_count "$fixture" '<!-- sia:ceiling ' 1 || return 1
+    assert_contains "$fixture" 'approved fixture-digest' || return 1
+    assert_not_contains "$fixture" 'revision:' || return 1
   done
-  assert_equal "$(fixture_field authorization_ceiling "$INITIAL_FIXTURE")" \
-    "$(fixture_field authorization_ceiling "$BLOCKED_FIXTURE")" \
+  assert_equal "$(comment_value ceiling "$INITIAL_FIXTURE")" \
+    "$(comment_value ceiling "$BLOCKED_FIXTURE")" \
     'unattended replan changed its authorization ceiling' || return 1
-  assert_equal "$(fixture_field authorized_external_actions "$INITIAL_FIXTURE")" \
-    "$(fixture_field authorized_external_actions "$BLOCKED_FIXTURE")" \
-    'unattended replan changed its external-action authority' || return 1
-  assert_contains "$BLOCKED_FIXTURE" 'status: blocked' || return 1
-  assert_contains "$BLOCKED_FIXTURE" '```sia-blocker' || return 1
-  assert_contains "$BLOCKED_FIXTURE" 'resume_status: in-progress' || return 1
-  assert_contains "$BLOCKED_FIXTURE" 'attempt: 1' || return 1
-  assert_contains "$BLOCKED_FIXTURE" 'resume_when:' || return 1
+  assert_contains "$BLOCKED_FIXTURE" '<!-- sia:status blocked -->' || return 1
+  assert_contains "$BLOCKED_FIXTURE" '<!-- sia:blocker fix:' || return 1
   assert_contains "$BLOCKED_FIXTURE" 'make attribution unsafe' || return 1
-  assert_contains "$BLOCKED_FIXTURE" 'plan_revision: 1' || return 1
-  assert_contains "$BLOCKED_FIXTURE" 'plan_revision: 2' || return 1
-  assert_contains "$DELIVERY" 'Allow at most three unattended Review/Validate → Fix cycles' || return 1
-  assert_contains "$DELIVERY" 'unsafe overlap or attribution is' || return 1
+  assert_contains "$DELIVERY" 'at most three Fix cycles' || return 1
+  assert_contains "$DELIVERY" 'unsafe overlap or attribution' || return 1
 }
 
 check_delivery_is_resumable() {
-  assert_contains "$DELIVERY" 'Sia resume <approved-plan>' || return 1
-  assert_contains "$DELIVERY" 'Load only the named active plan' || return 1
   assert_contains "$DELIVERY" '<!-- sia:approval:start -->' || return 1
-  assert_contains "$DELIVERY" '<!-- sia:evidence:start -->' || return 1
+  assert_contains "$DELIVERY" '<!-- sia:status pending-approval -->' || return 1
+  assert_contains "$DELIVERY" 'frontmatter has no ID, status, revision' || return 1
+  assert_contains "$DELIVERY" 'legacy artifacts unchanged' || return 1
   assert_contains "$DELIVERY" 'same-context execution' || return 1
-  assert_contains "$DELIVERY" 'active plan status and completion evidence only' || return 1
-  assert_contains "$DELIVERY" '```sia-phase-boundary' || return 1
-  assert_contains "$DELIVERY" 'During Plan, record' || return 1
-  assert_contains "$DELIVERY" '## Lifecycle state' || return 1
-  assert_contains "$DELIVERY" 'Approval → Build' || return 1
-  assert_contains "$DELIVERY" 'Ship → none' || return 1
-  assert_contains "$DELIVERY" 'one interactive approval for a standard intent envelope' || return 1
-  assert_contains "$DELIVERY" 'activating-request' || return 1
-  assert_contains "$DELIVERY" 'Unattended execution always' || return 1
-  for baseline in staged_paths unstaged_paths untracked_paths; do
-    assert_contains "$DELIVERY" "$baseline" || return 1
-  done
+  assert_contains "$DELIVERY" 'one interactive approval for standard work' || return 1
+  assert_contains "$DELIVERY" 'directly authorizes a compact receipt' || return 1
+  assert_contains "$DELIVERY" 'matching approval digest' || return 1
+  assert_contains "$DELIVERY" 'optional `base` and `dirty` comments' || return 1
 }
 
 check_parallel_work_is_bounded() {
@@ -122,13 +104,12 @@ check_read_only_workflows() {
 
 check_phase_specific_skill_composition() {
   assert_contains "$DOCUMENT" '  - documentation' || return 1
-  assert_contains "$DELIVERY" 'Resolve Build skills by logical name through the effective skill catalog' || return 1
-  assert_contains "$DELIVERY" 'effective `documentation` skill' || return 1
-  assert_contains "$DELIVERY" 'Load `safe-refactoring` only when' || return 1
+  assert_contains "$DELIVERY" 'Resolve required skills' || return 1
+  assert_contains "$DELIVERY" 'load `documentation` or `safe-refactoring` only when material' || return 1
   assert_contains "$DELIVERY" 'effective `code-review` and `testing` skills' || return 1
-  assert_contains "$DELIVERY" 'Lightweight loads only' || return 1
+  assert_contains "$DELIVERY" 'lightweight loads only' || return 1
   assert_contains "$DELIVERY" 'focused diff/scope check' || return 1
-  assert_contains "$DELIVERY" 'CUSTOM override' || return 1
+  assert_contains "$DELIVERY" 'CUSTOM' || return 1
 }
 
 run_case "isolated phases receive the complete bounded handoff" check_bounded_handoff

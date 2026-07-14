@@ -64,9 +64,10 @@ body. Load a skill only when a later task makes it relevant or the user requests
 
 ### `Sia resume <approved-plan>`
 
-Read a persisted delivery plan and verify its approved revision, mode, authorization ceiling, external-action list,
-digest, and current-revision records. A blocked unattended plan resumes only after its structured `resume_when`
-condition changes. Refuse stale, unapproved, ambiguous, or inconsistent plans. Other artifact kinds need an envelope.
+Read a persisted delivery plan and verify its visible approval digest plus compact status comments. New plans keep only
+`operation`, `workflow`, and `skills` in frontmatter; optional one-line footer comments carry base, dirty paths,
+unattended authority, and concise progress when needed. Existing valid legacy plans remain resumable. Refuse stale,
+unapproved, ambiguous, or inconsistent plans. Other artifact kinds need an envelope.
 
 ### `Sia handoff` followed by an envelope
 
@@ -107,11 +108,10 @@ approved only while it remains a faithful interpretation of the original outcome
 cycles remain required. Interactive lightweight work is directly authorized by its activating request; interactive
 standard work pauses once for an intent envelope and re-prompts only at a boundary expansion.
 
-For delivery, persist `execution_mode: unattended`, an immutable `authorization_ceiling`, and the exact
-`authorized_external_actions` in frontmatter and approval-controlled content. Sia computes and verifies the revision
-and digest before Build; an interactive user approves the displayed draft in plain language and never supplies a
-digest. Automatic approval identifies the plan bytes accepted under standing authorization; it does not prove user
-review. Handoffs carry the same fields, and `Sia resume <approved-plan>` inherits them.
+For delivery, an unattended plan adds immutable one-line `mode`, `ceiling`, and `external` comments only when needed.
+Sia computes and verifies the approval digest before Build; an interactive user approves the displayed draft in plain
+language and never supplies a digest. Automatic approval identifies accepted plan bytes; it does not prove user review.
+Handoffs retain their own complete fields, and `Sia resume <approved-plan>` inherits unattended authority.
 
 Unattended mode never expands host permissions, bypasses system or external approval interfaces, weakens project rules
 or dirty-worktree safeguards, or authorizes work outside the initial request. Commit, push, pull request, release,
