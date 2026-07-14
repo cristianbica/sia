@@ -1,7 +1,7 @@
 # Orchestration and workflows
 
 Operations select workflows. Workflows coordinate phases and load only the documentation and skills needed for the
-current phase. Route triage chooses the smallest safe execution path before writes: planless trivial work, compact
+current phase. Route triage chooses the smallest safe execution path before writes: planless trivial work, inline
 lightweight delivery, or standard delivery. A phase may use an isolated worker, a fresh user-started session, or the
 active session.
 
@@ -14,7 +14,9 @@ Sia's `implement` operation uses the following route contract:
   exact seam, paths, criteria, and focused test are evidenced. It excludes public/serialization contracts, migrations,
   configuration, permission, security, concurrency, external, compatibility, multi-consumer, broad-refactor,
   managed-Sia, lifecycle, dirty-attribution, and unresolved-assumption risk. Its activating request directly authorizes
-  a compact receipt, one bounded Build handoff, and focused validation without a reviewer or Fix loop.
+  an inline compact receipt, one bounded Build handoff, and focused validation without a reviewer or Fix loop. The
+  receipt states the outcome, exact paths or bounded area, acceptance checks, documentation impact, and external
+  actions before Build. It does not create a plan artifact, request another approval, or support `Sia resume`.
 - `standard`: every source change not fully qualifying for lightweight, plus operations/workflows, public contracts,
   migrations, security, external or destructive work, broad scope, unsafe attribution, or uncertainty; use the complete
   delivery lifecycle.
@@ -26,7 +28,8 @@ unambiguous, otherwise it selects `standard` or blocks. A route promotion is rec
 ## Isolation model
 
 Phase isolation reduces steering from rejected planning ideas and builder self-justification. The portable mechanism is
-an explicit handoff artifact, not native subagent support.
+an explicit handoff artifact, not native subagent support. Lightweight receipts remain inline; work that needs a
+persisted approval or `Sia resume` uses standard delivery.
 
 Preferred execution order:
 
@@ -61,11 +64,11 @@ in `unattended` mode. `unattended` is a modifier, not an operation or alias, and
 existing interactive artifact.
 
 Unattended mode provides standing authorization for Sia-owned workflow gates that remain within the original operation
-request. Sia applies the selected route: trivial work stays planless, lightweight work persists and digests a compact
-artifact with focused validation, and standard work performs separate Review/Validate and bounded Fix cycles. It does
-not ask questions: it uses conservative, reversible assumptions or returns a blocked result when a necessary decision
-would expand scope or cannot be made safely. A generated plan accepted this way is automatically approved under standing
-authorization, not represented as a plan the user reviewed.
+request. Sia applies the selected route: trivial work stays planless, lightweight work shows an inline compact receipt
+with focused validation, and standard work performs separate Review/Validate and bounded Fix cycles. It does not ask
+questions: it uses conservative, reversible assumptions or returns a blocked result when a necessary decision would
+expand scope or cannot be made safely. A generated standard plan accepted this way is automatically approved under
+standing authorization, not represented as a plan the user reviewed.
 
 The initial plan stores an immutable authorization ceiling and explicit external-action list. Replans may narrow or
 reinterpret implementation details inside that ceiling but cannot edit either authorization field. Workers receive the
@@ -183,10 +186,10 @@ produce an executable plan. Do not edit product/source code.
 
 ### Approve
 
-Eligible lightweight work records direct activating-request authorization. Standard work stops once for a
-plain-language intent-envelope approval. In-envelope implementation details become evidence; scope, risk, permission,
-or external-action expansion requires a revised plan. Unattended mode auto-authorizes only inside its original outcome.
-Authorization never expands host permissions or unrelated external actions.
+Eligible lightweight work shows its inline receipt under direct activating-request authorization. Standard work stops
+once for a plain-language intent-envelope approval. In-envelope implementation details become evidence; scope, risk,
+permission, or external-action expansion requires a revised plan. Unattended mode auto-authorizes only inside its
+original outcome. Authorization never expands host permissions or unrelated external actions.
 
 ### Build
 

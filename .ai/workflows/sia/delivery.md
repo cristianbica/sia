@@ -27,6 +27,12 @@ lightweight only when eligibility is unambiguous; otherwise select standard or r
 risk is acted on. For trivial work, report the diff, check, skips, and route.
 When waiting, use one longest-safe wait; never poll without new evidence.
 
+Before Build, every lightweight delivery shows an inline compact receipt with its outcome, exact paths or bounded area,
+acceptance checks, documentation impact, and external actions. The activating request remains its authorization: the
+receipt does not ask for another approval. It does not write `.ai/plans/` or become a `Sia resume` target.
+A correction that changes scope or any material risk promotes the work to standard delivery and its persisted approval
+plan.
+
 ## Plan
 
 - Purpose: produce a readable, executable standard plan; no product/source writes.

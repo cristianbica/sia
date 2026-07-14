@@ -31,6 +31,8 @@ documentation, and deterministic verification. The root `README.md` is the publi
 - **Repository knowledge:** `.ai/docs/` is a concise, evidence-linked routing layer maintained by documentation work.
 - **Delivery artifacts:** new standard plans use `.ai/plans/YYYY-MM-DD-NN-<slug>.md`, with a UTC date and daily
   zero-padded sequence so plan directories sort chronologically.
+- **Lightweight delivery:** eligible work shows an inline receipt before Build instead of a persisted plan; it cannot be
+  resumed with `Sia resume`.
 - **Installer ownership:** Sia replaces only its reserved paths and marked blocks; project content survives refreshes.
 
 ## Dogfood boundary

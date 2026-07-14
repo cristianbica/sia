@@ -42,6 +42,12 @@ check_lightweight_contract() {
   assert_contains "$DELIVERY" 'one internal source change' || return 1
   assert_contains "$DELIVERY" 'focused test' || return 1
   assert_contains "$DELIVERY" 'managed-Sia' || return 1
+  assert_contains "$DELIVERY" 'shows an inline compact receipt' || return 1
+  assert_contains "$DELIVERY" 'outcome, exact paths or bounded area' || return 1
+  assert_contains "$DELIVERY" 'does not ask for another approval' || return 1
+  assert_contains "$DELIVERY" 'does not write `.ai/plans/`' || return 1
+  assert_contains "$DELIVERY" 'become a `Sia resume` target' || return 1
+  assert_contains "$ORCHESTRATION" 'It does not create a plan artifact' || return 1
   assert_contains "$LIGHTWEIGHT_FIXTURE" 'expected_route: lightweight' || return 1
   assert_contains "$LIGHTWEIGHT_FIXTURE" 'authorization_source: activating-request' || return 1
   assert_contains "$LIGHTWEIGHT_FIXTURE" '.ai/skills/example/SKILL.md' || return 1

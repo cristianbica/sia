@@ -123,10 +123,12 @@ Sia refresh-docs billing
 
 An operation selects a workflow and relevant skills. `Sia implement` chooses a conservative route: trivial wording or
 formatting corrections are planless; eligible narrow documentation, definitions, and internal fixes are directly
-authorized by the request, use a compact receipt, and get focused validation; product/source or uncertain work uses
-standard delivery. Standard delivery plans once, stops for one intent-envelope approval, then builds, reviews, fixes,
-and reports. In-envelope implementation details do not cause another approval; expanded scope, risk, permissions, or
-external actions do. An explicit request for a full or thorough workflow selects standard delivery.
+authorized by the request, show an inline compact receipt, and get focused validation; product/source or uncertain work
+uses standard delivery. The receipt lists the outcome, bounded paths, checks, documentation impact, and external
+actions; it is not persisted or a second approval gate. Standard delivery plans once, stops for one intent-envelope
+approval, then builds, reviews, fixes, and reports. In-envelope implementation details do not cause another approval;
+expanded scope, risk, permissions, or external actions do. An explicit request for a full or thorough workflow selects
+standard delivery.
 
 ### Run an operation unattended
 
