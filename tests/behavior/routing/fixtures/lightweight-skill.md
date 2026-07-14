@@ -1,6 +1,7 @@
 ---
 case: project-skill-refinement
 expected_route: lightweight
+authorization_source: activating-request
 target: .ai/skills/example/SKILL.md
 behavior_change: prompt-only
 permission_change: false

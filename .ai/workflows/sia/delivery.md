@@ -5,8 +5,8 @@ description: Deliver authorized changes through planning, review, validation, fi
 
 # Delivery workflow
 Triage before choosing a path. Standard follows `Plan → Approve → Build → Review/Validate → Fix → Review/Validate →
-Ship`; lightweight follows `Plan → Approve → Build → focused Review/Validate → Ship`; trivial work is planless.
-Replanning returns to Plan and authorizes a new exact revision through the current execution mode.
+Ship`; lightweight follows direct authorization → Build → focused Review/Validate → Ship; trivial work is planless.
+Standard implementation-detail replanning stays inside its approved intent envelope; a boundary change returns to Plan.
 
 ## Route triage
 
@@ -19,8 +19,9 @@ Record `execution_route` as `trivial`, `lightweight`, or `standard`; missing rou
 - `lightweight`: narrow project-owned `.ai/docs/**` or definition paths, or one internal repository-source behavior
   change with an evidenced seam, exact paths, clear criteria, and a focused test. It has no public/serialization
   contract, migration, configuration, permission, security, concurrency, external, compatibility, multi-consumer,
-  broad-refactor, managed-Sia, lifecycle, dirty-attribution, or unresolved-assumption risk. Approve exact scope; use
-  one bounded Build handoff, focused validation, and no mandatory independent review worker or Fix loop.
+  broad-refactor, managed-Sia, lifecycle, dirty-attribution, or unresolved-assumption risk. The activating request
+  directly authorizes a compact receipt, one bounded Build handoff, focused validation, and no independent review worker
+  or Fix loop.
 - `standard`: every product/source change not fully qualifying for lightweight, plus operations/workflows, public
   contracts, migrations, security, destructive or external work, broad scope, dirty attribution risk, or uncertainty.
 
@@ -31,8 +32,8 @@ make eligibility unambiguous; otherwise select `standard` or return `blocked`. R
 unauthorized writes.
 
 For trivial work, report diff, check, skips, and route; promote before writing if behavior or policy could change.
-Lightweight persists a compact plan with exact paths, non-goals, focused checks, route evidence, and promotion
-conditions; do not copy transcripts. When waiting, use one longest-safe wait; never poll without new evidence.
+Lightweight persists a compact directly authorized receipt with exact paths, non-goals, focused checks, route evidence,
+and promotion conditions; omit transcripts. When waiting, use one longest-safe wait; never poll without new evidence.
 
 ## Plan
 
@@ -42,37 +43,38 @@ conditions; do not copy transcripts. When waiting, use one longest-safe wait; ne
 - Model profile: request `reasoning` for ambiguous/risky planning; lightweight may inherit the host default or request
   advisory `fast` for latency, not a price guarantee.
 - Inputs: request, project rules, relevant docs, repository evidence, operation, and declared skills.
-- Output: a persisted plan plus a concise user-facing summary of outcome, scope, non-goals, criteria, steps, validation,
+- Output: standard work gets a persisted plan and concise intent-envelope summary: outcome, scope, non-goals, criteria,
   risks, assumptions, external actions, path, and revision. The digest is internal, never an approval token.
-- Transition: persist the draft plan under `.ai/plans/`, then enter Approve.
+- Transition: standard persists a draft then enters Approve; lightweight persists its receipt then enters Build.
 
-Every delivery plan is persisted before authorization, even when all phases remain in one conversation.
-During Plan, record the initial staged, unstaged, and untracked path baseline, execution mode, and base commit in
-approval-controlled content. For unattended mode, derive the smallest `authorization_ceiling` from the activating
-request and list only its explicit external actions. Preserve both fields byte-for-byte in every later revision. Do not
-copy untracked contents into the plan. Discovery may create only that artifact and must not modify product/source files.
+Every non-trivial delivery artifact is persisted before Build, even when all phases remain in one conversation.
+During Plan, record the initial staged, unstaged, and untracked path baseline, mode, and base commit in
+approval-controlled content; lightweight receipt creation records the same fields. For unattended mode, derive the
+smallest `authorization_ceiling` from the activating request; list only explicit external actions. Preserve both fields
+byte-for-byte in every later revision. Do not copy untracked contents into the plan. Discovery may create only that
+artifact and must not modify product/source files.
 
 ## Approve
 
-- Purpose: bind permission to the exact proposed change.
-- Gate: exact-revision user approval in interactive mode; activating-request authorization in unattended mode.
-- Writes: approval metadata in the plan artifact only.
+- Purpose: bind permission to a standard intent envelope or record direct lightweight authorization.
+- Gate: one interactive approval for a standard intent envelope; activating request authorizes lightweight/unattended.
+- Writes: authorization metadata in the delivery artifact only.
 - Transition: Build after approval; Plan after any material change.
 
-Interactive mode presents the current draft plan summary and asks for plain-language approval. Accept `approve`,
-`approved`, `go ahead`, `proceed`, or an equally unambiguous affirmative only for that one current displayed draft.
-Never ask the user to copy, repeat, inspect, or compare a digest. After approval, Sia computes and records the digest
-itself and verifies it matches the displayed revision before Build. If the plan, baseline, or scope changes—or there is
-no one current displayed draft—keep or return it to `draft`, present the revised plan, and request fresh plain approval.
+For standard work, present the current draft's outcome, scope, non-goals, criteria, risks, external actions, and path,
+then accept one plain-language approval. The intent envelope covers implementation approach, step order, focused checks,
+and in-scope documentation; record those changes as evidence without another prompt. Ask again only when outcome,
+scope, non-goals, criteria, risk, permissions, or external actions expand.
+Never ask the user to copy, repeat, inspect, or compare a digest.
 
 The up-front unattended authorization records `execution_mode: unattended`, verifies the plan is the smallest faithful
 interpretation of the activating request, and continues without claiming the user reviewed it. The approval-controlled
 outcome, scope, non-goals, criteria, assumptions, and exclusions must all remain within the immutable unattended
 authorization ceiling.
 
-Editing approval-controlled content increments the revision, clears approval, and returns to Plan. An unattended
-replan may be automatically authorized only inside that ceiling and without changing either authorization field;
-otherwise it blocks instead of asking. Neither mode expands host permissions or external actions.
+Boundary changes increment the revision, clear approval, and return standard work to Plan. An unattended replan may be
+authorized only inside its ceiling; otherwise it blocks instead of asking.
+Neither mode expands host permissions or external actions.
 
 ## Build
 
@@ -81,13 +83,13 @@ otherwise it blocks instead of asking. Neither mode expands host permissions or 
   Lightweight uses one bounded Build handoff and no second worker.
 - Model profile: standard requests `fast` for mechanical work and `reasoning` for risky work; lightweight may request
   advisory `fast` for latency, never as a cost guarantee.
-- Inputs: approved plan, exact resolved definition paths, baseline, material docs, rules, and bounded handoff.
+- Inputs: approved plan or receipt, exact resolved definitions, baseline, material docs, rules, and bounded handoff.
 - Writes: approved repository scope, relevant tests, `.ai/docs/**`, and plan evidence.
 - Transition: Review/Validate when complete; Plan for material scope or approach changes.
 
 Before Build, compare the current commit and changed paths with the approved baseline. Preserve existing changes and
-report safely preservable overlap. In unattended mode, unsafe overlap, concurrent edits, or attribution blocks before
-writes; do not replan around it or modify, stash, reset, clean, or overwrite the pre-existing work.
+report safely preservable overlap. In unattended mode, unsafe overlap or attribution is blocked before writes;
+concurrent edits follow the same rule. Never alter pre-existing work.
 
 Resolve Build skills by logical name through the effective skill catalog. If the approved plan has documentation impact,
 load the effective `documentation` skill. Load `safe-refactoring` only when structural/refactoring guidance is material,
@@ -129,10 +131,8 @@ blocker instead of looping or weakening acceptance criteria. Interactive mode ma
 - Writes: active plan status and completion evidence only; no product, source, or external state by default.
 - Output: behavior, changed paths, verification, isolation used, approved deviations, and remaining risks.
 
-After recording `complete`, interactive Ship offers: “Keep the completed plan for history, or delete this plan file?”
-Delete only the exact active plan after explicit affirmative response. Do not infer deletion from approval, completion,
-or a general cleanup request. Unattended Ship never asks and always keeps the completed plan. If deletion is declined
-or fails, report that the completed plan was retained and still complete the delivery report.
+After recording `complete`, retain the plan for history without asking. Delete only the exact completed plan after a
+separate explicit user request; never infer deletion from approval, completion, or general cleanup language.
 
 Commit, push, pull request, release, publish, and deploy require explicit user intent. Never infer them from approval of
 the implementation plan or from unattended mode.
@@ -147,7 +147,7 @@ id: 2026-07-13-01-short-task-name
 operation: implement
 workflow: delivery
 execution_mode: interactive
-authorization_ceiling: [exact-plan-revision]
+authorization_ceiling: [approved-intent-envelope]
 authorized_external_actions: []
 status: draft
 execution_route: standard
@@ -175,7 +175,7 @@ id: 2026-07-13-01-short-task-name
 operation: implement
 workflow: delivery
 execution_mode: interactive
-authorization_ceiling: [exact-plan-revision]
+authorization_ceiling: [approved-intent-envelope]
 authorized_external_actions: []
 execution_route: standard
 revision: 1
@@ -221,8 +221,9 @@ authorization_source: explicit-user
 ````
 
 `sequence` starts at 1 for each `plan_revision` and increases by one. Resume validates only records matching the
-approved revision; earlier revisions remain historical evidence. An Approval record requires an authorization source
-matching its mode: `explicit-user` for interactive or `unattended-invocation` for unattended. Legal transitions are
+approved revision; earlier revisions remain historical evidence. An Approval record uses `explicit-user` for standard
+interactive work, `activating-request` for lightweight interactive work, or `unattended-invocation` for unattended.
+Legal transitions are
 Approval → Build, Build → Review/Validate, Review/Validate → Fix, Fix → Review/Validate, Review/Validate → Ship, and
 Ship → none. Lightweight Review/Validate may go directly to Ship after focused validation. A missing, duplicated,
 out-of-order, or contradictory current-revision record prevents resume.
@@ -246,8 +247,8 @@ Update frontmatter and append the required phase-boundary record as one logical 
 
 | Event | `status` | `next_phase` | Required record |
 | --- | --- | --- | --- |
-| Plan persisted or materially revised | `draft` | `approval` | None; clear approval fields |
-| Interactive approval or unattended authorization | `approved` | `build` | Approval → Build |
+| Standard plan persisted or boundary revised | `draft` | `approval` | None; clear approval fields |
+| Lightweight receipt or unattended/interactive authorization | `approved` | `build` | Approval → Build |
 | Build starts | `in-progress` | `build` | Latest record remains Approval → Build |
 | Build completes | `in-progress` | `review-validate` | Build → Review/Validate |
 | Review finds in-scope issues | `in-progress` | `fix` | Review/Validate → Fix |
@@ -257,25 +258,23 @@ Update frontmatter and append the required phase-boundary record as one logical 
 | Ship report completes | `complete` | `none` | Ship → none |
 | User cancels | `cancelled` | `none` | Record the reason outside a phase-boundary record |
 
-Ship closes the plan artifact as shown above. By default it remains available as history and evidence. Interactive
-cleanup may delete only that exact completed plan after explicit confirmation. Unattended execution always retains it.
-Product,
-source, and external delivery state remain read-only unless the user explicitly requests and authorizes another action.
+Ship closes the artifact as shown above and retains it as history and evidence. Unattended execution always retains it;
+interactive Ship does too. A separate explicit request may delete that exact completed plan. Product, source, and
+external delivery state remain read-only unless explicitly authorized.
 
 The approval metadata must match frontmatter, and `execution_mode` must be exactly `interactive` or `unattended`.
-`execution_route` is optional for backward compatibility and, when present, must be `lightweight` or `standard` in a
-planned artifact. `trivial` never creates a delivery plan. Route is approval-controlled; changing it materially resets
-approval and requires a new revision.
+`execution_route` is optional for backward compatibility and, when present, must be `lightweight` or `standard` in an
+artifact. `trivial` never creates one. Lightweight promotion creates a standard draft; route changes require a revision.
 For unattended plans, `authorization_ceiling` and `authorized_external_actions` are immutable across revisions and
 resume; any mismatch is an integrity error.
 Compute the lowercase SHA-256 digest over only the bytes between the approval marker lines after converting CRLF to LF,
 excluding a UTF-8 BOM, and ensuring exactly one final LF. Marker lines are excluded. The approval-block `revision` must
 equal frontmatter `revision`, and frontmatter `approved_revision` must equal it. Refuse malformed or mismatched content.
 
-Status, approval fields, `next_phase`, and evidence may change without invalidating approval. Evidence must not alter
-approved scope. A material deviation edits the approval block, increments both revisions, clears approval, and returns
-to Plan and Approve. Retain old records as prior-revision evidence and restart the new revision's sequence at 1.
-Interactive mode waits; unattended mode auto-authorizes only an in-ceiling revision.
+Status, approval fields, `next_phase`, and evidence may change without invalidating approval. Evidence may record
+standard implementation details only inside the intent envelope. A boundary deviation increments both revisions, clears
+approval, and returns to Plan. Retain old records as prior-revision evidence and restart its sequence at 1. Unattended
+mode auto-authorizes only an in-ceiling revision.
 
 At every phase boundary, place the exact current definition paths in the handoff. Load only the named active plan and
 honor explicit `do_not_load` paths.
@@ -289,12 +288,11 @@ Resume accepts `approved` or `in-progress`, plus `blocked` only for an unattende
 Approved and in-progress state must match the latest current-revision boundary. Blocked frontmatter must match the
 blocker's phase and attempt and retain the prior status as `resume_status`. Ship requires passing final review evidence.
 
-Resume inherits the approval-controlled mode and immutable authorization fields; it never switches them from
-conversation text. If `resume_when` is unchanged, return the same blocker without running the phase or incrementing its
-attempt. When it changes, restore `resume_status`, continue, and increment the attempt only if that phase blocks again.
-Clear `blocked_phase` on continuation, retain the attempt count until the phase completes, then reset it to 0. A new
-revision also resets it. After three attempts in one phase/revision, require new user instruction instead of resuming.
+Resume inherits the recorded mode and authorization fields; it never switches them from conversation text. If
+`resume_when` is unchanged, return the same blocker without running the phase or incrementing its attempt. When it
+changes, restore `resume_status`, continue, and increment the attempt only if that phase blocks again. Clear
+`blocked_phase` on continuation, reset it after completion or a new revision, and require instruction after three tries.
 
-On resume, compare current HEAD and changed paths with `base_ref`, the initial dirty baseline, and the latest evidence.
-Nonmaterial drift is recorded without changing approved content. In unattended mode, unsafe overlap or attribution is
-blocked and cannot be auto-replanned. Other material drift returns to Plan and Approve. Refuse contradictory artifacts.
+On resume, compare current HEAD and changed paths with `base_ref`, the initial dirty baseline, and latest evidence.
+Nonmaterial drift is recorded without changing approved content. Unsafe unattended overlap or attribution is blocked;
+other boundary drift returns standard work to Plan. Refuse contradictory artifacts.

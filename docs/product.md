@@ -14,7 +14,7 @@ operations and workflows. The host agent still reads files, edits code, runs com
 
 AI coding tools repeatedly spend time rediscovering repository structure, conventions, commands, and domain behavior.
 Sia should reduce that repeated work while making larger changes more predictable through artifact-based phase handoffs.
-It should not impose large-change ceremony on small, low-risk definition or documentation edits.
+It should not impose approval pauses on clearly bounded, low-risk definition, documentation, or internal fixes.
 
 This is a hypothesis to evaluate, not a guaranteed efficiency claim. Representative tasks must demonstrate less broad
 rediscovery without losing correctness or trusting stale documentation.
@@ -30,6 +30,7 @@ rediscovery without losing correctness or trusting stale documentation.
 - Prefer isolated phase execution so rejected ideas and builder assumptions do not steer later phases.
 - Remain usable when the host cannot spawn an isolated worker.
 - Support explicitly unattended operations without weakening workflow artifacts, review, or safety boundaries.
+- Keep Sia-owned approvals proportionate: direct lightweight authorization and one standard intent-envelope approval.
 - Let projects extend Sia through Sia operations rather than manual framework surgery.
 
 ## Non-goals

@@ -10,6 +10,8 @@ IMPLEMENT="$ROOT/src/managed/.ai/operations/sia/implement.md"
 ORCHESTRATION="$ROOT/docs/orchestration.md"
 LIGHTWEIGHT_FIXTURE="$ROOT/tests/behavior/routing/fixtures/lightweight-skill.md"
 LIGHTWEIGHT_SOURCE_FIXTURE="$ROOT/tests/behavior/routing/fixtures/lightweight-source-fix.md"
+IN_ENVELOPE_FIXTURE="$ROOT/tests/behavior/routing/fixtures/standard-in-envelope-replan.md"
+BOUNDARY_FIXTURE="$ROOT/tests/behavior/routing/fixtures/standard-boundary-replan.md"
 STANDARD_FIXTURE="$ROOT/tests/behavior/routing/fixtures/standard-feature.md"
 TRIVIAL_FIXTURE="$ROOT/tests/behavior/routing/fixtures/trivial-wording.md"
 LEGACY_FIXTURE="$ROOT/tests/behavior/routing/fixtures/legacy-plan.md"
@@ -35,7 +37,8 @@ check_trivial_contract() {
 }
 
 check_lightweight_contract() {
-  assert_contains "$DELIVERY" 'compact plan' || return 1
+  assert_contains "$DELIVERY" 'directly authorizes a compact receipt' || return 1
+  assert_contains "$DELIVERY" 'activating request authorizes lightweight' || return 1
   assert_contains "$DELIVERY" 'one bounded Build handoff' || return 1
   assert_contains "$DELIVERY" 'independent review worker' || return 1
   assert_contains "$DELIVERY" 'promote to standard' || return 1
@@ -43,9 +46,19 @@ check_lightweight_contract() {
   assert_contains "$DELIVERY" 'focused test' || return 1
   assert_contains "$DELIVERY" 'managed-Sia' || return 1
   assert_contains "$LIGHTWEIGHT_FIXTURE" 'expected_route: lightweight' || return 1
+  assert_contains "$LIGHTWEIGHT_FIXTURE" 'authorization_source: activating-request' || return 1
   assert_contains "$LIGHTWEIGHT_FIXTURE" '.ai/skills/example/SKILL.md' || return 1
   assert_contains "$LIGHTWEIGHT_SOURCE_FIXTURE" 'expected_route: lightweight' || return 1
+  assert_contains "$LIGHTWEIGHT_SOURCE_FIXTURE" 'authorization_source: activating-request' || return 1
   assert_contains "$LIGHTWEIGHT_SOURCE_FIXTURE" 'focused_test: test/options_test.rb' || return 1
+}
+
+check_intent_envelope_contract() {
+  assert_contains "$DELIVERY" 'one interactive approval for a standard intent envelope' || return 1
+  assert_contains "$DELIVERY" 'implementation approach, step order, focused checks' || return 1
+  assert_contains "$DELIVERY" 'external actions expand' || return 1
+  assert_contains "$IN_ENVELOPE_FIXTURE" 'requires_new_approval: false' || return 1
+  assert_contains "$BOUNDARY_FIXTURE" 'requires_new_approval: true' || return 1
 }
 
 check_standard_and_backward_compatibility() {
@@ -80,7 +93,8 @@ check_wait_and_telemetry_contract() {
 
 run_case "adaptive route contract is explicit and conservative" check_route_contract
 run_case "trivial work remains planless and exact-file scoped" check_trivial_contract
-run_case "lightweight work keeps approval but removes mandatory extra agents" check_lightweight_contract
+run_case "lightweight work is directly authorized and remains bounded" check_lightweight_contract
+run_case "standard intent envelopes distinguish evidence from boundary changes" check_intent_envelope_contract
 run_case "standard routing and old-plan compatibility remain explicit" check_standard_and_backward_compatibility
 run_case "lightweight context and benchmark validation remain bounded" check_context_and_benchmark_contract
 run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract

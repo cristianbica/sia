@@ -104,7 +104,8 @@ Unattended mode is the user's upfront authorization for Sia-owned workflow gates
 Sia does not ask approval or clarification questions: it makes conservative, reversible assumptions and records them,
 or returns a blocked result when a necessary choice cannot safely be inferred. Material replanning is automatically
 approved only while it remains a faithful interpretation of the original outcome. Separate review, validation, and Fix
-cycles remain required.
+cycles remain required. Interactive lightweight work is directly authorized by its activating request; interactive
+standard work pauses once for an intent envelope and re-prompts only at a boundary expansion.
 
 For delivery, persist `execution_mode: unattended`, an immutable `authorization_ceiling`, and the exact
 `authorized_external_actions` in frontmatter and approval-controlled content. Sia computes and verifies the revision
@@ -130,8 +131,8 @@ After resolution:
 3. Resolve its primary workflow and declared skills.
 4. Report malformed or missing references rather than silently substituting another definition.
 5. Load only the workflow, skills, and documentation required for intake and the current phase.
-6. Let the workflow triage the smallest safe execution route before writes; do not infer a low-risk route from size
-   alone.
+6. Let the workflow triage the smallest safe execution route before writes; eligible lightweight work is directly
+   authorized, while standard work requires one intent-envelope approval. Do not infer low risk from size alone.
 7. Follow the selected workflow route until completion, cancellation, or an explicit operation replacement.
 
 ## Project rules

@@ -23,10 +23,10 @@ product/source behavior, policy, public contract, broad scope, or uncertainty. N
 - Announce the selected execution route and the evidence supporting it. An explicit request for a full or thorough
   workflow selects standard delivery.
 
-Use the delivery workflow. Trivial work is planless and exact-file scoped. Lightweight work uses a compact approved
-plan, one bounded Build handoff, focused coordinator validation, and no mandatory independent review worker. Standard
-work keeps the complete lifecycle. Do not edit product/source before approval. During Build, stay in scope, update
-relevant tests and docs, and promote immediately when any lightweight condition ceases to be evidenced.
+Use the delivery workflow. Trivial work is planless and exact-file scoped. Lightweight work is directly authorized by
+the request, uses a compact receipt, one bounded Build handoff, and focused coordinator validation. Standard work gets
+one intent-envelope approval and keeps the complete lifecycle. Do not edit product/source before authorization. During
+Build, stay in scope, update relevant tests/docs, and promote immediately when lightweight eligibility ends.
 
 ## Outcome
 

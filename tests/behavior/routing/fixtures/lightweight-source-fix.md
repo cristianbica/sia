@@ -1,6 +1,7 @@
 ---
 case: internal-source-option-fix
 expected_route: lightweight
+authorization_source: activating-request
 target: lib/example/options.rb
 behavior_change: true
 public_contract_change: false

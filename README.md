@@ -121,14 +121,12 @@ Sia document the billing area
 Sia refresh-docs billing
 ```
 
-An operation selects a workflow and the relevant skills. `Sia implement` chooses a conservative route: trivial wording
-or formatting corrections are planless, narrow project-definition or documentation edits use a compact approved plan
-and focused validation, and product/source or uncertain work uses the full delivery lifecycle. The standard lifecycle
-plans first, stops for approval, builds the approved scope, reviews and validates it separately, fixes findings, and
-reports a product-read-only Ship result. An explicit request for a full or thorough workflow selects standard delivery.
-The review uses an isolated worker when the host can provide one and reports a same-context fallback truthfully.
-Sia asks for ordinary approval such as `approved` or `go ahead`; its plan digest is an internal stale-plan check, never
-something the user must copy or compare.
+An operation selects a workflow and relevant skills. `Sia implement` chooses a conservative route: trivial wording or
+formatting corrections are planless; eligible narrow documentation, definitions, and internal fixes are directly
+authorized by the request, use a compact receipt, and get focused validation; product/source or uncertain work uses
+standard delivery. Standard delivery plans once, stops for one intent-envelope approval, then builds, reviews, fixes,
+and reports. In-envelope implementation details do not cause another approval; expanded scope, risk, permissions, or
+external actions do. An explicit request for a full or thorough workflow selects standard delivery.
 
 ### Run an operation unattended
 
@@ -137,10 +135,8 @@ Sia unattended implement the restocking report
 ```
 
 `unattended` is an exact modifier before the operation name. It gives upfront authorization for Sia workflow gates
-within the original request. Sia uses the same conservative route triage: trivial work remains planless, lightweight
-work persists and digests a compact plan, and standard work continues through separate Review/Validate and bounded
-Fix cycles. It asks no questions, uses conservative reversible assumptions, or returns a blocked result when it cannot
-proceed safely. It does not claim that the user reviewed a generated plan.
+within the original request. Sia uses the same conservative routes, asks no questions, and returns a blocker instead of
+guessing when it cannot proceed safely. It does not claim that the user reviewed a generated plan.
 
 The plan preserves an immutable authorization ceiling and explicit external-action list across replans and resume.
 A blocked resume retries only after its recorded condition changes; identical failures and Fix cycles are bounded.
@@ -220,9 +216,8 @@ correctness requirements.
 - It replaces only marked Sia blocks in catalog indexes, `AGENTS.md`, and Claude compatibility instructions.
 - Repository docs, rules, plans, project definitions, and `CUSTOM` catalog content remain project-owned.
 - Unattended mode pre-authorizes only in-scope Sia gates, preserves its original ceiling, and bounds automatic retries.
-- Ship may close the active plan and offer to delete that exact completed plan after explicit confirmation; unattended
-  runs retain it. Product, source, and external state remain read-only unless the user explicitly requests another
-  delivery action.
+- Ship closes and retains the active plan; deleting that exact completed plan requires a separate explicit request.
+  Product, source, and external state remain read-only unless the user explicitly requests another delivery action.
 - Host system, developer, user, permission, and safety rules always remain authoritative.
 
 ## Project status and documentation

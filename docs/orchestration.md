@@ -13,8 +13,8 @@ Sia's `implement` operation uses the following route contract:
 - `lightweight`: narrow project-owned definition/documentation change, or one internal source behavior change whose
   exact seam, paths, criteria, and focused test are evidenced. It excludes public/serialization contracts, migrations,
   configuration, permission, security, concurrency, external, compatibility, multi-consumer, broad-refactor,
-  managed-Sia, lifecycle, dirty-attribution, and unresolved-assumption risk. It keeps compact approval, one bounded
-  Build handoff, and focused validation without a mandatory independent reviewer or Fix loop.
+  managed-Sia, lifecycle, dirty-attribution, and unresolved-assumption risk. Its activating request directly authorizes
+  a compact receipt, one bounded Build handoff, and focused validation without a reviewer or Fix loop.
 - `standard`: every source change not fully qualifying for lightweight, plus operations/workflows, public contracts,
   migrations, security, external or destructive work, broad scope, unsafe attribution, or uncertainty; use the complete
   delivery lifecycle.
@@ -122,10 +122,9 @@ child-worker usage from coordinator counters. These fields are telemetry, not wo
 
 ## Plan artifacts
 
-Persist every non-trivial delivery plan under `.ai/plans/` before approval. This gives same-context work, isolated
-workers, fresh conversations, approval, and resume one artifact contract. Planless trivial, investigation, review, and
-documentation workers use the bounded handoff envelope but do not create a delivery plan merely because the host can
-isolate them.
+Persist every non-trivial delivery artifact under `.ai/plans/` before Build. This gives same-context work, isolated
+workers, fresh conversations, authorization, and resume one artifact contract. Planless trivial, investigation, review,
+and documentation workers use the bounded handoff envelope but do not create a delivery artifact merely for isolation.
 
 A persisted plan under `.ai/plans/` includes at least:
 
@@ -135,7 +134,7 @@ id: 2026-07-12-01-subscription-pausing
 operation: implement
 workflow: delivery
 execution_mode: interactive
-authorization_ceiling: [exact-plan-revision]
+authorization_ceiling: [approved-intent-envelope]
 execution_route: standard
 authorized_external_actions: []
 status: draft
@@ -170,18 +169,18 @@ Phase transitions, baseline, resolved definition paths, model reporting, command
 
 After Approval and each completed Build, Review/Validate, Fix, or Ship phase, append one ordered fenced
 `sia-phase-boundary` record. It contains `sequence`, `plan_revision`, `completed_phase`, `next_phase`, `head_ref`,
-`changed_paths`, and `unresolved_material_findings`. An Approval record also contains `authorization_source`, matching
-its execution mode: `explicit-user` or `unattended-invocation`. Sequence starts at 1 for each plan revision; invalid
-current-revision records prevent resume.
+`changed_paths`, and `unresolved_material_findings`. An Approval record uses `explicit-user` for standard interactive
+work, `activating-request` for lightweight interactive work, or `unattended-invocation` for unattended work. Sequence
+starts at 1 for each plan revision; invalid current-revision records prevent resume.
 
 The approval block starts with `id`, `operation`, `workflow`, `execution_mode`, `execution_route`, and `revision`,
 followed by `base_ref`, `staged_paths`, `unstaged_paths`, `untracked_paths`, `docs`, and `skills`. Those values must
 match frontmatter. An older plan may omit `execution_route` and is treated as `standard`. The route is `lightweight` or
 `standard` in planned artifacts; `trivial` is planless. The `status`, approval fields, and `next_phase` are mutable
-routing fields and are excluded from the digest. Evidence may be appended without invalidating approval. A material
-deviation, including route promotion, changes the approval block and therefore requires a revised plan and renewed
-approval or unattended authorization. Prior-revision records remain historical evidence; the new revision starts its
-boundary sequence at 1.
+routing fields and are excluded from the digest. Evidence may record implementation details inside an approved intent
+envelope without another prompt. A boundary expansion or route promotion changes the approval block and requires a
+revised standard plan and approval, or unattended authorization. Prior-revision records remain historical evidence; the
+new revision starts its boundary sequence at 1.
 
 For unattended mode, `authorization_ceiling` and `authorized_external_actions` occur in frontmatter and the approval
 block and remain byte-for-byte unchanged across revisions. Any mismatch prevents resume.
@@ -196,13 +195,12 @@ CRLF to LF, excluding a UTF-8 BOM, and ensuring exactly one final LF. The marker
 Refuse missing, duplicate, nested, reversed, or malformed marker pairs. Changing approved content resets status to
 `draft`, clears approval, increments the revision in frontmatter and the approval block, and returns to approval.
 
-In interactive mode, Sia presents the current draft's outcome, scope, non-goals, criteria, validation, risks, and plan
-path/revision, then accepts a plain-language approval such as `approved` or `go ahead`. The digest is an internal
-integrity check: Sia computes, records, and verifies it; it never asks the user to copy, repeat, inspect, or compare
-one. An affirmative applies only to the one current displayed draft. If it changed or no such draft is unambiguous,
-Sia presents the current draft and asks again. In unattended mode, Sia may record automatic approval immediately after
-persisting and verifying the plan. A material replan may be revised, digested, and automatically approved only when it
-remains within the original requested outcome. Otherwise, return `blocked`.
+An eligible interactive lightweight request is directly authorized and records a compact receipt. For standard work,
+Sia presents outcome, scope, non-goals, criteria, risks, external actions, and path/revision, then accepts one
+plain-language approval. The digest is internal: Sia computes, records, and verifies it without asking the user to
+compare it. Implementation approach, steps, focused checks, and in-scope documentation may change as evidence. Ask
+again only when outcome, scope, non-goals, criteria, risk, permissions, or external actions expand. In unattended mode,
+Sia automatically authorizes an in-ceiling plan; otherwise, return `blocked`.
 
 A blocked plan appends a `sia-blocker` record with the revision, phase, prior status, attempt, reason, and an observable
 `resume_when` condition. Resume does no phase work while that condition is unchanged. If the same phase
@@ -253,11 +251,10 @@ produce an executable plan. Do not edit product/source code.
 
 ### Approve
 
-Interactive mode stops for a plain-language approval of its one current displayed plan. Sia binds that approval to the
-current stored revision and digest itself. Unattended mode verifies and automatically approves the exact revision under
-the original request's standing authorization. Material scope or approach changes require a revised plan; unattended
-mode may auto-approve it only when it remains within the original outcome. Approval never expands host permissions or
-authorizes unrelated external actions.
+Eligible lightweight work records direct activating-request authorization. Standard work stops once for a
+plain-language intent-envelope approval. In-envelope implementation details become evidence; scope, risk, permission,
+or external-action expansion requires a revised plan. Unattended mode auto-authorizes only inside its original outcome.
+Authorization never expands host permissions or unrelated external actions.
 
 ### Build
 
@@ -280,12 +277,10 @@ Allow at most three unattended Fix cycles per plan revision; then return a block
 
 ### Ship
 
-Ship writes only plan completion status and evidence by default. After recording `complete`, interactive Ship offers to
-keep the exact plan for history or delete it. Deletion requires an explicit affirmative response and is never inferred
-from completion or a general cleanup request; unattended Ship always retains the plan. Product, source, and external
-delivery state remain read-only. Confirm the final reviewed artifact and report behavior, files, verification,
-deviations, and remaining risks. Commit, push, pull request, release, publish, and deploy actions require explicit user
-intent.
+Ship writes only plan completion status and evidence by default, then retains the completed artifact without prompting.
+Deletion requires a separate explicit request and is never inferred from completion or cleanup language. Product,
+source, and external delivery state remain read-only. Confirm the final reviewed artifact and report behavior, files,
+verification, deviations, and risks. Commit, push, pull request, release, publish, and deploy need explicit intent.
 
 In unattended mode, continue through in-scope Fix and Review/Validate cycles without asking questions. Use conservative,
 reversible assumptions or return a blocked result when no safe in-scope path remains.

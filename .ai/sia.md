@@ -53,7 +53,7 @@ operation.
 
 ### `Sia resume <approved-plan>`
 
-Read only the named file. It must be an approved delivery plan under `.ai/plans/` with an intact approved revision and
+Read only the named file. It must be a delivery artifact under `.ai/plans/` with an intact approved revision and
 digest. Load `.ai/RULES.md` when present and verify the plan before entering its recorded next phase. Refuse ambiguous,
 stale, missing, unapproved, or internally inconsistent plans. Never scan `.ai/plans/` for alternatives.
 
@@ -68,8 +68,8 @@ retries only after its `resume_when` condition changes. Refuse draft, complete, 
 also requires a passing final Review/Validate record.
 
 Compare the current HEAD and changed paths with `base_ref`, the recorded dirty baseline, and the latest phase evidence.
-In unattended mode, unsafe overlap or attribution returns `blocked`; never auto-authorize around it. Otherwise, drift
-that invalidates scope or evidence returns to Plan and Approve. Record nonmaterial drift without rewriting the base.
+In unattended mode, unsafe overlap or attribution returns `blocked`; never auto-authorize around it. Otherwise,
+boundary drift returns standard work to Plan. Record nonmaterial drift without rewriting the base.
 
 At the phase boundary, resolve the current effective operation, workflow, and skills. Put their exact paths in the
 handoff. A definition-path or resolution change is reported; a material conflict with approved scope returns to Plan and
@@ -127,12 +127,12 @@ Use `Sia <operation> [request]` interactively or `Sia unattended <operation> [re
 6. Load only the workflow, skills, and repository documentation required for intake and the current phase.
 7. Follow the workflow until completion, cancellation, or explicit operation replacement.
 
-Unattended mode is enabled only by the exact modifier. Do not infer unattended mode from natural-language requests. It
-is upfront authorization for Sia-owned gates and conservative decisions clearly within the activating request; the
-default is interactive. Persist it in every plan and handoff. Apply route gates: trivial is planless; lightweight uses
-compact plan/digest/focused validation; standard keeps separate review and fixes. Auto-authorize an in-scope plan or
-replan. If safe progress needs new scope, authority, or credentials, return `blocked` rather than asking the user or
-guessing.
+Unattended mode is enabled only by the exact modifier. Do not infer unattended mode from natural-language requests.
+It authorizes Sia-owned gates and conservative decisions within the activating request; the default is interactive.
+Persist mode in every artifact and handoff. Trivial is planless; lightweight is directly authorized.
+standard uses one intent-envelope approval and separate review/fixes. Unattended auto-authorizes in-ceiling artifacts or
+replans. If progress needs new scope, authority, or credentials,
+return `blocked` rather than asking the user or guessing.
 
 Project rules are hard Sia-specific constraints during operations, resume, and isolated phase execution. They take
 precedence over repository documentation, skills, operations, workflows, and plans, but never over system or host
@@ -222,9 +222,8 @@ changes gates, expands permissions, or invalidates resumption.
   writes.
 - Unattended mode does not expand host permissions or authorize external actions, including destructive actions, that
   the user did not explicitly request. It cannot suppress permission prompts imposed by the host.
-- Ship may write active-plan completion metadata. Interactive Ship may delete that exact completed plan only after an
-  explicit confirmation; unattended Ship retains it. Product, source, and external state remain read-only unless the
-  user explicitly requests another delivery action.
+- Ship may write active-plan completion metadata and retains it by default. Delete that exact completed plan only after
+  a separate explicit request. Product, source, and external state remain read-only unless explicitly authorized.
 - Sia never expands filesystem, command, network, or external-action permissions.
 Before activation, the Sia bridge does not direct the host to read `.ai/**`. A host may independently index repository
 files; Sia cannot control undocumented host behavior.
