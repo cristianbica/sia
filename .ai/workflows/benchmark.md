@@ -84,6 +84,9 @@ Use a fresh supported host process for the primary candidate. Give it only the t
 approved permissions, selected tool, selected model when supplied, and its isolated target workspace. The prompt must
 not contain the actual revision, evaluator oracle, comparator identity, or sibling paths.
 
+Give every candidate the same validation instruction: run its own proportionate focused checks, but do not run the
+manifest's broad checks. After each candidate exits, the coordinator runs those same manifest checks in isolation.
+
 Before asking Sia to implement the task, bootstrap its repository documentation with the Sia `document repository`
 operation. Run that bootstrap in the candidate target, record its elapsed time and evidence separately, and do not
 include documentation work in the measured implementation time. If documentation bootstrap needs an unapproved action,
@@ -97,8 +100,8 @@ wait behavior, process ID, exit status, timeout, changed paths, and host-reporte
 
 When `comparator` is omitted, skip this phase. For `vanilla`, run the same task directly through the selected host
 without Sia. For `sia@<git-ref>`, install only that requested Sia revision into a separate target. Hold task, base,
-tool, model request, permissions, timeout, setup, and checks constant. Never let the comparator read the actual or the
-other candidate's workspace.
+tool, model request, permissions, timeout, setup, candidate validation instruction, and coordinator checks constant.
+Never let the comparator read the actual or the other candidate's workspace.
 
 Wait for every candidate process to exit or reach its approved timeout, then confirm it is no longer running. Progress
 events, JSONL output, and partial responses are evidence only; they never establish completion.

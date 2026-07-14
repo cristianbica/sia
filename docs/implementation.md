@@ -32,8 +32,8 @@ Implement only enough to test the core product promise:
 - three SIA/CUSTOM catalog indexes and deterministic resolution;
 - the not-initialized docs router and one `document` operation;
 - one `delivery` workflow, persisted plan contract, and manual fresh-conversation resumption;
-- adaptive delivery routing: planless trivial corrections, compact lightweight definition/documentation changes, and the
-  unchanged standard lifecycle for product/source or uncertain work;
+- adaptive delivery routing: planless trivial corrections, compact lightweight definition/documentation work and fully
+  evidenced internal source fixes, and the unchanged standard lifecycle for every other source or uncertain work;
 - `implement` plus a minimal `repository-discovery` and `testing` skill;
 - advisory `fast`/`reasoning` fields with truthful host fallback reporting;
 - deterministic activation contracts for all target entrypoints and live runners where safely available.
@@ -112,8 +112,8 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Malformed approval/evidence markers, metadata mismatch, or noncanonical digest verification prevent resume.
 - `Sia resume <approved-plan>` verifies approved content and enters the recorded delivery phase rather than replanning.
 - Phase handoffs name exact current definition paths; workers do not independently reroute through catalogs.
-- Lightweight delivery uses one bounded Build handoff and focused coordinator validation; route promotion is explicit
-  and conservative.
+- Lightweight delivery uses one bounded Build handoff and focused coordinator validation. An internal source change
+  qualifies only with an evidenced seam, exact paths, criteria, and focused test; all excluded risks promote it.
 - A refreshed Sia definition set does not by itself invalidate an approved plan.
 - Review uses the base/dirty-worktree baseline and does not attribute pre-existing changes to Sia.
 - Documentation changes are included before final review.
@@ -133,7 +133,7 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Handoffs record the requested profile and source; results record the actual model when reported and `unknown`
   otherwise.
 - Model availability or a different actual model never blocks work or invalidates artifact resumption.
-- `fast` is a latency hint rather than a price guarantee; cost optimization comes from route and context reduction.
+- `fast` is a latency hint rather than a price guarantee; cost optimization comes from safe route and context reduction.
 
 ### Installer
 
@@ -173,6 +173,8 @@ efficiency. Then track:
 - user corrections and workflow-gate failures.
 - route promotions, unnecessary workers, polling turns, elapsed time, cached versus uncached input, and generated
   reasoning/output tokens.
+- repeated active-context loading, bulk successful command output, and broad-diff replay; retain artifacts by path and
+  compare concise results instead.
 
 Sia succeeds only if documentation reduces rediscovery while maintaining or improving correctness. Token or file-read
 reductions alone are not success when plans become worse.

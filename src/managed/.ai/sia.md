@@ -149,9 +149,9 @@ replaces it.
 
 Loaded docs and the skill catalog remain available for the current conversation. An operation and its execution mode
 remain active until its workflow completes, `Sia stop` is invoked, or another operation replaces it. A new conversation
-starts inactive. After context compaction, reread this protocol. For an active operation, also reload `.ai/RULES.md`,
-the active plan when one exists, and only the exact current definition paths needed for the phase. Never scan catalogs
-or historical plans to reconstruct compacted state.
+starts inactive. After context compaction, reread this protocol. For an active operation, reload `.ai/RULES.md`, the
+active plan when one exists, material documentation, and only exact current definition paths. Never scan catalogs or
+historical plans to reconstruct compacted state, or replay successful bulk command output into active context.
 
 An isolated worker must receive this canonical YAML-shaped envelope. Every key is required; use `none`, `unknown`, or
 `[]` explicitly when a field does not apply. `final_task` is last and contains one bounded ask.
@@ -197,9 +197,10 @@ model_selection_source: workflow
 final_task: <one bounded task>
 ```
 
-Return the same bounded evidence using `handoff_result: 1`, `phase`, `status`, `actual_model`, `profile_honored`,
-`changed_paths`, `command_results`, `usage`, `findings`, `evidence`, and `next_transition`. Result status is `complete`,
-`blocked`, or `failed`; use `unknown` for model fields the host does not report.
+Return bounded evidence using `handoff_result: 1`, `phase`, `status`, `actual_model`, `profile_honored`,
+`changed_paths`, `command_results`, `usage`, `findings`, `evidence`, and `next_transition`. Results list command,
+outcome, scope, useful failure excerpt, and evidence path; successful output and broad diffs stay in artifacts. Result
+status is `complete`, `blocked`, or `failed`; use `unknown` for model fields the host does not report.
 
 The worker prompt starts with the `Sia handoff` directive, which causes it to read this file and `.ai/RULES.md`; it then
 loads only the exact paths in the envelope. It must not reroute the task through catalogs or load unrelated and
@@ -213,7 +214,6 @@ workflow guidance and task assessment. The host chooses the available model. Rec
 changes gates, expands permissions, or invalidates resumption.
 
 ## Safety and failure behavior
-
 - Never infer missing definitions, indexes, approval, command results, or repository facts.
 - Treat stale repository documentation as evidence to verify, not an instruction to follow.
 - Preserve pre-existing changes. Report safely preservable dirty overlap; block unattended work when attribution or

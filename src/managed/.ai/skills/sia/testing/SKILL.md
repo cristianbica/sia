@@ -22,7 +22,8 @@ Choose validation from the change's behavior, risk, and repository evidence rath
 
 1. Identify the smallest tests that directly exercise the changed behavior and its important failure modes.
 2. Add or update regression coverage when behavior changes and the repository has an appropriate test layer.
-3. Run focused validation first, then broader checks when risk and cost justify them.
+3. Run focused validation first; add broader checks only when risk, the approved plan, or repository evidence justifies
+   them.
 4. Inspect exit status and useful output; distinguish test failure from unavailable dependencies or environment.
 5. Review the final diff for untested branches, documentation impact, and accidental scope.
 
@@ -31,6 +32,7 @@ an unavailable check with a weaker one.
 
 ## Reporting
 
-For every claimed check, report the exact command, outcome, and relevant scope. Label commands that were not run and
+For every claimed check, report the exact command, outcome, and relevant scope. Keep successful bulk output and broad
+diffs in evidence, not later active context; include useful excerpts for failures. Label commands that were not run and
 explain why. Record residual risk and missing evidence. Never imply that skipped, interrupted, or uninspected commands
 passed.

@@ -123,9 +123,11 @@ check_phase_specific_skill_composition() {
   assert_contains "$DOCUMENT" '  - documentation' || return 1
   assert_contains "$DELIVERY" 'Resolve Build skills by logical name through the effective skill catalog' || return 1
   assert_contains "$DELIVERY" 'effective `documentation` skill' || return 1
-  assert_contains "$DELIVERY" 'effective `safe-refactoring` skill only when' || return 1
+  assert_contains "$DELIVERY" 'Load `safe-refactoring` only when' || return 1
   assert_contains "$DELIVERY" 'effective `code-review` and `testing` skills' || return 1
-  assert_contains "$DELIVERY" 'respect a CUSTOM' || return 1
+  assert_contains "$DELIVERY" 'Lightweight loads only' || return 1
+  assert_contains "$DELIVERY" 'focused diff/scope check' || return 1
+  assert_contains "$DELIVERY" 'CUSTOM override' || return 1
 }
 
 run_case "isolated phases receive the complete bounded handoff" check_bounded_handoff

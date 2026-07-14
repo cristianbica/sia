@@ -9,9 +9,11 @@ DELIVERY="$ROOT/src/managed/.ai/workflows/sia/delivery.md"
 IMPLEMENT="$ROOT/src/managed/.ai/operations/sia/implement.md"
 ORCHESTRATION="$ROOT/docs/orchestration.md"
 LIGHTWEIGHT_FIXTURE="$ROOT/tests/behavior/routing/fixtures/lightweight-skill.md"
+LIGHTWEIGHT_SOURCE_FIXTURE="$ROOT/tests/behavior/routing/fixtures/lightweight-source-fix.md"
 STANDARD_FIXTURE="$ROOT/tests/behavior/routing/fixtures/standard-feature.md"
 TRIVIAL_FIXTURE="$ROOT/tests/behavior/routing/fixtures/trivial-wording.md"
 LEGACY_FIXTURE="$ROOT/tests/behavior/routing/fixtures/legacy-plan.md"
+BENCHMARK="$ROOT/.ai/workflows/benchmark.md"
 
 check_route_contract() {
   for route in trivial lightweight standard; do
@@ -37,18 +39,32 @@ check_lightweight_contract() {
   assert_contains "$DELIVERY" 'one bounded Build handoff' || return 1
   assert_contains "$DELIVERY" 'independent review worker' || return 1
   assert_contains "$DELIVERY" 'promote to standard' || return 1
+  assert_contains "$DELIVERY" 'internal repository-source behavior' || return 1
+  assert_contains "$DELIVERY" 'focused test' || return 1
+  assert_contains "$DELIVERY" 'managed-Sia' || return 1
   assert_contains "$LIGHTWEIGHT_FIXTURE" 'expected_route: lightweight' || return 1
   assert_contains "$LIGHTWEIGHT_FIXTURE" '.ai/skills/example/SKILL.md' || return 1
+  assert_contains "$LIGHTWEIGHT_SOURCE_FIXTURE" 'expected_route: lightweight' || return 1
+  assert_contains "$LIGHTWEIGHT_SOURCE_FIXTURE" 'focused_test: test/options_test.rb' || return 1
 }
 
 check_standard_and_backward_compatibility() {
   assert_contains "$DELIVERY" 'missing route metadata' || return 1
   assert_contains "$DELIVERY" 'optional for backward compatibility' || return 1
-  assert_contains "$DELIVERY" '`standard`: product/source behavior' || return 1
+  assert_contains "$DELIVERY" 'product/source change not fully qualifying' || return 1
   assert_contains "$STANDARD_FIXTURE" 'expected_route: standard' || return 1
   assert_contains "$STANDARD_FIXTURE" 'product/source' || return 1
   assert_contains "$LEGACY_FIXTURE" 'expected_route: standard' || return 1
   assert_not_contains "$LEGACY_FIXTURE" 'execution_route:' || return 1
+}
+
+check_context_and_benchmark_contract() {
+  assert_contains "$DELIVERY" 'do not reread catalogs, broad docs' || return 1
+  assert_contains "$DELIVERY" 'Lightweight loads only' || return 1
+  assert_contains "$DELIVERY" 'focused diff/scope check' || return 1
+  assert_contains "$BENCHMARK" 'same validation instruction' || return 1
+  assert_contains "$BENCHMARK" "manifest's broad checks" || return 1
+  assert_contains "$BENCHMARK" 'coordinator runs those same manifest checks' || return 1
 }
 
 check_wait_and_telemetry_contract() {
@@ -66,6 +82,7 @@ run_case "adaptive route contract is explicit and conservative" check_route_cont
 run_case "trivial work remains planless and exact-file scoped" check_trivial_contract
 run_case "lightweight work keeps approval but removes mandatory extra agents" check_lightweight_contract
 run_case "standard routing and old-plan compatibility remain explicit" check_standard_and_backward_compatibility
+run_case "lightweight context and benchmark validation remain bounded" check_context_and_benchmark_contract
 run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract
 
 finish_tests

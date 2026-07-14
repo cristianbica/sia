@@ -10,9 +10,9 @@ skills:
 # Implement
 
 Turn the user's request into the smallest complete repository change supported by evidence. Start with delivery route
-triage: use the planless trivial path only for an obvious non-behavioral correction, the lightweight path for a narrow
-project-owned definition or documentation change, and the standard path for product/source behavior, policy, public
-contracts, broad scope, or uncertainty. Never classify by line count alone; uncertainty promotes to standard.
+triage: use the planless trivial path only for an obvious non-behavioral correction, lightweight only for a narrow
+project-owned definition, documentation, or fully qualified internal source change, and standard for every other
+product/source behavior, policy, public contract, broad scope, or uncertainty. Never classify by line count alone.
 
 ## Intake
 
@@ -26,7 +26,7 @@ contracts, broad scope, or uncertainty. Never classify by line count alone; unce
 Use the delivery workflow. Trivial work is planless and exact-file scoped. Lightweight work uses a compact approved
 plan, one bounded Build handoff, focused coordinator validation, and no mandatory independent review worker. Standard
 work keeps the complete lifecycle. Do not edit product/source before approval. During Build, stay in scope, update
-relevant tests and docs, and promote when route eligibility ends.
+relevant tests and docs, and promote immediately when any lightweight condition ceases to be evidenced.
 
 ## Outcome
 

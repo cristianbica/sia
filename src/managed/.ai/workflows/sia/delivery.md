@@ -4,7 +4,6 @@ description: Deliver authorized changes through planning, review, validation, fi
 ---
 
 # Delivery workflow
-
 Triage before choosing a path. Standard follows `Plan → Approve → Build → Review/Validate → Fix → Review/Validate →
 Ship`; lightweight follows `Plan → Approve → Build → focused Review/Validate → Ship`; trivial work is planless.
 Replanning returns to Plan and authorizes a new exact revision through the current execution mode.
@@ -17,11 +16,13 @@ Record `execution_route` as `trivial`, `lightweight`, or `standard`; missing rou
 - `trivial`: an obvious typo, formatting, comment, or wording-only correction in the requested file, with no behavior,
   policy, permission, schema, command, or public-contract change. It needs no plan or approval artifact; do not create a
   plan or spawn a worker solely because the host supports one. Doubt promotes it to `lightweight` or `standard`.
-- `lightweight`: narrow project-owned `.ai/docs/**` or definition paths, with no product/source, managed SIA, lifecycle,
-  permission, external-action, or unresolved-assumption risk. Prompt behavior may change, so approve exact scope and use
+- `lightweight`: narrow project-owned `.ai/docs/**` or definition paths, or one internal repository-source behavior
+  change with an evidenced seam, exact paths, clear criteria, and a focused test. It has no public/serialization
+  contract, migration, configuration, permission, security, concurrency, external, compatibility, multi-consumer,
+  broad-refactor, managed-Sia, lifecycle, dirty-attribution, or unresolved-assumption risk. Approve exact scope; use
   one bounded Build handoff, focused validation, and no mandatory independent review worker or Fix loop.
-- `standard`: product/source behavior, operations/workflows, public contracts, migrations, security, destructive or
-  external work, broad scope, dirty attribution risk, or uncertainty. Keep the complete lifecycle.
+- `standard`: every product/source change not fully qualifying for lightweight, plus operations/workflows, public
+  contracts, migrations, security, destructive or external work, broad scope, dirty attribution risk, or uncertainty.
 
 Size is supporting evidence, never proof of eligibility. A request saying `full` or `thorough` selects `standard`.
 
@@ -29,8 +30,8 @@ Unattended classification is conservative: select `trivial` or `lightweight` onl
 make eligibility unambiguous; otherwise select `standard` or return `blocked`. Record a route promotion before newly
 unauthorized writes.
 
-For trivial work, report diff, check, skips, and route; promote before writing if behavior or policy could change. For
-lightweight work, persist a compact plan with exact paths, non-goals, focused checks, route evidence, and promotion
+For trivial work, report diff, check, skips, and route; promote before writing if behavior or policy could change.
+Lightweight persists a compact plan with exact paths, non-goals, focused checks, route evidence, and promotion
 conditions; do not copy transcripts. When waiting, use one longest-safe wait; never poll without new evidence.
 
 ## Plan
@@ -41,9 +42,8 @@ conditions; do not copy transcripts. When waiting, use one longest-safe wait; ne
 - Model profile: request `reasoning` for ambiguous/risky planning; lightweight may inherit the host default or request
   advisory `fast` for latency, not a price guarantee.
 - Inputs: request, project rules, relevant docs, repository evidence, operation, and declared skills.
-- Output: a persisted plan plus a concise user-facing summary of outcome, scope, non-goals, criteria, steps,
-  validation, risks, assumptions, external actions, path, and revision. The digest is internal and is not shown as an
-  approval token.
+- Output: a persisted plan plus a concise user-facing summary of outcome, scope, non-goals, criteria, steps, validation,
+  risks, assumptions, external actions, path, and revision. The digest is internal, never an approval token.
 - Transition: persist the draft plan under `.ai/plans/`, then enter Approve.
 
 Every delivery plan is persisted before authorization, even when all phases remain in one conversation.
@@ -81,7 +81,7 @@ otherwise it blocks instead of asking. Neither mode expands host permissions or 
   Lightweight uses one bounded Build handoff and no second worker.
 - Model profile: standard requests `fast` for mechanical work and `reasoning` for risky work; lightweight may request
   advisory `fast` for latency, never as a cost guarantee.
-- Inputs: approved plan, exact resolved definition paths, baseline, relevant docs, rules, and bounded handoff.
+- Inputs: approved plan, exact resolved definition paths, baseline, material docs, rules, and bounded handoff.
 - Writes: approved repository scope, relevant tests, `.ai/docs/**`, and plan evidence.
 - Transition: Review/Validate when complete; Plan for material scope or approach changes.
 
@@ -89,10 +89,10 @@ Before Build, compare the current commit and changed paths with the approved bas
 report safely preservable overlap. In unattended mode, unsafe overlap, concurrent edits, or attribution blocks before
 writes; do not replan around it or modify, stash, reset, clean, or overwrite the pre-existing work.
 
-Resolve Build skills by logical name through the effective skill catalog. If the approved plan has documentation
-impact, load the effective `documentation` skill. Load the effective `safe-refactoring` skill only when the approved
-change modifies existing behavior or structure and refactoring guidance is relevant. In both cases, respect a CUSTOM
-override and put the exact resolved path in the handoff; do not load either skill when the condition does not apply.
+Resolve Build skills by logical name through the effective skill catalog. If the approved plan has documentation impact,
+load the effective `documentation` skill. Load `safe-refactoring` only when structural/refactoring guidance is material,
+not for a localized behavior fix that does not restructure. Respect a CUSTOM override and put only exact resolved paths
+in the handoff. After resolution, do not reread catalogs, broad docs, historical plans, or prior evidence.
 
 ## Review/Validate
 
@@ -109,8 +109,9 @@ override and put the exact resolved path in the handoff; do not load either skil
 Inspect correctness, scope, regressions, security and operational risk, documentation, and the truthfulness of command
 claims. Do not claim that an uninspected command passed.
 
-For this phase, resolve and load the effective `code-review` and `testing` skills through the skill catalog. Respect
-CUSTOM overrides, record the exact resolved paths, and use the selected definitions for both Review and Validate.
+Standard work loads the effective `code-review` and `testing` skills through the skill catalog. Lightweight loads only
+`testing` and performs the explicit focused diff/scope check. Respect CUSTOM overrides, record exact resolved paths, and
+promote on a material finding.
 
 ## Fix
 
@@ -123,7 +124,6 @@ Allow at most three unattended Review/Validate → Fix cycles per plan revision.
 blocker instead of looping or weakening acceptance criteria. Interactive mode may request new direction.
 
 ## Ship
-
 - Purpose: hand off the final reviewed result.
 - Gate: acceptance criteria satisfied and validation evidence reviewed.
 - Writes: active plan status and completion evidence only; no product, source, or external state by default.

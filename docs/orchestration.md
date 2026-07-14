@@ -10,10 +10,14 @@ active session.
 Sia's `implement` operation uses the following route contract:
 
 - `trivial`: exact-file, non-behavioral wording/formatting/comment correction; no plan, approval artifact, or worker.
-- `lightweight`: narrow project-owned definition or documentation change; compact plan and approval, one bounded Build
-  handoff, focused validation, and no mandatory independent reviewer.
-- `standard`: product/source behavior, operations/workflows, public contracts, migrations, security, external or
-  destructive work, broad scope, unsafe attribution, or uncertainty; use the complete delivery lifecycle.
+- `lightweight`: narrow project-owned definition/documentation change, or one internal source behavior change whose
+  exact seam, paths, criteria, and focused test are evidenced. It excludes public/serialization contracts, migrations,
+  configuration, permission, security, concurrency, external, compatibility, multi-consumer, broad-refactor,
+  managed-Sia, lifecycle, dirty-attribution, and unresolved-assumption risk. It keeps compact approval, one bounded
+  Build handoff, and focused validation without a mandatory independent reviewer or Fix loop.
+- `standard`: every source change not fully qualifying for lightweight, plus operations/workflows, public contracts,
+  migrations, security, external or destructive work, broad scope, unsafe attribution, or uncertainty; use the complete
+  delivery lifecycle.
 
 Line count is supporting evidence only. An explicit request for a full/thorough workflow selects `standard`; uncertain
 classification promotes to `standard`. Unattended mode selects `trivial` or `lightweight` only when eligibility is
@@ -106,7 +110,8 @@ Keep the stable, cacheable prefix byte-for-byte stable: project rules, route con
 pointers come first. Put the variable suffix last: the active plan, focused diff, current evidence, constraints, and one
 final ask.
 Reference canonical files by path, load only the current phase's excerpts, and name broad or historical paths in
-`do_not_load`. Never paste a complete repository, catalog, or prior plan into a bounded handoff.
+`do_not_load`. Never paste a complete repository, catalog, prior plan, successful bulk output, or broad diff into a
+bounded handoff; preserve that material as evidence and return its path plus a concise outcome instead.
 
 Every envelope contains `execution_mode: interactive` or `execution_mode: unattended`. An unattended worker performs
 only its assignment and returns `blocked` to the coordinator instead of asking the user for approval or clarification.
@@ -256,15 +261,16 @@ authorizes unrelated external actions.
 
 ### Build
 
-Prefer an isolated worker using the approved handoff. Implement only approved scope, add or update tests, update
-affected repository documentation, preserve pre-existing changes, and stop for replanning when material assumptions
-fail.
+Prefer an isolated worker using the approved handoff. After exact definitions resolve, do not reread catalogs, broad
+docs, historical plans, or prior evidence. Implement only approved scope, add or update tests, preserve pre-existing
+changes, and stop for replanning when material assumptions fail.
 
 ### Review and validate
 
 Use a separate review phase and prefer an isolated worker that did not build the change. Compare the complete
-diff—including documentation—with the approved plan and baseline. Inspect correctness, scope, regressions, risks, and
-command evidence. Report the actual isolation mechanism and never claim an uninspected command passed.
+diff—including documentation—with the approved plan and baseline. Lightweight instead uses a focused coordinator
+diff/scope check and testing; a material finding promotes it to standard. Inspect correctness, scope, regressions,
+risks, and command evidence. Report the actual isolation mechanism and never claim an uninspected command passed.
 
 ### Fix
 
