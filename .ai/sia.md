@@ -143,16 +143,19 @@ Rules and custom definitions may narrow unattended work but cannot activate it o
 
 Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or a direct Sia conversation.
 
-Help, docs loading, skills loading, Forge, a direct conversation, and an invalid handoff do not replace an already
-active operation. Only successful completion, `Sia stop`, `Sia reload`, or successful resolution of a new operation
-ends or replaces it.
+Help, docs loading, skills loading, Forge, a direct conversation, and an invalid handoff do not replace an active
+operation. Only successful completion, `Sia stop`, `Sia reload`, or a newly resolved operation ends or replaces it.
 
 ## Context, workers, and model profiles
 
-Loaded docs and the skill catalog remain available for the current conversation. An operation and its execution mode
-remain active until its workflow completes, `Sia stop`, or replacement; a new conversation starts inactive. After
-compaction, reread this protocol. For an active operation reload `.ai/RULES.md`, its plan and material docs, and exact
-current definitions only. Never scan catalogs or historical plans, or replay successful bulk output into active context.
+Keep isolated-worker context in lean, deterministic cache-aware order: stable protocol/rules, resolved route/workflow,
+task-relevant invariant tool/context declarations, and definitions with durable documentation paths first; append the
+active plan, focused evidence, constraints, and one final ask. State each invariant once and prefer exact paths to
+replaying durable content.
+Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix. Loaded docs and
+skills remain for the conversation; active operation/mode remains until complete, stop, or replacement. After
+compaction, reread this protocol and reload only rules, plan, material docs, and exact definitions. Never scan catalogs,
+historical plans, or replay bulk output.
 
 An isolated worker must receive this canonical YAML-shaped envelope. Every key is required; use `none`, `unknown`, or
 `[]` explicitly when a field does not apply. `final_task` is last and contains one bounded ask.
@@ -198,21 +201,18 @@ model_selection_source: workflow
 final_task: <one bounded task>
 ```
 
-Return bounded evidence using `handoff_result: 1`, `phase`, `status`, `actual_model`, `profile_honored`,
-`changed_paths`, `command_results`, `usage`, `findings`, `evidence`, and `next_transition`. Results list command,
-outcome, scope, useful failure excerpt, and evidence path; successful output and broad diffs stay in artifacts. Result
-status is `complete`, `blocked`, or `failed`; use `unknown` for model fields the host does not report.
+Return bounded evidence with `handoff_result: 1`, phase/status, actual model/profile, paths, commands, usage,
+findings/evidence, and next transition. List command, outcome, scope, failure excerpt, and evidence path; keep bulk
+output and diffs in artifacts. Status is `complete`, `blocked`, or `failed`; use `unknown` for unreported model fields.
 
-The worker prompt starts with the `Sia handoff` directive, which causes it to read this file and `.ai/RULES.md`; it then
-loads only the exact paths in the envelope. It must not reroute the task through catalogs or load unrelated and
-historical artifacts. An unattended worker never authorizes a revision; it returns `blocked` to its coordinator instead
-of asking the user. Describe isolation truthfully when the host may inherit hidden context.
+The `Sia handoff` worker reads this file, `.ai/RULES.md`, and only exact envelope paths; never reroute the task through
+catalogs or load unrelated/historical artifacts. An unattended worker never authorizes a revision; it returns `blocked`
+instead of asking the user. Describe isolation truthfully when the host may inherit hidden context.
 
 Workflows may request advisory `fast` or `reasoning` profiles. A user choice takes precedence, then project rules, then
-workflow guidance and task assessment. The host chooses the available model. Record `requested_model_profile` and
-`model_selection_source` in the handoff. Record result field `actual_model` when reported or `unknown` otherwise, and
-`profile_honored` as `true`, `false`, or `unknown` only when supportable. An unavailable profile never blocks work,
-changes gates, expands permissions, or invalidates resumption.
+workflow guidance and task assessment. The host chooses the available model. Record `requested_model_profile`,
+`model_selection_source`, `actual_model` or `unknown`, and `profile_honored` only when supportable. An unavailable
+profile never blocks work, changes gates, expands permissions, or invalidates resumption.
 
 ## Safety and failure behavior
 - Never infer missing definitions, indexes, approval, command results, or repository facts.

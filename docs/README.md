@@ -12,6 +12,7 @@ This directory is the canonical product, protocol, and implementation specificat
 | [Repository knowledge](repository-knowledge.md) | Documentation structure, evidence, freshness, and maintenance |
 | [Extensions and catalogs](extensions.md) | Skills, operations, workflows, indexes, overrides, and creators |
 | [Orchestration and workflows](orchestration.md) | Isolation, artifacts, phase contracts, and core workflows |
+| [Prompt caching](prompt-caching.md) | Portable prompt layout plus provider-specific cache controls and telemetry |
 | [Tool integration and installation](integration.md) | Installed layout, entrypoint bridges, ownership, and upgrades |
 | [Source repository layout](source-layout.md) | Source tree, payload classes, fixtures, and ownership mapping |
 | [Host validation matrix](host-matrix.md) | Probed versions, harness guarantees, and live semantic status |

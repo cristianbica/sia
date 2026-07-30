@@ -121,19 +121,27 @@ host exposes only polling, use its longest safe interval and report the actual w
 
 ## Context budget
 
-Keep the stable, cacheable prefix byte-for-byte stable: project rules, route contract, and durable documentation
-pointers come first. Put the variable suffix last: the active plan, focused diff, current evidence, constraints, and one
-final ask.
+Keep the stable, cacheable prefix lean and byte-for-byte stable: project rules, route contract, task-relevant invariant
+tool/context declarations, and durable documentation pointers come first. State each invariant once and render them in
+deterministic order, then put the variable suffix last: the active plan, focused diff, current evidence, constraints,
+and one final ask. Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix.
 Reference canonical files by path, load only the current phase's excerpts, and name broad or historical paths in
 `do_not_load`. Never paste a complete repository, catalog, prior plan, successful bulk output, or broad diff into a
 bounded handoff; preserve that material as evidence and return its path plus a concise outcome instead.
+
+See [prompt caching](prompt-caching.md) for provider controls, telemetry names, and the portable fallback. Those details
+are host capabilities, not workflow gates.
 
 Every envelope contains `execution_mode: interactive` or `execution_mode: unattended`. An unattended worker performs
 only its assignment and returns `blocked` to the coordinator instead of asking the user for approval or clarification.
 
 When the host reports usage, a handoff result may include `elapsed_ms`, `input_tokens`, `cached_input_tokens`,
-`output_tokens`, and `reasoning_output_tokens`. Record `unknown` when a field is unavailable; never estimate
-child-worker usage from coordinator counters. These fields are telemetry, not workflow gates.
+`cache_read_input_tokens`, `cache_write_input_tokens`, `output_tokens`, and `reasoning_output_tokens`. Preserve a
+provider's read/write values when exposed, retain `cached_input_tokens` for generic compatibility, and never estimate
+missing fields or child-worker usage from coordinator counters. Record `unknown` instead; these are telemetry, not
+workflow gates. Evaluate equivalent cold and warm runs with correctness, total and uncached input, cache reads/writes,
+output/reasoning tokens, and latency. Estimate provider cost only when the host has all applicable provider rates; a
+cache hit alone is not a cost guarantee.
 
 ## Plan artifacts
 

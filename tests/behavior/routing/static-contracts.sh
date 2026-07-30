@@ -8,6 +8,8 @@ ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 DELIVERY="$ROOT/src/managed/.ai/workflows/sia/delivery.md"
 IMPLEMENT="$ROOT/src/managed/.ai/operations/sia/implement.md"
 ORCHESTRATION="$ROOT/docs/orchestration.md"
+PROMPT_CACHING="$ROOT/docs/prompt-caching.md"
+PROTOCOL="$ROOT/src/managed/.ai/sia.md"
 LIGHTWEIGHT_FIXTURE="$ROOT/tests/behavior/routing/fixtures/lightweight-skill.md"
 LIGHTWEIGHT_SOURCE_FIXTURE="$ROOT/tests/behavior/routing/fixtures/lightweight-source-fix.md"
 IN_ENVELOPE_FIXTURE="$ROOT/tests/behavior/routing/fixtures/standard-in-envelope-replan.md"
@@ -88,9 +90,21 @@ check_wait_and_telemetry_contract() {
   assert_contains "$DELIVERY" 'never poll without new evidence' || return 1
   assert_contains "$ORCHESTRATION" 'input_tokens' || return 1
   assert_contains "$ORCHESTRATION" 'cached_input_tokens' || return 1
+  assert_contains "$ORCHESTRATION" 'cache_read_input_tokens' || return 1
+  assert_contains "$ORCHESTRATION" 'cache_write_input_tokens' || return 1
   assert_contains "$ORCHESTRATION" 'never estimate' || return 1
   assert_contains "$ORCHESTRATION" 'child-worker usage' || return 1
   assert_contains "$ORCHESTRATION" 'not a cost guarantee' || return 1
+  assert_contains "$PROTOCOL" 'lean, deterministic cache-aware order' || return 1
+  assert_contains "$PROTOCOL" 'State each invariant once' || return 1
+  assert_contains "$PROTOCOL" 'timestamps, run IDs, volatile telemetry' || return 1
+  assert_contains "$PROMPT_CACHING" 'Portable fallback' || return 1
+  assert_contains "$PROMPT_CACHING" 'OpenAI' || return 1
+  assert_contains "$PROMPT_CACHING" 'Anthropic' || return 1
+  assert_contains "$PROMPT_CACHING" 'Gemini' || return 1
+  assert_contains "$PROMPT_CACHING" 'prompt_cache_key' || return 1
+  assert_contains "$PROMPT_CACHING" 'cache_write_tokens' || return 1
+  assert_contains "$PROMPT_CACHING" 'cold and warm' || return 1
 }
 
 check_forge_contract() {

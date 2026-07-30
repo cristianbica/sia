@@ -153,7 +153,11 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 Record the prompt, execution mode, selected execution route, repository state, host, requested profile, actual model
 when reported, permissions, cache state, timeout, scope, allowed paths, worker count, wait behavior, and token usage
 when the host reports it. Control them where practical, but do not require exact model matching when routing is
-advisory.
+advisory. Record cache reads and writes separately when the provider exposes them; do not infer either figure from total
+input tokens. Use the provider-specific mapping in [prompt caching](prompt-caching.md) and compare cache effectiveness
+with correctness, scope, latency, and output tokens rather than treating a cache hit as success. Compare equivalent
+cold and warm runs; estimate provider cost only when every applicable input, cache-read, cache-write, and output rate
+is known.
 Evaluate these hypotheses separately:
 
 1. `Sia load docs` versus normal host behavior.
