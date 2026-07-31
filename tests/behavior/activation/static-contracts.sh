@@ -47,6 +47,11 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'invalid form reports an arity or syntax error' || return 1
   assert_contains "$PROTOCOL" 'YYYY-MM-DD-NN-<slug>.md' || return 1
   assert_contains "$PROTOCOL" 'filenames only' || return 1
+  assert_contains "$PROTOCOL" 'authorized_plan_paths' || return 1
+  assert_contains "$PROTOCOL" 'user explicitly requests or approves reading it' || return 1
+  assert_contains "$PROTOCOL" 'Do not add paths inferred from task similarity' || return 1
+  assert_contains "$PROTOCOL" 'Filename-only inspection' || return 1
+  assert_contains "$PROTOCOL" 'cannot recover exact authorization, fail closed' || return 1
   assert_contains "$PROTOCOL" 'only when no operation is active' || return 1
   assert_contains "$PROTOCOL" 'cannot be resumed' || return 1
   assert_contains "$PROTOCOL" 'independently eligible increment' || return 1
@@ -87,6 +92,8 @@ check_workflow_contract() {
   assert_contains "$delivery" 'reasoning' || return 1
   assert_contains "$delivery" 'fast' || return 1
   assert_contains "$delivery" 'do_not_load' || return 1
+  assert_contains "$delivery" 'authorized_plan_paths' || return 1
+  assert_contains "$delivery" 'every other `.ai/plans/**` path' || return 1
   assert_contains "$delivery" '<!-- sia:approval:start -->' || return 1
   assert_contains "$delivery" 'lowercase SHA-256' || return 1
   assert_contains "$delivery" '<!-- sia:status pending-approval -->' || return 1

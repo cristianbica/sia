@@ -41,6 +41,12 @@ case $prompt in
   'Sia reload')
     response='SIA_PROTOCOL_CANARY_7F3D Sia reloaded the current protocol; no work started and persisted plans were retained.'
     ;;
+  'Sia investigate whether pre-existing plan contents are available without explicit authorization')
+    response='SIA_PROTOCOL_CANARY_7F3D Pre-existing plans require an explicit authorized path.'
+    ;;
+  'Sia resume .ai/plans/pre-existing-plan.md')
+    response='SIA_PROTOCOL_CANARY_7F3D Authorized plan access fixture is pending approval.'
+    ;;
   *) response='unexpected prompt' ;;
 esac
 

@@ -38,16 +38,17 @@ plan.
 - Purpose: produce a readable, executable standard plan; no product/source writes.
 - Output: the visible plan states only outcome, scope, non-goals, acceptance, checks, risks, and external actions.
 - Filename: every new artifact is `.ai/plans/YYYY-MM-DD-NN-<slug>.md`, using the UTC creation date and a two-digit,
-  zero-padded daily sequence. Inspect filenames only (never prior plan contents) to select the next unused `NN` for that
-  date; this makes directory order chronological and deterministic.
+  zero-padded daily sequence. Inspect filenames only (never unauthorized plan contents) to select the next unused `NN`
+  for that date; this makes directory order chronological and deterministic.
 - Header: exactly `operation`, `workflow`, and declared `skills`; the filename is the plan identity.
 - Footer: state is optional one-line `<!-- sia:<name> <value> -->` comments after the approval block. `status` is
   required; all other comments appear only when relevant.
 - Model profile: request `reasoning` for ambiguous or risky planning; lightweight may use `fast`.
 
-Persist a compact artifact before Build. Standard starts with `<!-- sia:status pending-approval -->`; interactive and
-standard are defaults, so they need no mode or route comment. Record `base` for resume. Add `dirty` only for existing
-paths; add `mode`, `route`, `ceiling`, or `external` only when they differ from those defaults or are nonempty.
+Persist a compact artifact before Build and immediately add its exact path to the conversation's
+`authorized_plan_paths`. Standard starts with `<!-- sia:status pending-approval -->`; interactive and standard are
+defaults, so they need no mode or route comment. Record `base` for resume. Add `dirty` only for existing paths; add
+`mode`, `route`, `ceiling`, or `external` only when they differ from those defaults or are nonempty.
 
 ## Approve
 
@@ -73,8 +74,9 @@ optional `base` and `dirty` comments. Preserve pre-existing work; unsafe overlap
 unattended writes. Do not stash, reset, clean, or overwrite it.
 
 Request `fast` for mechanical work and `reasoning` for risky work. Resolve required skills through the effective
-catalog, load `documentation` or `safe-refactoring` only when material, and put exact paths plus `do_not_load` in the
-handoff. After resolution, do not reread catalogs, broad docs, historical plans, or prior evidence. Append a short
+catalog, load `documentation` or `safe-refactoring` only when material, and put exact paths,
+`authorized_plan_paths`, and every other `.ai/plans/**` path in `do_not_load` in the handoff.
+After resolution, do not reread catalogs, broad docs, unauthorized plans, or prior evidence. Append a short
 `<!-- sia:progress build: <summary> -->` comment and set status to `review-validate` when complete.
 
 ## Review/Validate
@@ -141,4 +143,4 @@ legacy artifacts unchanged; never rewrite them merely to compact them.
 
 Changing approval-block bytes removes the approval comment and returns to `pending-approval`; progress comments never
 repair invalid approval content. Load only the named active plan and exact current definitions. At phase boundaries put
-definition paths, evidence, and worker-only state in the handoff envelope, not the plan.
+definition paths, authorized plan paths, evidence, and worker-only state in the handoff envelope, not the plan.

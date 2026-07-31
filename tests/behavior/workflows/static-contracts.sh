@@ -21,6 +21,7 @@ check_bounded_handoff() {
     'execution_mode:' \
     'authorization_ceiling:' \
     'authorized_external_actions:' \
+    'authorized_plan_paths:' \
     'operation:' \
     'workflow:' \
     'phase:' \
@@ -36,8 +37,9 @@ check_bounded_handoff() {
     'handoff_result: 1'; do
     assert_contains "$PROTOCOL" "$value" || return 1
   done
-  assert_contains "$PROTOCOL" 'reroute the task' || return 1
+  assert_contains "$PROTOCOL" 'reroute through catalogs' || return 1
   assert_contains "$PROTOCOL" 'Sia handoff' || return 1
+  assert_contains "$PROTOCOL" '.ai/plans/** except exact authorized_plan_paths' || return 1
 }
 
 check_unattended_delivery() {
@@ -86,6 +88,8 @@ check_delivery_is_resumable() {
   assert_contains "$DELIVERY" 'YYYY-MM-DD-NN-<slug>.md' || return 1
   assert_contains "$DELIVERY" 'UTC creation date' || return 1
   assert_contains "$DELIVERY" 'filenames only' || return 1
+  assert_contains "$DELIVERY" 'immediately add its exact path' || return 1
+  assert_contains "$DELIVERY" 'unauthorized plans' || return 1
 }
 
 check_parallel_work_is_bounded() {

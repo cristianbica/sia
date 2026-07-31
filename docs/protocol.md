@@ -74,10 +74,11 @@ body. Load a skill only when a later task makes it relevant or the user requests
 
 ### `Sia resume <approved-plan>`
 
-Read a persisted delivery plan and verify its visible approval digest plus compact status comments. New plans keep only
-`operation`, `workflow`, and `skills` in frontmatter; optional one-line footer comments carry base, dirty paths,
-unattended authority, and concise progress when needed. Existing valid legacy plans remain resumable. Refuse stale,
-unapproved, ambiguous, or inconsistent plans. Other artifact kinds need an envelope.
+The exact path in this directive authorizes reading that plan and no other pre-existing plan. Verify its visible
+approval digest plus compact status comments. New plans keep only `operation`, `workflow`, and `skills` in frontmatter;
+optional one-line footer comments carry base, dirty paths, unattended authority, and concise progress when needed.
+Existing valid legacy plans remain resumable. Refuse stale, unapproved, ambiguous, or inconsistent plans. Other
+artifact kinds need an envelope.
 
 ### `Sia handoff` followed by an envelope
 
@@ -165,12 +166,14 @@ Only successful completion, `Sia stop`, `Sia reload`, or a successfully resolved
 ## Activation duration
 
 - Loaded docs and skill catalogs remain available for the current conversation.
+- Plan-content authorization starts empty and contains only exact paths created by the active Sia conversation or
+  explicitly requested or approved by the user.
 - An operation remains active until its workflow completes, the user invokes `Sia stop` or `Sia reload`, or another
   operation replaces it.
 - A new conversation starts with Sia inactive unless it begins with a recognized Sia invocation.
-- After compaction, reread the entrypoint and `.ai/sia.md`. For an active operation, also reload `.ai/RULES.md`, the
-  named active plan when one exists, and only the exact current definition paths needed for the phase. Never scan
-  catalogs or historical plans to reconstruct compacted state.
+- After compaction, reread the entrypoint and `.ai/sia.md`. For an active operation, also reload `.ai/RULES.md`, an
+  authorized active plan when one exists, and only the exact current definition paths needed for the phase. Never scan
+  catalogs or unauthorized plans to reconstruct compacted state; missing exact plan authorization fails closed.
 
 ## Worker startup
 

@@ -110,6 +110,8 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - New plans use minimal operation/workflow/skills frontmatter and optional one-line status comments at EOF.
 - Malformed approval markers, conflicting status comments, or a nonmatching digest prevent resume.
 - `Sia resume <approved-plan>` verifies approved content and enters the recorded delivery phase rather than replanning.
+- Plan content is readable only from exact conversation-created or user-authorized paths; broad discovery excludes
+  every other `.ai/plans/**` file, and missing authorization after compaction fails closed.
 - Phase handoffs name exact current definition paths; workers do not independently reroute through catalogs.
 - Lightweight delivery uses one bounded Build handoff and focused coordinator validation. An internal source change
   qualifies only with an evidenced seam, exact paths, criteria, and focused test; all excluded risks promote it.

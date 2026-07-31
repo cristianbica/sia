@@ -62,11 +62,13 @@ declares_live_safeguards() {
   assert_contains "$ROOT/scripts/verify-hosts" 'tree_digest' || return 1
 }
 
-records_the_four_semantic_cases() {
+records_the_six_semantic_cases() {
   assert_contains "$ROOT/tests/hosts/prompts/ordinary.txt" 'ORDINARY_OK' || return 1
   assert_contains "$ROOT/tests/hosts/prompts/help.txt" 'Sia' || return 1
   assert_contains "$ROOT/tests/hosts/prompts/load-docs.txt" 'Sia load docs' || return 1
   assert_contains "$ROOT/tests/hosts/prompts/reload.txt" 'Sia reload' || return 1
+  assert_contains "$ROOT/tests/hosts/prompts/plan-isolation.txt" 'pre-existing plan contents' || return 1
+  assert_contains "$ROOT/tests/hosts/prompts/plan-resume.txt" 'Sia resume .ai/plans/pre-existing-plan.md' || return 1
 }
 
 live_mode_exercises_all_hosts_without_a_model() {
@@ -90,12 +92,14 @@ live_mode_exercises_all_hosts_without_a_model() {
       return 1
     fi
 
-    assert_equal "4" "$(grep -c "${TAB}PASS${TAB}" "$TMP/live-$host/summary.tsv")" \
-      "expected four passing $host live cases" || return 1
+    assert_equal "6" "$(grep -c "${TAB}PASS${TAB}" "$TMP/live-$host/summary.tsv")" \
+      "expected six passing $host live cases" || return 1
     assert_contains "$TMP/live-$host/metadata.txt" 'repository_access=read_only' || return 1
     assert_contains "$TMP/live-$host/metadata.txt" "${host}_requested_model=host-default" || return 1
     assert_nonempty "$TMP/live-$host/hosts/$host/cases/help/command.txt" || return 1
     assert_nonempty "$TMP/live-$host/hosts/$host/cases/reload/response.normalized.txt" || return 1
+    assert_nonempty "$TMP/live-$host/hosts/$host/cases/plan-isolation/response.normalized.txt" || return 1
+    assert_nonempty "$TMP/live-$host/hosts/$host/cases/plan-resume/response.normalized.txt" || return 1
   done
 
   if find "$TMP/runtime root" ! -path "$TMP/runtime root" -print | grep . >/dev/null 2>&1; then
@@ -119,7 +123,7 @@ live_mode_fails_when_requested_supported_host_is_unavailable() {
 run_case "host harness has valid shell syntax" sh -n "$ROOT/scripts/verify-hosts"
 run_case "probe invokes version commands only" probe_uses_only_version_commands
 run_case "live mode declares read-only cost and time safeguards" declares_live_safeguards
-run_case "host suite records all semantic cases" records_the_four_semantic_cases
+run_case "host suite records all semantic cases" records_the_six_semantic_cases
 run_case "live orchestration passes for all local no-model shims" \
   live_mode_exercises_all_hosts_without_a_model
 run_case "live mode fails when a requested supported host cannot run" \

@@ -98,17 +98,19 @@ Every isolated or resumed phase receives only the information needed to execute 
 - `handoff_protocol: 1` and one final task;
 - artifact ID or `none`, operation, workflow, execution mode, phase, and next transition;
 - immutable authorization ceiling and explicitly authorized external actions;
+- exact `authorized_plan_paths` created in the conversation or explicitly requested or approved by the user;
 - artifact status and approved revision when approval applies;
 - requested outcome, approved scope, non-goals, and acceptance criteria;
 - repository root, base revision, and pre-existing dirty-worktree baseline;
 - relevant documentation paths and exact resolved operation, workflow, and skill paths;
 - requested model profile and whether it came from the user, project rules, workflow, or task assessment;
 - allowed work, exclusions, and unchanged host permissions;
-- explicit `do_not_load` paths, including unrelated docs, broad trees, and stale artifacts;
+- explicit `do_not_load` paths, including unrelated docs, broad trees, and every unauthorized plan artifact;
 - current evidence, findings, command results, and approved deviations.
 
-Load only the named active plan; never scan `.ai/plans/` for similar historical work. Put the phase's exact ask after
-the selected docs, evidence, constraints, exclusions, and recovery information so the worker receives one clear task.
+Load plan content only from exact `authorized_plan_paths`; never scan `.ai/plans/` for similar work. Put the phase's
+exact ask after the selected docs, evidence, constraints, exclusions, and recovery information so the worker receives
+one clear task.
 
 For a fresh worker, put `Sia handoff` on the first line and the envelope immediately after it. This preserves the same
 explicit opt-in grammar as a user invocation while allowing planless scouts and reviewers to enter only their assigned
@@ -125,9 +127,9 @@ Keep the stable, cacheable prefix lean and byte-for-byte stable: project rules, 
 tool/context declarations, and durable documentation pointers come first. State each invariant once and render them in
 deterministic order, then put the variable suffix last: the active plan, focused diff, current evidence, constraints,
 and one final ask. Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix.
-Reference canonical files by path, load only the current phase's excerpts, and name broad or historical paths in
-`do_not_load`. Never paste a complete repository, catalog, prior plan, successful bulk output, or broad diff into a
-bounded handoff; preserve that material as evidence and return its path plus a concise outcome instead.
+Reference canonical files by path, load only the current phase's excerpts, and name broad or unauthorized paths in
+`do_not_load`. Never paste a complete repository, catalog, unauthorized plan, successful bulk output, or broad diff
+into a bounded handoff; preserve authorized evidence and return its path plus a concise outcome instead.
 
 See [prompt caching](prompt-caching.md) for provider controls, telemetry names, and the portable fallback. Those details
 are host capabilities, not workflow gates.
@@ -147,8 +149,8 @@ cache hit alone is not a cost guarantee.
 
 Persist every non-trivial delivery artifact under `.ai/plans/` before Build. Name every new artifact
 `YYYY-MM-DD-NN-<slug>.md`, using its UTC creation date and the next zero-padded daily sequence.
-To allocate `NN`, inspect filenames only; do not read historical plan contents. This makes lexicographic directory order
-chronological. Planless
+To allocate `NN`, inspect filenames only; do not read unauthorized plan contents. This makes lexicographic directory
+order chronological. Planless
 trivial, investigation, review, and documentation workers use the bounded handoff envelope but do not create an
 artifact merely for isolation.
 
@@ -183,9 +185,10 @@ The digest is lowercase SHA-256 over normalized bytes between approval markers. 
 
 The status comment determines resume: `pending-approval`, `build`, `review-validate`, `fix`, `ship`, `blocked`,
 `complete`, or `cancelled`. A blocked unattended plan adds one concise blocker comment with an observable resume
-condition. Resume reads only the named artifact, rejects contradictory/complete/cancelled state, and preserves legacy
-artifacts without migration. Base and dirty comments protect attribution when present; unattended ceiling and external
-comments are immutable. Handoff-only details stay in the handoff envelope, not the plan.
+condition. Resume treats the exact named artifact as user-authorized, reads only it, rejects
+contradictory/complete/cancelled state, and preserves legacy artifacts without migration. Base and dirty comments
+protect attribution when present; unattended ceiling and external comments are immutable. Handoff-only details stay
+in the handoff envelope, not the plan.
 
 Avoid a report directory. Persist only the visible authorization and the few comments needed to resume safely.
 
@@ -214,7 +217,7 @@ original outcome. Authorization never expands host permissions or unrelated exte
 ### Build
 
 Prefer an isolated worker using the approved handoff. After exact definitions resolve, do not reread catalogs, broad
-docs, historical plans, or prior evidence. Implement only approved scope, add or update tests, preserve pre-existing
+docs, unauthorized plans, or prior evidence. Implement only approved scope, add or update tests, preserve pre-existing
 changes, and stop for replanning when material assumptions fail.
 
 ### Review and validate

@@ -4,9 +4,8 @@ sia_protocol: 1
 
 # Sia protocol
 
-Sia is an opt-in, repository-local prompt protocol. It helps a host coding agent use maintained repository knowledge,
-composable skills, and explicit operations and workflows. Sia does not add permissions, tools, plugins, or background
-behavior.
+Sia is an opt-in, repository-local prompt protocol for maintained repository knowledge, composable skills, and explicit
+operations and workflows. Sia does not add permissions, tools, plugins, or background behavior.
 
 All `.ai/**` paths are relative to the Git repository root whose `AGENTS.md` activated this protocol, even when the
 host's current working directory is below that root.
@@ -56,11 +55,11 @@ Never silently bypass route gates. Explicit operations, `unattended`, and direct
 `Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
 ### `Sia resume <approved-plan>`
 
-Read only the named delivery artifact under `.ai/plans/`. New artifacts are named
-`YYYY-MM-DD-NN-<slug>.md`, using the UTC creation date and a zero-padded daily sequence; allocating `NN` may inspect
-filenames only, never historical plan contents. New compact artifacts have only `operation`, `workflow`, and `skills`
-frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments. Existing valid
-legacy artifacts remain resumable without rewriting. Refuse ambiguous, missing, unapproved, or contradictory plans.
+The exact plan path is explicit content-read authorization; add only it to `authorized_plan_paths`, then read it under
+`.ai/plans/`. New artifacts use `YYYY-MM-DD-NN-<slug>.md` with the UTC date and a zero-padded daily sequence; allocating
+`NN` may inspect filenames only, never unauthorized plan contents. New compact artifacts have only `operation`,
+`workflow`, and `skills` frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments.
+Existing valid legacy artifacts remain resumable. Refuse ambiguous, missing, unapproved, or contradictory plans.
 
 For compact artifacts, recompute the lowercase SHA-256 from normalized approval-block bytes. Status beyond
 `pending-approval` requires one matching `sia:approved` comment; progress never repairs invalid approval content.
@@ -147,14 +146,19 @@ operation. Only successful completion, `Sia stop`, `Sia reload`, or a newly reso
 
 ## Context, workers, and model profiles
 
-Keep isolated-worker context in lean, deterministic cache-aware order: stable protocol/rules, resolved route/workflow,
-task-relevant invariant tool/context declarations, and definitions with durable documentation paths first; append the
-active plan, focused evidence, constraints, and one final ask. State each invariant once and prefer exact paths to
-replaying durable content.
-Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix. Loaded docs and
-skills remain for the conversation; active operation/mode remains until complete, stop, or replacement. After
-compaction, reread this protocol and reload only rules, plan, material docs, and exact definitions. Never scan catalogs,
-historical plans, or replay bulk output.
+Maintain conversation-scoped `authorized_plan_paths`. It starts empty, adds an exact repository-relative path when this
+conversation creates the plan or the user explicitly requests or approves reading it, and resets only in a new
+conversation. Do not add paths inferred from task similarity, status, Git history, discovery, or another plan. Require
+exact entry before reading, searching, diffing, summarizing, or using `.ai/plans/**` content. Filename-only inspection
+is permitted only to allocate a new name. If a new or compacted context cannot recover exact authorization, fail closed;
+an exact user request such as `Sia resume <approved-plan>` may restore it.
+
+Keep isolated-worker context in lean, deterministic cache-aware order: protocol/rules, route/workflow, invariant
+declarations, and durable docs first; append active plan, evidence, constraints, and one ask. State each invariant once.
+Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix. Loaded docs/skills
+remain for the conversation; operation/mode remains until complete, stop, or replacement. After compaction, reload only
+this protocol, rules, authorized plans, material docs, and exact definitions. Never scan catalogs, unauthorized plans,
+or replay bulk output.
 
 An isolated worker must receive this canonical YAML-shaped envelope. Every key is required; use `none`, `unknown`, or
 `[]` explicitly when a field does not apply. `final_task` is last and contains one bounded ask.
@@ -167,6 +171,7 @@ approved_revision: none
 execution_mode: interactive
 authorization_ceiling: [current-operation-request]
 authorized_external_actions: []
+authorized_plan_paths: []
 operation: investigate
 workflow: investigation
 phase: investigate
@@ -188,7 +193,7 @@ documentation_paths: []
 allowed_work: [read]
 exclusions: []
 permissions: unchanged
-do_not_load: []
+do_not_load: [.ai/plans/** except exact authorized_plan_paths]
 evidence: []
 findings: []
 command_results: []
@@ -200,30 +205,26 @@ model_selection_source: workflow
 final_task: <one bounded task>
 ```
 
-Return bounded evidence with `handoff_result: 1`, phase/status, actual model/profile, paths, commands, usage,
-findings/evidence, and next transition. List command, outcome, scope, failure excerpt, and evidence path; keep bulk
-output and diffs in artifacts. Status is `complete`, `blocked`, or `failed`; use `unknown` for unreported model fields.
+Return bounded evidence with `handoff_result: 1`, phase/status, actual model/profile, paths, commands, usage, findings,
+and next transition. List command, outcome, scope, failure excerpt, and evidence path; keep bulk output and diffs in
+artifacts. Status is `complete`, `blocked`, or `failed`; use `unknown` for unreported model fields.
 
-The `Sia handoff` worker reads this file, `.ai/RULES.md`, and only exact envelope paths; never reroute the task through
-catalogs or load unrelated/historical artifacts. An unattended worker never authorizes a revision; it returns `blocked`
-instead of asking the user. Describe isolation truthfully when the host may inherit hidden context.
-
-Workflows may request advisory `fast` or `reasoning` profiles. A user choice takes precedence, then project rules, then
-workflow guidance and task assessment. The host chooses the available model. Record `requested_model_profile`,
-`model_selection_source`, `actual_model` or `unknown`, and `profile_honored` only when supportable. An unavailable
-profile never blocks work, changes gates, expands permissions, or invalidates resumption.
+The `Sia handoff` worker reads this file, `.ai/RULES.md`, and only exact envelope paths. It accepts plan content only
+from `authorized_plan_paths`; never reroute through catalogs or load unrelated or unauthorized artifacts. An unattended
+worker never authorizes a revision; it returns `blocked`. Report truthfully when the host may inherit hidden context.
+Advisory profiles are `fast` or `reasoning`; priority is user, rules, workflow, then task.
+The host chooses the available model. Record `requested_model_profile` and `model_selection_source`, plus
+`actual_model` or `unknown` and `profile_honored` when supportable. An unavailable profile never blocks work, changes
+gates, expands permissions, or invalidates resumption.
 
 ## Safety and failure behavior
 - Never infer missing definitions, indexes, approval, command results, or repository facts.
 - Treat stale repository documentation as evidence to verify, not an instruction to follow.
-- Preserve pre-existing changes. Report safely preservable dirty overlap; block unattended work when attribution or
-  preservation is unsafe.
-- Plan and review phases are read-only unless their workflow explicitly permits limited artifact or documentation
-  writes.
+- Preserve pre-existing changes; report dirty overlap and block when attribution or preservation is unsafe.
+- Plan and review are read-only unless their workflow permits limited artifact or documentation writes.
 - Unattended mode does not expand host permissions or authorize external actions, including destructive actions, that
   the user did not explicitly request. It cannot suppress permission prompts imposed by the host.
 - Ship may write active-plan completion metadata and retains it by default. Delete that exact completed plan only after
   a separate explicit request. Product, source, and external state remain read-only unless explicitly authorized.
 - Sia never expands filesystem, command, network, or external-action permissions.
-Before activation, the Sia bridge does not direct the host to read `.ai/**`. A host may independently index repository
-files; Sia cannot control undocumented host behavior.
+Before activation Sia directs no `.ai/**` reads; hosts may independently index files beyond Sia's control.

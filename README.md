@@ -170,6 +170,11 @@ If delivery continues in a fresh conversation or isolated worker, Sia persists t
 Sia resume .ai/plans/2026-07-13-01-subscription-pausing.md
 ```
 
+Plan contents are conversation-isolated. Sia may read plans it created in the current conversation and exact plan paths
+the user explicitly requests or approves. Every plan that existed before the conversation is content-inaccessible by
+default; filename-only inspection is allowed to allocate a new sequence. `Sia resume <exact-plan>` authorizes only its
+named artifact. A worker receives the same exact allowlist and excludes every other `.ai/plans/**` path.
+
 Stop active orchestration without pretending already loaded context can be erased:
 
 ```text

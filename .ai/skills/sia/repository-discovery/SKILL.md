@@ -31,6 +31,10 @@ Prefer filenames, symbols, targeted search, and small directory listings over br
 Separate direct observations from inference. Cite repository paths for important claims and state confidence when
 evidence is incomplete.
 
+Exclude `.ai/plans/**` from repository-wide search, diff, indexing, and discovery commands. Plan content is available
+only when its exact path appears in the conversation or handoff `authorized_plan_paths`; open those paths directly.
+Filename-only inspection may allocate a new plan name but must not become task evidence.
+
 ## Constraints
 
 - Do not edit product or source code while using this skill for a read-only phase.
