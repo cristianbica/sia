@@ -13,15 +13,12 @@ host's current working directory is below that root.
 
 ## Activation
 
-Attempt activation only when `Sia` is the first non-whitespace token in the user's message and is followed by
-whitespace or the end of the message. Matching is case-sensitive. `sia`, `SIA`, `Sia:`, and incidental mentions do not
-activate Sia.
+Attempt activation only when case-sensitive `Sia` is the first non-whitespace token and is followed by whitespace or
+the end of the message. `sia`, `SIA`, `Sia:`, and incidental mentions do not activate Sia.
 
-Before doing anything else for a valid invocation, validate this file. Its first three lines must be exactly `---`,
-`sia_protocol: 1`, and `---`, and the prompt body after that header must contain non-whitespace text.
-
-If this file is missing, empty, unreadable, or structurally invalid, report an installation-integrity error and stop.
-Do not reconstruct Sia behavior from other files, prior conversations, or general knowledge.
+For a valid invocation, first require this file's exact header lines `---`, `sia_protocol: 1`, and `---`, followed by a
+nonempty body. If it is missing, empty, unreadable, or invalid, report an installation-integrity error and stop; never
+reconstruct Sia behavior from other files, prior conversations, or general knowledge.
 
 Resolve the remainder after `Sia` in this order:
 
@@ -40,10 +37,9 @@ Resolve the remainder after `Sia` in this order:
 
 ### `Sia load docs`
 
-Read only `.ai/docs/INDEX.md` and make its routes available to the host's normal workflow. Do not follow links until a
-later task makes them relevant, and do not activate an operation. If the index is missing or has
-`status: not-initialized`, report that repository documentation is unavailable and suggest
-`Sia document repository`.
+Read only `.ai/docs/INDEX.md` and expose its routes to the host's normal workflow. Follow no links until a later task
+requires them, and do not activate an operation. If the index is missing or `status: not-initialized`, report repository
+documentation unavailable and suggest `Sia document repository`.
 
 ### `Sia load skills`
 
@@ -54,44 +50,38 @@ operation.
 ### `Sia forge on` and `Sia forge off`
 `Sia forge on` enables conversation-scoped Forge only when no operation is active. It ends on `Sia forge off`,
 `Sia stop`, `Sia reload`, or a new conversation; it creates no artifact and cannot be resumed.
-While enabled, unqualified questions receive direct answers; actions route only to trivial or lightweight delivery with
-an inline receipt.
-If standard delivery is needed, explain why; ask to switch or narrow to an independently eligible increment.
-Never silently switch or bypass route gates. Explicit operations, `unattended`, and directives resolve normally.
+While enabled, unqualified questions receive direct answers; actions route only to trivial or lightweight delivery
+with an inline receipt. Standard work explains why; ask to switch or narrow to an independently eligible increment.
+Never silently bypass route gates. Explicit operations, `unattended`, and directives resolve normally.
 `Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
 ### `Sia resume <approved-plan>`
 
 Read only the named delivery artifact under `.ai/plans/`. New artifacts are named
 `YYYY-MM-DD-NN-<slug>.md`, using the UTC creation date and a zero-padded daily sequence; allocating `NN` may inspect
-filenames only and never historical plan contents. New compact artifacts have only `operation`, `workflow`, and
-`skills` frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments. Existing valid
+filenames only, never historical plan contents. New compact artifacts have only `operation`, `workflow`, and `skills`
+frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments. Existing valid
 legacy artifacts remain resumable without rewriting. Refuse ambiguous, missing, unapproved, or contradictory plans.
 
 For compact artifacts, recompute the lowercase SHA-256 from normalized approval-block bytes. Status beyond
-`pending-approval` requires one matching `sia:approved` comment; progress never repairs invalid approval content. Derive
-the next phase from status. `mode`, `route`, `base`, `dirty`, `ceiling`, `external`, and `blocker` comments apply only
-when present. A blocked unattended plan retries only after an observable condition changes. Refuse complete or
-cancelled artifacts; Ship also requires passing final Review/Validate evidence.
+`pending-approval` requires one matching `sia:approved` comment; progress never repairs invalid approval content.
+Optional mode/route/base/dirty/ceiling/external/blocker comments apply only when present; derive phase from status.
+A blocked unattended plan retries only after observable change. Refuse complete/cancelled; Ship requires passing review.
 
 Compare current HEAD and changed paths with optional base/dirty comments and progress evidence. In unattended mode,
 unsafe overlap or attribution returns `blocked`; never auto-authorize around it. Otherwise, boundary drift returns
-standard work to Plan. Record nonmaterial drift without rewriting the base.
+standard work to Plan; record nonmaterial drift without rewriting the base.
 
 At the phase boundary, resolve the current effective operation, workflow, and skills. Put their exact paths in the
-handoff. A definition-path or resolution change is reported; a material conflict with approved scope returns to Plan and
-Approve rather than silently changing the work.
+handoff. Report a definition-path or resolution change; a material conflict returns to Plan and Approve.
 
 ### `Sia handoff` followed by a bounded handoff envelope
 
-This directive is for a fresh worker started by an already active Sia operation. The first line must be exactly
-`Sia handoff`; the remaining message must begin with `handoff_protocol: 1` and contain the envelope fields defined
-below. It is invalid without a nonempty envelope.
-
+A fresh worker started by an active Sia operation uses this directive. First line must be exactly `Sia handoff`; the
+remaining message must begin with `handoff_protocol: 1` and contain the complete nonempty envelope below.
 Validate the assigned operation, workflow, phase, artifact status when applicable, exact definition paths, allowed
-work, exclusions, `do_not_load` paths, and final task. Then load `.ai/RULES.md`, this protocol, and only the exact paths
-named by the handoff. Do not resolve through catalogs, select another operation, coordinate user approval, or expand
-the phase. Return the requested result envelope and end this worker's Sia activity. Refuse an incomplete,
-contradictory, or permission-expanding handoff.
+work, exclusions, `do_not_load` paths, and final task. Load `.ai/RULES.md`, this protocol, and only exact named paths.
+Never reroute through catalogs, choose another operation, coordinate approval, or expand the phase. Return the requested
+result envelope and end the worker's Sia activity; refuse incomplete, contradictory, or permission-expanding handoffs.
 
 ### `Sia stop`
 
@@ -145,6 +135,15 @@ Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or a di
 
 Help, docs loading, skills loading, Forge, a direct conversation, and an invalid handoff do not replace an active
 operation. Only successful completion, `Sia stop`, `Sia reload`, or a newly resolved operation ends or replaces it.
+
+## User-facing responses
+
+- Write the shortest complete answer that leads with the outcome, finding, blocker, or decision in normal English.
+- For a simple answer, use one sentence or one exact command.
+- For diagnosis, investigation, or review, keep only decisive evidence, uncertainty, material findings, and next action.
+- Remove greetings, preambles, self-reference, process narration, repetition, and generic closers.
+- Preserve required facts, exact technical strings, safety limits, approval boundaries, and requested detail.
+- Expand when the user asks for detail or when safe, correct action requires explanation.
 
 ## Context, workers, and model profiles
 

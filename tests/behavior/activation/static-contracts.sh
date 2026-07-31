@@ -53,6 +53,16 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'disables Forge' || return 1
 }
 
+check_response_contract() {
+  assert_contains "$PROTOCOL" '## User-facing responses' || return 1
+  assert_contains "$PROTOCOL" 'shortest complete answer' || return 1
+  assert_contains "$PROTOCOL" 'one sentence or one exact command' || return 1
+  assert_contains "$PROTOCOL" 'decisive evidence, uncertainty, material findings, and next action' || return 1
+  assert_contains "$PROTOCOL" 'process narration, repetition, and generic closers' || return 1
+  assert_contains "$PROTOCOL" 'exact technical strings, safety limits, approval boundaries' || return 1
+  assert_contains "$PROTOCOL" 'when safe, correct action requires explanation' || return 1
+}
+
 check_unattended_directive() {
   assert_contains "$PROTOCOL" 'Sia unattended <operation> [request]' || return 1
   assert_contains "$PROTOCOL" 'Do not infer unattended mode from natural-language requests' || return 1
@@ -97,6 +107,7 @@ check_seed_indexes() {
 run_case "the root bridge is awareness-only" check_agents_bridge
 run_case "the Claude bridge only imports root instructions" check_claude_bridge
 run_case "the protocol declares core reserved directives" check_protocol_directives
+run_case "activated responses stay concise without losing required boundaries" check_response_contract
 run_case "unattended activation is exact, bounded, and noninteractive" check_unattended_directive
 run_case "activation fails closed at the bridge" check_fail_closed_contract
 run_case "delivery declares phases, exclusions, and advisory profiles" check_workflow_contract
