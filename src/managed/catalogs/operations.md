@@ -10,7 +10,7 @@
   - aliases: `bug`, `fix-bug`
 - `implement` — Route a repository change to proportionate planning, implementation, validation, and delivery.
   - aliases: `build`
-- `investigate` — Answer a bounded repository question from evidence without changing the repository.
+- `investigate` — Investigate read-only evidence and optionally save an explicitly requested delivery plan.
 - `reconcile-catalogs` — Reconcile project definitions and CUSTOM entries through targeted safe repairs.
 - `refresh-docs` — Audit and refresh targeted repository documentation against current evidence.
   - aliases: `refresh-documentation`

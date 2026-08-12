@@ -156,8 +156,8 @@ repairs. It preserves valid custom descriptions and never rewrites SIA blocks.
 
 ## Shipped definitions
 
-- Operations: `implement`, `fix`, `review`, `investigate`, `document`, `refresh-docs`, the three creators, and
-  `reconcile-catalogs`.
+- Operations: `implement`, `fix`, `review`, `investigate` (read-only except for one explicitly requested new delivery
+  plan), `document`, `refresh-docs`, the three creators, and `reconcile-catalogs`.
 - Workflows: `delivery`, `review`, `investigation`, `documentation`, and `definition`.
 - Initial skills: `repository-discovery`, `testing`, `bug-triage`, `code-review`, `documentation`, and
   `safe-refactoring`.

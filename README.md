@@ -121,6 +121,7 @@ Sia implement subscription pausing
 Sia fix duplicate renewal charges
 Sia review the current branch
 Sia investigate intermittent webhook failures
+Sia investigate intermittent webhook failures and save an implementation plan
 Sia document the billing area
 Sia refresh-docs billing
 ```
@@ -133,6 +134,10 @@ actions; it is not persisted or a second approval gate. Standard delivery plans 
 approval, then builds, reviews, fixes, and reports. In-envelope implementation details do not cause another approval;
 expanded scope, risk, permissions, or external actions do. An explicit request for a full or thorough workflow selects
 standard delivery.
+
+Investigation keeps product, source, existing plans, and external state read-only. If its original request explicitly
+asks to save an implementation plan, its coordinating session may create one new `pending-approval` delivery plan and
+report the exact `Sia resume <path>` command; it never approves or executes that plan.
 
 For rapid, conversation-scoped iteration, use Forge:
 

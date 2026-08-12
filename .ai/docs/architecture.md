@@ -39,7 +39,7 @@ Installed project-owned paths have their own responsibilities:
 | `.ai/operations/<name>.md` | Custom user intent and operation contract | `create-operation` or an explicit
   project change |
 | `.ai/workflows/<name>.md` | Custom phases, gates, and transitions | `create-workflow` or an explicit project change |
-| `.ai/plans/**` | Delivery artifacts and approval evidence | Delivery workflow only |
+| `.ai/plans/**` | Delivery artifacts and approval evidence | Delivery workflow or investigation's explicit new-draft exception |
 | `.ai/RULES.md` | Hard project-specific Sia constraints | Project owner; never Sia refresh |
 
 The reserved `.ai/*/sia/` directories and `.ai/sia.md` are not project extension points. When developing Sia, edit the

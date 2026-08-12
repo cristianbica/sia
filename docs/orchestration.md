@@ -150,9 +150,10 @@ cache hit alone is not a cost guarantee.
 Persist every non-trivial delivery artifact under `.ai/plans/` before Build. Name every new artifact
 `YYYY-MM-DD-NN-<slug>.md`, using its UTC creation date and the next zero-padded daily sequence.
 To allocate `NN`, inspect filenames only; do not read unauthorized plan contents. This makes lexicographic directory
-order chronological. Planless
-trivial, investigation, review, and documentation workers use the bounded handoff envelope but do not create an
-artifact merely for isolation.
+order chronological. Planless trivial, investigation, review, and documentation workers use the bounded handoff
+envelope and do not create an artifact merely for isolation. An investigation may create one normal pending-approval
+delivery plan only when its original request explicitly asks to save a plan; this is not an investigation artifact or
+implementation approval.
 
 New plans keep only the information a reader needs in their header and visible body:
 
@@ -247,9 +248,15 @@ reversible assumptions or return a blocked result when no safe in-scope path rem
 
 ### Investigation
 
-Read-only and normally planless. Timebox the question, inspect the smallest useful evidence set, separate observations
-from inference, report confidence and unknowns, and recommend a next operation. An investigation report never approves
-implementation.
+Product, source, existing plans, and external state remain read-only. Timebox the question, inspect the smallest useful
+evidence set, separate observations from inference, report confidence and unknowns, and recommend a next operation.
+
+When the original request explicitly asks to save an implementation plan, the coordinating session may create exactly
+one new compact delivery plan under `.ai/plans/` after synthesis. Resolve one unambiguous effective delivery operation;
+use its exact workflow and skills, normal UTC filename allocation, approval markers, `pending-approval` status, and
+base/dirty evidence. Add only that new path to plan authorization. Never read or edit another plan, approve or execute
+the draft, add unattended authority, or let a scout write it. Report `Sia resume <path>`; normal delivery approval still
+applies. An investigation report never approves implementation and has no resumable artifact of its own.
 
 ### Review
 

@@ -8,8 +8,10 @@ ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 PROTOCOL=$ROOT/src/managed/.ai/sia.md
 DELIVERY=$ROOT/src/managed/.ai/workflows/sia/delivery.md
 INVESTIGATION=$ROOT/src/managed/.ai/workflows/sia/investigation.md
+INVESTIGATE=$ROOT/src/managed/.ai/operations/sia/investigate.md
 REVIEW=$ROOT/src/managed/.ai/workflows/sia/review.md
 DOCUMENT=$ROOT/src/managed/.ai/operations/sia/document.md
+DRAFT_FIXTURE=$ROOT/tests/behavior/workflows/fixtures/investigation-draft-plan.md
 INITIAL_FIXTURE=$ROOT/tests/behavior/workflows/fixtures/unattended-initial.md
 BLOCKED_FIXTURE=$ROOT/tests/behavior/workflows/fixtures/unattended-blocked-replan.md
 
@@ -109,6 +111,27 @@ check_read_only_workflows() {
   assert_contains "$REVIEW" 'never make those edits' || return 1
 }
 
+check_investigation_draft_plan() {
+  assert_contains "$INVESTIGATE" 'explicit request to save a plan' || return 1
+  assert_contains "$INVESTIGATION" 'exactly one new compact delivery artifact' || return 1
+  assert_contains "$INVESTIGATION" 'scouts remain fully read-only' || return 1
+  assert_contains "$INVESTIGATION" 'one unambiguous effective delivery operation' || return 1
+  assert_contains "$INVESTIGATION" 'inspecting filenames only' || return 1
+  assert_contains "$INVESTIGATION" 'Never edit an existing plan' || return 1
+  assert_contains "$INVESTIGATION" 'Sia resume <path>' || return 1
+  assert_contains "$INVESTIGATION" 'no resumable artifact of its own' || return 1
+  assert_nonempty "$DRAFT_FIXTURE" || return 1
+  assert_fixed_count "$DRAFT_FIXTURE" '<!-- sia:approval:start -->' 1 || return 1
+  assert_fixed_count "$DRAFT_FIXTURE" '<!-- sia:approval:end -->' 1 || return 1
+  assert_fixed_count "$DRAFT_FIXTURE" '<!-- sia:status pending-approval -->' 1 || return 1
+  assert_contains "$DRAFT_FIXTURE" '<!-- sia:base abc123 -->' || return 1
+  assert_contains "$DRAFT_FIXTURE" '<!-- sia:dirty app/webhooks.rb -->' || return 1
+  assert_not_contains "$DRAFT_FIXTURE" '<!-- sia:approved ' || return 1
+  assert_not_contains "$DRAFT_FIXTURE" '<!-- sia:mode ' || return 1
+  assert_not_contains "$DRAFT_FIXTURE" '<!-- sia:ceiling ' || return 1
+  assert_not_contains "$DRAFT_FIXTURE" '<!-- sia:progress ' || return 1
+}
+
 check_phase_specific_skill_composition() {
   assert_contains "$DOCUMENT" '  - documentation' || return 1
   assert_contains "$DELIVERY" 'Resolve required skills' || return 1
@@ -125,6 +148,7 @@ run_case "unattended delivery preserves artifacts, review, and safety boundaries
 run_case "unattended artifacts preserve authority and block boundedly" check_unattended_artifact_fixtures
 run_case "parallel investigation and review partitions remain bounded" check_parallel_work_is_bounded
 run_case "investigation and standalone review are read-only" check_read_only_workflows
+run_case "investigation may create only an explicit pending delivery draft" check_investigation_draft_plan
 run_case "delivery composes override-aware skills by phase" check_phase_specific_skill_composition
 
 finish_tests
