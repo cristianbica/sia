@@ -42,7 +42,8 @@ the fixture repository read-only to the host, disables delegation and external t
 hard USD 0.05 per-invocation limit. Codex and OpenCode do not expose a portable hard monetary cap, so their cost is
 recorded as `unknown`.
 
-The four cases verify that an ordinary prompt does not load the protocol, `Sia` returns help including unattended mode,
-`Sia load docs` reports the seed router as uninitialized, and `Sia reload` rereads the protocol without starting work.
-Detailed artifacts contain versions, commands, prompts, raw output, normalized responses, timing, reported cost,
-repository fingerprints, and the semantic result.
+The eight cases verify ordinary prompts remain unaffected; bare `Sia`, `Sia help`, and `Sia show help` expose every
+effective operation and skill, including CUSTOM-only and override fixtures; docs loading and reload behave narrowly;
+pre-existing plan content stays isolated until an exact resume request authorizes it. Detailed artifacts contain
+versions, commands, prompts, raw output, normalized responses, timing, reported cost, repository fingerprints, and the
+semantic result.

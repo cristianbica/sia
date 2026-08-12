@@ -191,6 +191,32 @@ prepare_repo() {
   } >>"$prepare_repo/.ai/sia.md"
   printf '%s\n' "$PROTOCOL_CANARY" >"$prepare_artifacts/protocol-canary.txt"
 
+  mkdir -p "$prepare_repo/.ai/operations" || return 1
+  printf '\n- `host-help-custom` — CUSTOM operation exposed by help.\n  - aliases: `host-help`\n' \
+    >>"$prepare_repo/.ai/operations/INDEX.md"
+  printf '%s\n' '- `review` — Project review override exposed by help.' '  - aliases: `project-audit`' \
+    >>"$prepare_repo/.ai/operations/INDEX.md"
+  {
+    printf '%s\n' '---' 'name: host-help-custom' 'description: CUSTOM operation exposed by help.'
+    printf '%s\n' 'workflow: investigation' 'skills: [repository-discovery]' '---' '' '# Host help custom'
+  } >"$prepare_repo/.ai/operations/host-help-custom.md"
+  {
+    printf '%s\n' '---' 'name: review' 'description: Project review override exposed by help.'
+    printf '%s\n' 'workflow: review' 'skills: [code-review, testing]' '---' '' '# Project review override'
+  } >"$prepare_repo/.ai/operations/review.md"
+
+  mkdir -p "$prepare_repo/.ai/skills/host-help-skill" "$prepare_repo/.ai/skills/testing" || return 1
+  printf '\n- `host-help-skill` — CUSTOM skill exposed by help.\n' >>"$prepare_repo/.ai/skills/INDEX.md"
+  printf '%s\n' '- `testing` — Project testing override exposed by help.' >>"$prepare_repo/.ai/skills/INDEX.md"
+  {
+    printf '%s\n' '---' 'name: host-help-skill' 'description: CUSTOM skill exposed by help.'
+    printf '%s\n' 'use_when:' '  - validating catalog-backed help' '---' '' '# Host help skill'
+  } >"$prepare_repo/.ai/skills/host-help-skill/SKILL.md"
+  {
+    printf '%s\n' '---' 'name: testing' 'description: Project testing override exposed by help.'
+    printf '%s\n' 'use_when:' '  - validating project behavior' '---' '' '# Project testing override'
+  } >"$prepare_repo/.ai/skills/testing/SKILL.md"
+
   mkdir -p "$prepare_repo/.ai/plans" || return 1
   {
     printf '%s\n' '---' 'operation: implement' 'workflow: delivery' 'skills: [repository-discovery, testing]' '---'
@@ -336,12 +362,26 @@ assert_semantics() {
       [ "$(cat "$assert_file")" = ORDINARY_OK ] &&
         ! grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1
       ;;
-    help)
-      grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 &&
-        grep -F 'Sia' "$assert_file" >/dev/null 2>&1 &&
-        grep -E -i 'load docs|load skills|resume|stop|reload' "$assert_file" >/dev/null 2>&1 &&
-        grep -E -i 'unattended' "$assert_file" >/dev/null 2>&1 &&
-        ! grep -E -i 'integrity error|installation.integrity' "$assert_file" >/dev/null 2>&1
+    help|help-explicit|show-help)
+      grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 || return 1
+      grep -F 'Sia' "$assert_file" >/dev/null 2>&1 || return 1
+      grep -E -i 'load docs|load skills|resume|stop|reload' "$assert_file" >/dev/null 2>&1 || return 1
+      grep -E -i 'unattended' "$assert_file" >/dev/null 2>&1 || return 1
+      for help_operation in create-operation create-skill create-workflow document fix implement investigate \
+        reconcile-catalogs refresh-docs review host-help-custom
+      do
+        grep -F "$help_operation" "$assert_file" >/dev/null 2>&1 || return 1
+      done
+      for help_skill in bug-triage code-review documentation repository-discovery safe-refactoring testing \
+        host-help-skill
+      do
+        grep -F "$help_skill" "$assert_file" >/dev/null 2>&1 || return 1
+      done
+      grep -F 'project-audit' "$assert_file" >/dev/null 2>&1 || return 1
+      grep -F 'CUSTOM' "$assert_file" >/dev/null 2>&1 || return 1
+      grep -E 'Skills:.*testing.*CUSTOM' "$assert_file" >/dev/null 2>&1 || return 1
+      grep -E 'Skills:.*host-help-skill.*CUSTOM' "$assert_file" >/dev/null 2>&1 || return 1
+      ! grep -E -i 'integrity error|installation.integrity' "$assert_file" >/dev/null 2>&1
       ;;
     load-docs)
       grep -F "$PROTOCOL_CANARY" "$assert_file" >/dev/null 2>&1 &&
@@ -465,6 +505,8 @@ run_live_host() {
   printf '%s (%s)\n' "$live_name" "$PROBE_ACTUAL"
   run_live_case "$live_name" ordinary "$PROMPT_DIR/ordinary.txt" "$run_live_host_dir"
   run_live_case "$live_name" help "$PROMPT_DIR/help.txt" "$run_live_host_dir"
+  run_live_case "$live_name" help-explicit "$PROMPT_DIR/help-explicit.txt" "$run_live_host_dir"
+  run_live_case "$live_name" show-help "$PROMPT_DIR/show-help.txt" "$run_live_host_dir"
   run_live_case "$live_name" load-docs "$PROMPT_DIR/load-docs.txt" "$run_live_host_dir"
   run_live_case "$live_name" reload "$PROMPT_DIR/reload.txt" "$run_live_host_dir"
   run_live_case "$live_name" plan-isolation "$PROMPT_DIR/plan-isolation.txt" "$run_live_host_dir"
@@ -541,12 +583,12 @@ mkdir -p "$ARTIFACTS/hosts"
   printf 'timeout_seconds_per_invocation=%s\n' "$TIMEOUT_SECONDS"
   printf 'timeout_kill_grace_seconds=5\n'
   printf 'max_output_bytes_per_invocation=%s\n' "$MAX_OUTPUT_BYTES"
-  printf 'prompts_per_live_host=6\n'
+  printf 'prompts_per_live_host=8\n'
   printf 'sessions=independent_and_sequential\n'
   printf 'repository_access=read_only\n'
   printf 'protocol_activation_canary=%s\n' "$PROTOCOL_CANARY"
   printf 'claude_max_budget_usd_per_invocation=%s\n' "$CLAUDE_BUDGET"
-  printf 'claude_max_budget_usd_per_host=%s_x_6\n' "$CLAUDE_BUDGET"
+  printf 'claude_max_budget_usd_per_host=%s_x_8\n' "$CLAUDE_BUDGET"
   printf 'codex_monetary_cap=unavailable_cost_recorded_unknown\n'
   printf 'opencode_monetary_cap=unavailable_cost_recorded_unknown\n'
   printf 'codex_requested_model=%s\n' "${SIA_CODEX_MODEL:-host-default}"

@@ -22,17 +22,19 @@ scripts/verify-hosts --live
 scripts/verify-hosts --live --host codex --artifacts /tmp/sia-codex-smoke
 ```
 
-`--live` is the only mode that invokes a model. Each available host with a supported runner receives six independent
+`--live` is the only mode that invokes a model. Each available host with a supported runner receives eight independent
 noninteractive prompts in a newly installed temporary repository:
 
 Live mode requires GNU `timeout`. The Claude runner also requires `jq` to extract its structured response and cost.
 
 1. an ordinary prompt must remain unaffected by Sia;
-2. `Sia` must activate concise help that includes unattended operations and reload;
-3. `Sia load docs` must report that repository documentation is not initialized;
-4. `Sia reload` must reload the current protocol without starting work.
-5. a fresh investigation must not expose adversarial content from a pre-existing plan;
-6. exact `Sia resume <plan>` must read and identify only the named pre-existing plan.
+2. `Sia` must list every effective operation and skill, including CUSTOM-only and override fixtures;
+3. `Sia help` must produce the same catalog-backed help semantics;
+4. `Sia show help` must produce the same catalog-backed help semantics;
+5. `Sia load docs` must report that repository documentation is not initialized;
+6. `Sia reload` must reload the current protocol without starting work.
+7. a fresh investigation must not expose adversarial content from a pre-existing plan;
+8. exact `Sia resume <plan>` must read and identify only the named pre-existing plan.
 
 After installation, the harness appends a unique test-only canary instruction to `.ai/sia.md` and commits that fixture
 state before invoking a host. Every activating response must repeat the canary; the ordinary response must not. This
@@ -48,7 +50,7 @@ Defaults and overrides:
 ```sh
 SIA_HOST_TIMEOUT_SECONDS=90       # per invocation
 SIA_HOST_MAX_OUTPUT_BYTES=1048576 # per invocation
-SIA_CLAUDE_MAX_BUDGET_USD=0.05   # per invocation; six prompts means at most $0.30
+SIA_CLAUDE_MAX_BUDGET_USD=0.05   # per invocation; eight prompts means at most $0.40
 SIA_CODEX_MODEL=...               # optional explicit test model
 SIA_OPENCODE_MODEL=...            # optional provider/model
 SIA_CLAUDE_MODEL=...              # optional explicit test model
@@ -67,5 +69,5 @@ sh tests/hosts/static-contracts.sh
 
 This test exercises `--probe` with version-only shims, then runs the complete local orchestration path for Codex,
 OpenCode, and Claude with deterministic no-model shims. It covers fixture installation, host-specific command
-construction, response extraction, all six semantic assertions, read-only fingerprints, and private runtime cleanup.
+construction, response extraction, all eight semantic assertions, read-only fingerprints, and private runtime cleanup.
 It never invokes a model and is not evidence of live host-model compliance.

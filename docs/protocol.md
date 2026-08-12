@@ -33,7 +33,7 @@ read-only conversation.
 
 After reading `.ai/sia.md`, resolve the remainder in this order:
 
-1. Empty remainder: show concise help covering docs, skills, interactive/unattended operations, resume, and stop.
+1. Empty remainder or the exact remainder `help` or `show help`: show the same concise help menu and do nothing else.
 2. Exact `unattended` modifier: resolve the following logical operation in unattended mode.
 3. Reserved directive: execute its narrowly defined behavior.
 4. Reserved directive name with invalid arity or syntax: report an error and do not use conversational fallback.
@@ -57,6 +57,32 @@ for brevity. Sia expands explanations when the user asks or when safe, correct a
 remain governed by the host because this contract is inside the opt-in protocol, not the activation bridge.
 
 ## Reserved directives
+
+### `Sia help` and `Sia show help`
+
+These exact forms are equivalent to bare `Sia`. They read only `.ai/operations/INDEX.md` and `.ai/skills/INDEX.md`,
+validate and merge each index's SIA and CUSTOM entries under the normal catalog override rules, then show a concise
+menu. General request shapes include:
+
+- `Sia load docs`
+- `Sia load skills`
+- `Sia forge on` / `Sia forge off`
+- `Sia unattended <operation> [request]`
+- `Sia resume <approved-plan>`
+- `Sia stop`
+- `Sia reload`
+
+An Operations section lists every effective logical name exactly once with its catalog description and effective
+aliases. CUSTOM-only entries and overrides are labeled CUSTOM; an override replaces the same-named SIA entry and its
+aliases. Malformed, duplicated, or ambiguous entries produce an error rather than a partial or inferred list.
+
+A single comma-separated `Skills:` line lists every effective skill name exactly once. CUSTOM-only skills and overrides
+are labeled CUSTOM, and a CUSTOM override suppresses the same-named SIA entry. Malformed, duplicated, or ambiguous
+entries in either catalog produce an error rather than a partial list.
+
+Help does not read operation or skill bodies, other catalogs, docs, workflows, or rules and does not start or replace
+an operation. Extra arguments to `help` or after `show help` are syntax errors rather than conversational or operation
+fallbacks.
 
 ### `Sia load docs`
 
@@ -102,9 +128,9 @@ Validate and reread the current `.ai/sia.md` without restarting the host. Stop a
 turns while preserving any persisted plan. Do not load catalogs, docs, or skills or start work. Reload cannot erase old
 model context; the current valid protocol takes precedence.
 
-Public reserved directives require exact arity. `Sia load docs extra`, `Sia load skills extra`, `Sia resume`, `Sia stop
-extra`, and `Sia reload extra` are errors rather than operation invocations. `Sia handoff` instead requires its
-structured body.
+Public reserved directives require exact arity. `Sia help extra`, `Sia show help extra`, `Sia load docs extra`,
+`Sia load skills extra`, `Sia resume`, `Sia stop extra`, and `Sia reload extra` are errors rather than operation
+invocations. `Sia handoff` instead requires its structured body.
 
 ## Unattended operation invocation
 

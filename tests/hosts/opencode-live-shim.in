@@ -34,7 +34,9 @@ done
 
 case $prompt in
   'Reply with exactly ORDINARY_OK and nothing else.') response=ORDINARY_OK ;;
-  Sia) response='SIA_PROTOCOL_CANARY_7F3D Sia help: load docs, load skills, unattended operations, resume, stop, and reload.' ;;
+  Sia|'Sia help'|'Sia show help')
+    response='SIA_PROTOCOL_CANARY_7F3D Sia help: load docs, load skills, Forge, unattended, resume, stop, reload. Operations: create-operation, create-skill, create-workflow, document, fix, implement, investigate, reconcile-catalogs, refresh-docs, review (CUSTOM; alias: project-audit), host-help-custom (CUSTOM; alias: host-help). Skills: bug-triage, code-review, documentation, repository-discovery, safe-refactoring, testing (CUSTOM), host-help-skill (CUSTOM).'
+    ;;
   'Sia load docs')
     response='SIA_PROTOCOL_CANARY_7F3D Documentation is unavailable and not initialized. Run Sia document repository.'
     ;;

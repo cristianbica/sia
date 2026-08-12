@@ -34,7 +34,7 @@ check_claude_bridge() {
 
 check_protocol_directives() {
   assert_nonempty "$PROTOCOL" || return 1
-  for directive in 'Sia load docs' 'Sia load skills' 'Sia forge on' 'Sia forge off' 'Sia resume' 'Sia handoff' 'Sia stop' 'Sia reload'; do
+  for directive in 'Sia help' 'Sia show help' 'Sia load docs' 'Sia load skills' 'Sia forge on' 'Sia forge off' 'Sia resume' 'Sia handoff' 'Sia stop' 'Sia reload'; do
     assert_contains "$PROTOCOL" "$directive" || return 1
   done
   assert_contains "$PROTOCOL" '.ai/RULES.md' || return 1
@@ -56,6 +56,18 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'cannot be resumed' || return 1
   assert_contains "$PROTOCOL" 'independently eligible increment' || return 1
   assert_contains "$PROTOCOL" 'disables Forge' || return 1
+  assert_contains "$PROTOCOL" 'equivalent to bare `Sia`' || return 1
+  assert_contains "$PROTOCOL" 'Extra arguments to `help` or after' || return 1
+  assert_contains "$PROTOCOL" 'Read only `.ai/operations/INDEX.md`' || return 1
+  assert_contains "$PROTOCOL" '`.ai/skills/INDEX.md`' || return 1
+  assert_contains "$PROTOCOL" 'every effective operation' || return 1
+  assert_contains "$PROTOCOL" 'every effective skill' || return 1
+  assert_contains "$PROTOCOL" 'comma-separated `Skills:` line' || return 1
+  assert_contains "$PROTOCOL" 'labeling project entries and overrides' || return 1
+  assert_contains "$PROTOCOL" 'as CUSTOM' || return 1
+  assert_contains "$PROTOCOL" 'description and effective aliases' || return 1
+  assert_contains "$PROTOCOL" 'instead of a partial or inferred list' || return 1
+  assert_contains "$PROTOCOL" 'Do not read operation or skill bodies' || return 1
 }
 
 check_response_contract() {

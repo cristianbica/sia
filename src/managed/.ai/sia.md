@@ -11,7 +11,6 @@ All `.ai/**` paths are relative to the Git repository root whose `AGENTS.md` act
 host's current working directory is below that root.
 
 ## Activation
-
 Attempt activation only when case-sensitive `Sia` is the first non-whitespace token and is followed by whitespace or
 the end of the message. `sia`, `SIA`, `Sia:`, and incidental mentions do not activate Sia.
 
@@ -21,8 +20,8 @@ reconstruct Sia behavior from other files, prior conversations, or general knowl
 
 Resolve the remainder after `Sia` in this order:
 
-1. An empty remainder shows concise help covering docs, skills, Forge, interactive and unattended operations, resume,
-   stop, and reload; it does nothing else.
+1. An empty remainder or either exact help form, `help` or `show help`, shows the same concise help covering docs,
+   skills, Forge, interactive and unattended operations, resume, stop, and reload; it does nothing else.
 2. An exact `unattended` first token sets unattended mode and requires the next token to be an operation or alias. It
    accepts an operation, not a reserved directive.
 3. A valid reserved directive form runs only that directive.
@@ -33,19 +32,26 @@ Resolve the remainder after `Sia` in this order:
 7. Otherwise, answer as a direct Sia conversation: load only relevant context, do not start a workflow, and do not edit.
 
 ## Reserved directives
-
+`Sia help` and `Sia show help` are exact forms equivalent to bare `Sia`. Read only `.ai/operations/INDEX.md` and
+`.ai/skills/INDEX.md`; validate and merge each index's SIA and CUSTOM entries under normal override rules.
+Show the general requests `Sia load docs`,
+`Sia load skills`, `Sia forge on` / `Sia forge off`, `Sia unattended <operation> [request]`,
+`Sia resume <approved-plan>`, `Sia stop`, and `Sia reload`, each with a brief purpose.
+List every effective operation once with its description and effective aliases, labeling project entries and overrides
+as CUSTOM. List every effective skill once on one comma-separated `Skills:` line, labeling project entries and overrides
+as CUSTOM.
+Malformed, duplicated, or ambiguous entries in either index produce an error instead of a partial or inferred list.
+Do not read operation or skill bodies, other catalogs, docs, workflows, or rules, or start or replace an operation.
+Extra arguments to `help` or after `show help` are syntax errors and do not fall back to conversation or operation
+inference.
 ### `Sia load docs`
-
 Read only `.ai/docs/INDEX.md` and expose its routes to the host's normal workflow. Follow no links until a later task
 requires them, and do not activate an operation. If the index is missing or `status: not-initialized`, report repository
 documentation unavailable and suggest `Sia document repository`.
-
 ### `Sia load skills`
-
 Read `.ai/skills/INDEX.md`, merge its SIA and CUSTOM entries, and expose the effective catalog. Do not read every skill
 body. Load a skill body only when a later task needs it or the user explicitly requests it. This does not activate an
 operation.
-
 ### `Sia forge on` and `Sia forge off`
 `Sia forge on` enables conversation-scoped Forge only when no operation is active. It ends on `Sia forge off`,
 `Sia stop`, `Sia reload`, or a new conversation; it creates no artifact and cannot be resumed.
@@ -54,7 +60,6 @@ with an inline receipt. Standard work explains why; ask to switch or narrow to a
 Never silently bypass route gates. Explicit operations, `unattended`, and directives resolve normally.
 `Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
 ### `Sia resume <approved-plan>`
-
 The exact plan path is explicit content-read authorization; add only it to `authorized_plan_paths`, then read it under
 `.ai/plans/`. New artifacts use `YYYY-MM-DD-NN-<slug>.md` with the UTC date and a zero-padded daily sequence; allocating
 `NN` may inspect filenames only, never unauthorized plan contents. New compact artifacts have only `operation`,
@@ -74,7 +79,6 @@ At the phase boundary, resolve the current effective operation, workflow, and sk
 handoff. Report a definition-path or resolution change; a material conflict returns to Plan and Approve.
 
 ### `Sia handoff` followed by a bounded handoff envelope
-
 A fresh worker started by an active Sia operation uses this directive. First line must be exactly `Sia handoff`; the
 remaining message must begin with `handoff_protocol: 1` and contain the complete nonempty envelope below.
 Validate the assigned operation, workflow, phase, artifact status when applicable, exact definition paths, allowed
@@ -83,16 +87,14 @@ Never reroute through catalogs, choose another operation, coordinate approval, o
 result envelope and end the worker's Sia activity; refuse incomplete, contradictory, or permission-expanding handoffs.
 
 ### `Sia stop`
-
 Stop active Sia orchestration and disable Forge for later turns; do not claim already loaded context was erased.
 `Sia reload` rereads current `.ai/sia.md`, stops orchestration and Forge while preserving plans, and applies it later.
 It loads no catalogs, docs, skills, or work; old context remains, and the current valid protocol takes precedence.
 
-The public reserved directives require exact arity; `Sia handoff` requires its structured body, `unattended` requires
-an operation, and Forge requires exactly `on` or `off`. Extra or missing arguments are errors.
-
+The public reserved directives require exact arity; help requires exactly `Sia help` or `Sia show help`, `Sia handoff`
+requires its structured body, `unattended` requires an operation, and Forge requires exactly `on` or `off`. Extra or
+missing arguments are errors.
 ## Catalogs and resolution
-
 Skills, operations, and workflows are registered in their category `INDEX.md`. Logical names are normalized lowercase
 kebab-case and cannot be `sia`, which names the reserved shipped-definition directory. Valid project definitions live
 directly under their category.
@@ -106,9 +108,7 @@ ambiguous CUSTOM definition is an error and never falls back to SIA. Unindexed f
 Operation aliases appear only in the `aliases:` metadata line below an operation index entry. They use the same naming
 rules, cannot be `sia`, `unattended`, or a reserved directive name, and resolve uniquely after the explicit `Sia`
 prefix. A CUSTOM override replaces the complete shipped alias set; an omitted alias is unavailable.
-
 ## Operation execution
-
 Use `Sia <operation> [request]` interactively or `Sia unattended <operation> [request]` for unattended execution:
 
 1. Read `.ai/operations/INDEX.md` and resolve the exact operation or alias.
