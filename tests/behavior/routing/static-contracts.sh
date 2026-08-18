@@ -111,18 +111,43 @@ check_forge_contract() {
   assert_contains "$ORCHESTRATION" '## Forge mode' || return 1
   assert_contains "$ORCHESTRATION" 'Sia forge on' || return 1
   assert_contains "$ORCHESTRATION" 'Sia forge off' || return 1
-  assert_contains "$ORCHESTRATION" 'questions receive direct answers' || return 1
-  assert_contains "$ORCHESTRATION" 'request → inline plan → explicit approval' || return 1
+  assert_contains "$ORCHESTRATION" 'Questions receive direct answers' || return 1
+  assert_contains "$ORCHESTRATION" '`Read tmp/review-mandates.md`' || return 1
+  assert_contains "$ORCHESTRATION" '`Sia Read tmp/review-mandates.md` follows the same immediate path' || return 1
+  assert_contains "$ORCHESTRATION" '`Sia implement feature X`' || return 1
+  assert_contains "$ORCHESTRATION" '`Sia fix bug Y`' || return 1
+  assert_contains "$ORCHESTRATION" 'Turn Forge off first' || return 1
+  assert_contains "$ORCHESTRATION" 'Forge is context-first for terse follow-ups' || return 1
+  assert_contains "$ORCHESTRATION" 'reopening files or repeating searches' || return 1
+  assert_contains "$ORCHESTRATION" 'one focused clarification' || return 1
+  assert_contains "$ORCHESTRATION" '`inline plan` request is a cadence instruction' || return 1
+  assert_contains "$ORCHESTRATION" 'only minimum' || return 1
+  assert_contains "$ORCHESTRATION" 'without routine command' || return 1
+  assert_contains "$ORCHESTRATION" '`done and move to next one. inline plan`' || return 1
+  assert_contains "$ORCHESTRATION" 'reads the file and returns the result directly' || return 1
+  assert_contains "$ORCHESTRATION" 'non-mutating local work runs immediately' || return 1
+  assert_contains "$ORCHESTRATION" 'without a plan or approval' || return 1
+  assert_contains "$ORCHESTRATION" 'local diagnostics whose purpose' || return 1
+  assert_contains "$ORCHESTRATION" 'unexpectedly changes durable state' || return 1
+  assert_contains "$ORCHESTRATION" 'Requested durable changes and external actions' || return 1
+  assert_contains "$ORCHESTRATION" 'request → inline plan → explicit' || return 1
+  assert_contains "$ORCHESTRATION" 'direct bounded-write lane' || return 1
+  assert_contains "$ORCHESTRATION" 'precise imperative is its own authorization' || return 1
+  assert_contains "$ORCHESTRATION" '`do:` explicitly requests direct execution' || return 1
+  assert_contains "$ORCHESTRATION" '`plan:` and `inline plan` explicitly request the approval path' || return 1
+  assert_contains "$ORCHESTRATION" '`mark #4 done`' || return 1
+  assert_contains "$ORCHESTRATION" '`handle #5`' || return 1
+  assert_contains "$ORCHESTRATION" 'stops before crossing the bounded request' || return 1
   assert_contains "$ORCHESTRATION" 'Approval binds one visible task' || return 1
-  assert_contains "$ORCHESTRATION" 'does not write `.ai/plans/**`' || return 1
-  assert_contains "$ORCHESTRATION" 'do not promote Forge work to a persisted artifact' || return 1
-  assert_contains "$ORCHESTRATION" 'ready for the next action' || return 1
-  assert_contains "$PROTOCOL" 'every action gets an' || return 1
-  assert_contains "$PROTOCOL" 'Approval binds one task' || return 1
-  assert_contains "$PROTOCOL" 'Size changes depth' || return 1
-  assert_contains "$PROTOCOL" 'Forge is ready for the next task' || return 1
-  assert_not_contains "$ORCHESTRATION" 'persisted plan, approval gate' || return 1
-  assert_not_contains "$PROTOCOL" 'Standard plans are resumable state' || return 1
+  assert_contains "$ORCHESTRATION" 'writes no `.ai/plans/**`' || return 1
+  assert_contains "$ORCHESTRATION" 'ready for the next request' || return 1
+  assert_contains "$PROTOCOL" 'Reuse active context' || return 1
+  assert_contains "$PROTOCOL" 'resolve clear terse follow-ups without fresh intake' || return 1
+  assert_contains "$PROTOCOL" 'precise bounded imperative authorizes its local write' || return 1
+  assert_contains "$PROTOCOL" '`do:` requests that lane' || return 1
+  assert_contains "$PROTOCOL" '`plan:`/`inline plan` or unsafe uncertainty requires approval' || return 1
+  assert_contains "$PROTOCOL" 'prefixed operations stay in Forge' || return 1
+  assert_not_contains "$PROTOCOL" 'every action gets an' || return 1
 }
 
 run_case "adaptive route contract is explicit and conservative" check_route_contract
@@ -132,6 +157,6 @@ run_case "standard intent envelopes distinguish evidence from boundary changes" 
 run_case "standard routing and old-plan compatibility remain explicit" check_standard_and_backward_compatibility
 run_case "lightweight context and benchmark validation remain bounded" check_context_and_benchmark_contract
 run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract
-run_case "Forge repeats approved inline delivery without persisted artifacts" check_forge_contract
+run_case "Forge reuses context and presents requested inline plans promptly" check_forge_contract
 
 finish_tests

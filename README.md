@@ -146,11 +146,27 @@ Sia forge on
 Sia forge off
 ```
 
-Forge answers unqualified questions directly. Each action starts a repeating loop: Sia shows a concise inline plan,
-waits for explicit approval, implements, reviews, validates, fixes when needed, and returns ready for the next request.
-Small, medium, and larger tasks use the same artifact-free loop; size and risk only increase planning, review, and test
-depth. Forge writes no `.ai/plans/**` artifact and cannot resume after a new conversation. Use an explicit operation
-when persisted, resumable delivery is wanted. `Sia forge off`, `Sia stop`, or `Sia reload` also ends Forge.
+Forge answers questions and performs non-mutating local work immediately: reads, searches, listings, diffs,
+status/history, inspection, review, and safe diagnostics need no plan or approval. A precise bounded imperative also
+authorizes its stated local, reversible write directly. Vague outcomes, planned requests, risky or destructive work,
+external actions, and material scope expansion use a repeating loop: inline plan, explicit approval, implementation,
+review, validation, fixes when needed, then the next request. Size alone does not select a lane. Forge writes no
+`.ai/plans/**` artifact and cannot resume after a new conversation. Use an explicit operation when persisted,
+resumable delivery is wanted. `Sia forge off`, `Sia stop`, or `Sia reload` also ends Forge.
+
+Use `do:` to request direct execution and `plan:` or `inline plan` to request approval first. These are cadence
+selectors, not safety overrides. `Mark #4 done` or `do: change this label to Completed` can execute directly when the
+target and result are clear. `Handle #5` and `plan: handle #5` require a plan. If direct work uncovers material
+ambiguity, risk, or expansion, Forge stops before crossing the stated boundary and presents an inline plan.
+
+While Forge is enabled, `Sia` is an optional prefix: `Sia Read …` stays immediate, and `Sia implement …` or
+`Sia fix …` stays in the inline Forge loop. Exact operation names and aliases do not start persisted delivery until
+Forge is turned off. Reserved directives and `unattended` keep their explicit meanings.
+
+Forge also treats terse follow-ups as commands over active context. It resolves `done`, `next one`, item numbers, and
+clear pronouns from already loaded content instead of restarting intake. When asked for an `inline plan`, it reuses that
+evidence, performs only minimum safety-critical discovery, and presents the envelope promptly; deeper implementation
+discovery follows approval unless it could change the approved boundary.
 
 ### Run an operation unattended
 

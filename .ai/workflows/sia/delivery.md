@@ -5,23 +5,46 @@ description: Deliver authorized changes through planning, review, validation, fi
 
 # Delivery workflow
 
-Forge actions use the separate inline loop below. Otherwise, triage before choosing a path. Standard follows `Plan →
-Approve → Build → Review/Validate → Fix → Review/Validate → Ship`; lightweight follows direct authorization → Build →
-focused Review/Validate → Ship; trivial work is planless.
+Forge requests use the immediate or approved inline paths below. Otherwise, triage before choosing a path. Standard
+follows `Plan → Approve → Build → Review/Validate → Fix → Review/Validate → Ship`; lightweight follows direct
+authorization → Build → focused Review/Validate → Ship; trivial work is planless.
 
 ## Forge delivery
 
-Use this path for an unqualified action while Forge is enabled and no operation is active. Questions receive direct
-answers. Explicit operations, `unattended`, and directives use normal resolution instead.
+Use these paths for unqualified requests or a later valid `Sia …` request while Forge is enabled and no operation is
+active. Discard the optional `Sia` prefix before classifying the request. Exact operation names and aliases stay in
+Forge; reserved directives and `unattended` use normal resolution instead.
 
-Resolve one fitting effective operation under the normal confidence and catalog rules, then load its rules, workflow,
-skills, and material documentation. If the action is ambiguous, clarify it without planning or writing. Do not route a
-Forge action through trivial, lightweight, or standard artifact handling.
+Treat terse follow-ups as commands over active Forge context. Resolve `done`, `next one`, `same`, item numbers,
+pronouns, and equivalent shorthand from recent conversation state, loaded content, and the current task when one clear
+referent exists. Reuse established findings, decisions, ordering, and verified evidence; do not reopen files or repeat
+searches by default. Treat a user-stated completion or transition as current context unless a small relevant check
+contradicts it. When multiple material interpretations remain, ask one focused clarification without speculative
+discovery.
 
-For every Forge action, present a concise inline intent envelope with outcome, scope, non-goals, acceptance criteria,
-checks, risks, and external actions. Ask for explicit approval before writes. Approval binds only that visible task;
-when its outcome, scope, non-goals, criteria, risk, permissions, or external actions change, show a revised inline plan
-and ask again. Never write Forge state to `.ai/plans/**`, add a digest or status comment, or offer `Sia resume` for it.
+Questions and non-mutating local requests run immediately without operation resolution, an inline plan, or approval.
+This includes reads, searches, listings, diffs, status and history, inspection, review, and safe local diagnostics whose
+purpose is evidence rather than an intended durable repository or external-state change. Load only relevant context,
+perform the work, report the result, and leave Forge ready for the next request.
+
+Safe diagnostics may create ordinary transient temporary or cache output, but a command known to rewrite durable
+repository state is a change. If an immediate diagnostic unexpectedly changes durable state, stop and report the exact
+change without silently retaining, reverting, or cleaning it.
+
+For a requested durable change or external action, resolve one fitting effective operation under the normal confidence
+and catalog rules, then load its rules, workflow, skills, and material documentation. If the request is ambiguous,
+clarify it without planning or acting. Do not use normal trivial, lightweight, or standard artifact handling.
+
+An explicit request for an `inline plan` or equivalent is an output and cadence instruction, not approval. Reuse loaded
+context and perform only the minimum safety-critical discovery needed to state outcome, scope, non-goals, acceptance,
+checks, risks, and external actions. Stop discovery as soon as that envelope is safe. Defer deeper seam, caller,
+analogue, and regression-detail discovery until after approval unless it could materially change the envelope. Present
+the plan directly and ask for approval without routine command narration, repeated evidence, or a discovery transcript.
+
+Present a concise inline intent envelope with outcome, scope, non-goals, acceptance criteria, checks, risks, and
+external actions. Ask for explicit approval before the change or external action. Approval binds only that visible
+task; when its outcome, scope, non-goals, criteria, risk, permissions, or external actions change, show a revised inline
+plan and ask again. Never write Forge state to `.ai/plans/**`, add a digest or status comment, or offer `Sia resume`.
 
 After approval, implement only the inline envelope. Preserve pre-existing work and apply the normal permission,
 external-action, security, and dirty-worktree gates. Use proportionate Build, Review/Validate, and bounded Fix cycles;
@@ -29,7 +52,7 @@ load the effective testing and code-review skills when material. Task size and r
 review depth, and validation, but never promote Forge work to a persisted artifact solely because it is large.
 
 Report checks, findings, fixes, skips, and residual risk. Completion clears the inline task and leaves Forge ready for
-the next action. A new conversation loses the task; use an explicit operation when resumability is desired. Genuine
+the next request. A new conversation loses the task; use an explicit operation when resumability is desired. Genuine
 scope, permission, credential, external-action, safety, attribution, or validation blockers still stop the task.
 
 ## Route triage

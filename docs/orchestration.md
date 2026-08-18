@@ -82,19 +82,56 @@ credential, safety, attribution, or material-scope blockers end unattended work 
 ## Forge mode
 
 `Sia forge on` enables a conversation-scoped iterative mode when no operation is active; `Sia forge off`, `Sia stop`,
-`Sia reload`, or a new conversation ends it. Forge is a repeating delivery loop for unqualified action requests:
-request → inline plan → explicit approval → Build → Review/Validate → bounded Fix → completion → next request.
-Unqualified questions receive direct answers.
+`Sia reload`, or a new conversation ends it. Questions receive direct answers; non-mutating local work runs immediately
+without a plan or approval. This includes reads, searches, listings, diffs, status/history, inspection, review, and safe
+local diagnostics whose purpose is evidence rather than durable change. For example, `Read tmp/review-mandates.md`
+reads the file and returns the result directly.
 
-Every action presents an inline intent envelope with outcome, scope, non-goals, acceptance criteria, checks, risks, and
-external actions. Approval binds one visible task; a boundary change presents a revised plan and requires approval
-again. Forge does not write `.ai/plans/**`, store a digest or status comment, or support `Sia resume`. Task size and
-risk scale plan detail, isolation, review depth, and validation, but do not promote Forge work to a persisted artifact.
+The `Sia` prefix is optional while Forge is enabled. `Sia Read tmp/review-mandates.md` follows the same immediate path.
+`Sia implement feature X`, `Sia fix bug Y`, exact operation names, aliases, and otherwise inferred operations remain
+Forge requests instead of starting persisted delivery. Turn Forge off first when persisted interactive delivery is
+wanted.
 
-Forge remains enabled and ready for the next action after completion. Its usual permission, external-action, security,
+Forge is context-first for terse follow-ups. Phrases such as `done`, `next one`, `same`, item numbers, and pronouns
+resolve from recent conversation state, loaded content, and the current task when the referent is clear. Forge reuses
+established findings, decisions, ordering, and verified evidence instead of reopening files or repeating searches. A
+user-stated completion or transition is current context unless a small relevant check contradicts it. Genuine material
+ambiguity gets one focused clarification, not speculative discovery.
+
+Safe diagnostics may create normal transient temporary or cache output. A command known to rewrite durable repository
+state is a change; if an immediate diagnostic unexpectedly changes durable state, Forge stops and reports the exact
+change without retaining, reverting, or cleaning it silently.
+
+Changes that do not qualify for direct execution and all external actions use the repeating delivery loop: request →
+inline plan → explicit approval → Build → Review/Validate → bounded Fix → completion → next request. The plan states
+outcome, scope, non-goals, acceptance criteria, checks, risks, and external actions. Approval binds one visible task; a
+boundary change presents a revised plan and requires approval again. Forge writes no `.ai/plans/**`, digest, or status
+and cannot use `Sia resume`. Task size and risk scale plan detail, isolation, review depth, and validation, not
+persistence.
+
+Forge also has a direct bounded-write lane. A precise imperative is its own authorization when it has one clear target
+and result, a local reversible effect, predictable scope, and no material ambiguity, external action, destructive
+effect, permission or security concern, migration, broad refactor, or dirty-worktree attribution risk. Active context
+may make the target clear. Forge executes only the stated boundary, applies proportionate review and checks, and
+reports the changed paths and validation without asking for a second approval.
+
+`do:` explicitly requests direct execution. `plan:` and `inline plan` explicitly request the approval path. These
+selectors express cadence and never bypass eligibility or safety gates. Thus `mark #4 done` and a sufficiently specific
+`do: change this label to Completed` may execute directly, while `handle #5`, `plan: handle #5`, risky or destructive
+work, and external actions require a plan. If direct discovery reveals material ambiguity, risk, or expansion, Forge
+stops before crossing the bounded request, reports any completed in-bound work, and presents an inline plan.
+
+An explicit `inline plan` request is a cadence instruction. Forge uses loaded evidence, performs only minimum
+safety-critical discovery, stops when the envelope can be stated safely, and presents it without routine command
+narration or evidence dumps. Deeper seam, caller, analogue, and regression discovery moves after approval unless it
+could materially change scope, criteria, risk, permissions, or external actions. For example,
+`done and move to next one. inline plan` should resolve the next loaded item and promptly present its envelope.
+
+Forge remains enabled and ready for the next request. Its usual permission, external-action, security,
 dirty-worktree, scope, review, and validation gates still apply. A new conversation loses any inline state; when the
 user wants resumability, they can choose an explicit operation. Explicit operations, `unattended`, and directives use
-normal Sia resolution rather than the Forge loop.
+normal Sia resolution rather than the Forge loop after Forge is off. While Forge is on, valid reserved directives and
+`unattended` retain normal resolution; ordinary operation names and aliases do not escape Forge.
 
 ## Handoff envelope
 

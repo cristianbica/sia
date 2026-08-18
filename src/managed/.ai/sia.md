@@ -26,10 +26,11 @@ Resolve the remainder after `Sia` in this order:
    accepts an operation, not a reserved directive.
 3. A valid reserved directive form runs only that directive.
 4. A reserved directive name in an invalid form reports an arity or syntax error and does not fall back.
-5. An exact operation or alias resolves in interactive mode and receives the remaining tokens as its request.
-6. Without an exact match, infer one operation only when the request clearly asks for an action and one effective
+5. With Forge enabled and no operation, route any unhandled remainder through Forge; `Sia` does not trigger operations.
+6. An exact operation or alias resolves in interactive mode and receives the remaining tokens as its request.
+7. Without an exact match, infer one operation only when the request clearly asks for an action and one effective
    operation fits with high confidence; announce the inference before running it. Never infer unattended mode.
-7. Otherwise, answer as a direct Sia conversation: load only relevant context, do not start a workflow, and do not edit.
+8. Otherwise, answer as a direct Sia conversation: load only relevant context, do not start a workflow, and do not edit.
 
 ## Reserved directives
 `Sia help` and `Sia show help` are exact forms equivalent to bare `Sia`. Read only `.ai/operations/INDEX.md` and
@@ -54,10 +55,9 @@ body. Load a skill body only when a later task needs it or the user explicitly r
 operation.
 ### `Sia forge on` and `Sia forge off`
 `Sia forge on` enables Forge only when no operation is active; off/stop/reload or a new chat ends it.
-Forge is conversation-scoped, creates no artifact, and cannot be resumed. Questions get answers; every action gets an
-inline plan and explicit approval. Approval binds one task; boundary changes replan and reapprove. Size changes depth,
-not persistence. After proportionate Build/Review/Validate/Fix, Forge is ready for the next task. Never bypass route,
-permission, external-action, or dirty-worktree gates. Operations, `unattended`, and directives resolve normally.
+Forge is artifact-free and cannot be resumed. Reuse active context; resolve clear terse follow-ups without fresh intake.
+Non-mutating work is immediate; a precise bounded imperative authorizes its local write, and `do:` requests that lane.
+`plan:`/`inline plan` or unsafe uncertainty requires approval; prefixed operations stay in Forge; controls stay controls.
 `Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
 ### `Sia resume <approved-plan>`
 The exact plan path is explicit content-read authorization; add only it to `authorized_plan_paths`, then read it under

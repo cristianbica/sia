@@ -44,6 +44,8 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'direct Sia conversation' || return 1
   assert_contains "$PROTOCOL" 'high confidence' || return 1
   assert_contains "$PROTOCOL" 'Never infer unattended mode' || return 1
+  assert_contains "$PROTOCOL" 'route any unhandled remainder through Forge' || return 1
+  assert_contains "$PROTOCOL" '`Sia` does not trigger operations' || return 1
   assert_contains "$PROTOCOL" 'invalid form reports an arity or syntax error' || return 1
   assert_contains "$PROTOCOL" 'YYYY-MM-DD-NN-<slug>.md' || return 1
   assert_contains "$PROTOCOL" 'filenames only' || return 1
@@ -54,8 +56,12 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'cannot recover exact authorization, fail closed' || return 1
   assert_contains "$PROTOCOL" 'only when no operation is active' || return 1
   assert_contains "$PROTOCOL" 'cannot be resumed' || return 1
-  assert_contains "$PROTOCOL" 'every action gets an' || return 1
-  assert_contains "$PROTOCOL" 'Approval binds one task' || return 1
+  assert_contains "$PROTOCOL" 'Reuse active context' || return 1
+  assert_contains "$PROTOCOL" 'resolve clear terse follow-ups without fresh intake' || return 1
+  assert_contains "$PROTOCOL" 'precise bounded imperative authorizes its local write' || return 1
+  assert_contains "$PROTOCOL" '`do:` requests that lane' || return 1
+  assert_contains "$PROTOCOL" '`plan:`/`inline plan` or unsafe uncertainty requires approval' || return 1
+  assert_contains "$PROTOCOL" 'prefixed operations stay in Forge' || return 1
   assert_not_contains "$PROTOCOL" 'independently eligible increment' || return 1
   assert_contains "$PROTOCOL" 'disables Forge' || return 1
   assert_contains "$PROTOCOL" 'equivalent to bare `Sia`' || return 1

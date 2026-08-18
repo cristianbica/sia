@@ -56,9 +56,33 @@ check_unattended_delivery() {
 
 check_forge_inline_delivery() {
   assert_contains "$DELIVERY" '## Forge delivery' || return 1
-  assert_contains "$DELIVERY" 'For every Forge action' || return 1
-  assert_contains "$DELIVERY" 'Ask for explicit approval before writes' || return 1
-  assert_contains "$DELIVERY" 'Approval binds only that visible task' || return 1
+  assert_contains "$DELIVERY" 'later valid `Sia …` request' || return 1
+  assert_contains "$DELIVERY" 'Discard the optional `Sia` prefix' || return 1
+  assert_contains "$DELIVERY" 'Exact operation names and aliases stay in' || return 1
+  assert_contains "$DELIVERY" 'Treat terse follow-ups as commands over active Forge context' || return 1
+  assert_contains "$DELIVERY" 'do not reopen files or repeat' || return 1
+  assert_contains "$DELIVERY" 'user-stated completion or transition as current context' || return 1
+  assert_contains "$DELIVERY" 'ask one focused clarification' || return 1
+  assert_contains "$DELIVERY" 'run immediately without operation resolution' || return 1
+  assert_contains "$DELIVERY" 'safe local diagnostics' || return 1
+  assert_contains "$DELIVERY" 'unexpectedly changes durable state' || return 1
+  assert_contains "$DELIVERY" 'without silently retaining, reverting, or cleaning it' || return 1
+  assert_contains "$DELIVERY" 'authorization clarity and boundary predictability, not size' || return 1
+  assert_contains "$DELIVERY" '`do:` explicitly requests' || return 1
+  assert_contains "$DELIVERY" '`plan:` and `inline plan` explicitly request' || return 1
+  assert_contains "$DELIVERY" 'precise imperative with one clear target' || return 1
+  assert_contains "$DELIVERY" 'request itself authorizes a qualifying bounded write' || return 1
+  assert_contains "$DELIVERY" 'without an inline plan or a' || return 1
+  assert_contains "$DELIVERY" 'stop before acting beyond the bounded' || return 1
+  assert_contains "$DELIVERY" 'vague or outcome-oriented request such as `handle #5`' || return 1
+  assert_contains "$DELIVERY" 'output and cadence instruction, not approval' || return 1
+  assert_contains "$DELIVERY" 'minimum safety-critical discovery' || return 1
+  assert_contains "$DELIVERY" 'Stop discovery as soon as that envelope is safe' || return 1
+  assert_contains "$DELIVERY" 'until after approval unless it could materially change the envelope' || return 1
+  assert_contains "$DELIVERY" 'without routine command narration' || return 1
+  assert_contains "$DELIVERY" 'Ask for explicit approval before the change or external action' || return 1
+  assert_contains "$DELIVERY" 'Approval binds' || return 1
+  assert_contains "$DELIVERY" 'only that visible task' || return 1
   assert_contains "$DELIVERY" 'Never write Forge state to `.ai/plans/**`' || return 1
   assert_contains "$DELIVERY" 'never promote Forge work to a persisted artifact solely because it is large' || return 1
   assert_contains "$DELIVERY" 'leaves Forge ready for' || return 1
