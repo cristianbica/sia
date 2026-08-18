@@ -54,6 +54,16 @@ check_unattended_delivery() {
   assert_contains "$DELIVERY" 'Neither mode expands host' || return 1
 }
 
+check_forge_inline_delivery() {
+  assert_contains "$DELIVERY" '## Forge delivery' || return 1
+  assert_contains "$DELIVERY" 'For every Forge action' || return 1
+  assert_contains "$DELIVERY" 'Ask for explicit approval before writes' || return 1
+  assert_contains "$DELIVERY" 'Approval binds only that visible task' || return 1
+  assert_contains "$DELIVERY" 'Never write Forge state to `.ai/plans/**`' || return 1
+  assert_contains "$DELIVERY" 'never promote Forge work to a persisted artifact solely because it is large' || return 1
+  assert_contains "$DELIVERY" 'leaves Forge ready for' || return 1
+}
+
 comment_value() {
   sed -n "s/^<!-- sia:$1 \(.*\) -->$/\1/p" "$2" | sed -n '1p'
 }
@@ -145,6 +155,7 @@ check_phase_specific_skill_composition() {
 run_case "isolated phases receive the complete bounded handoff" check_bounded_handoff
 run_case "delivery approval and resume remain artifact-based" check_delivery_is_resumable
 run_case "unattended delivery preserves artifacts, review, and safety boundaries" check_unattended_delivery
+run_case "Forge delivery uses one approved inline task without persistence" check_forge_inline_delivery
 run_case "unattended artifacts preserve authority and block boundedly" check_unattended_artifact_fixtures
 run_case "parallel investigation and review partitions remain bounded" check_parallel_work_is_bounded
 run_case "investigation and standalone review are read-only" check_read_only_workflows

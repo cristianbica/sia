@@ -112,9 +112,17 @@ check_forge_contract() {
   assert_contains "$ORCHESTRATION" 'Sia forge on' || return 1
   assert_contains "$ORCHESTRATION" 'Sia forge off' || return 1
   assert_contains "$ORCHESTRATION" 'questions receive direct answers' || return 1
-  assert_contains "$ORCHESTRATION" 'triaged only to trivial or' || return 1
-  assert_contains "$ORCHESTRATION" 'asks whether to switch to standard delivery' || return 1
-  assert_contains "$ORCHESTRATION" 'never silently switches routes' || return 1
+  assert_contains "$ORCHESTRATION" 'request → inline plan → explicit approval' || return 1
+  assert_contains "$ORCHESTRATION" 'Approval binds one visible task' || return 1
+  assert_contains "$ORCHESTRATION" 'does not write `.ai/plans/**`' || return 1
+  assert_contains "$ORCHESTRATION" 'do not promote Forge work to a persisted artifact' || return 1
+  assert_contains "$ORCHESTRATION" 'ready for the next action' || return 1
+  assert_contains "$PROTOCOL" 'every action gets an' || return 1
+  assert_contains "$PROTOCOL" 'Approval binds one task' || return 1
+  assert_contains "$PROTOCOL" 'Size changes depth' || return 1
+  assert_contains "$PROTOCOL" 'Forge is ready for the next task' || return 1
+  assert_not_contains "$ORCHESTRATION" 'persisted plan, approval gate' || return 1
+  assert_not_contains "$PROTOCOL" 'Standard plans are resumable state' || return 1
 }
 
 run_case "adaptive route contract is explicit and conservative" check_route_contract
@@ -124,6 +132,6 @@ run_case "standard intent envelopes distinguish evidence from boundary changes" 
 run_case "standard routing and old-plan compatibility remain explicit" check_standard_and_backward_compatibility
 run_case "lightweight context and benchmark validation remain bounded" check_context_and_benchmark_contract
 run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract
-run_case "Forge keeps rapid iteration within explicit route boundaries" check_forge_contract
+run_case "Forge repeats approved inline delivery without persisted artifacts" check_forge_contract
 
 finish_tests

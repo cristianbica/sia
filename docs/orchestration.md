@@ -82,14 +82,19 @@ credential, safety, attribution, or material-scope blockers end unattended work 
 ## Forge mode
 
 `Sia forge on` enables a conversation-scoped iterative mode when no operation is active; `Sia forge off`, `Sia stop`,
-`Sia reload`, or a new conversation ends it. Forge creates no artifact and cannot be resumed. It applies to unqualified
-later questions and action requests: questions receive direct answers, while actions are triaged only to trivial or
-lightweight delivery. Lightweight work still shows its required inline receipt and focused validation.
+`Sia reload`, or a new conversation ends it. Forge is a repeating delivery loop for unqualified action requests:
+request → inline plan → explicit approval → Build → Review/Validate → bounded Fix → completion → next request.
+Unqualified questions receive direct answers.
 
-When an action needs standard delivery, Forge explains the reason and asks whether to switch to standard delivery or to
-stay in Forge by narrowing the next request to an independently eligible increment. It never silently switches routes
-or bypasses route, approval, permission, or external-action gates. An explicit operation, `unattended`, or another
-reserved directive uses normal Sia resolution.
+Every action presents an inline intent envelope with outcome, scope, non-goals, acceptance criteria, checks, risks, and
+external actions. Approval binds one visible task; a boundary change presents a revised plan and requires approval
+again. Forge does not write `.ai/plans/**`, store a digest or status comment, or support `Sia resume`. Task size and
+risk scale plan detail, isolation, review depth, and validation, but do not promote Forge work to a persisted artifact.
+
+Forge remains enabled and ready for the next action after completion. Its usual permission, external-action, security,
+dirty-worktree, scope, review, and validation gates still apply. A new conversation loses any inline state; when the
+user wants resumability, they can choose an explicit operation. Explicit operations, `unattended`, and directives use
+normal Sia resolution rather than the Forge loop.
 
 ## Handoff envelope
 

@@ -5,8 +5,32 @@ description: Deliver authorized changes through planning, review, validation, fi
 
 # Delivery workflow
 
-Triage before choosing a path. Standard follows `Plan → Approve → Build → Review/Validate → Fix → Review/Validate →
-Ship`; lightweight follows direct authorization → Build → focused Review/Validate → Ship; trivial work is planless.
+Forge actions use the separate inline loop below. Otherwise, triage before choosing a path. Standard follows `Plan →
+Approve → Build → Review/Validate → Fix → Review/Validate → Ship`; lightweight follows direct authorization → Build →
+focused Review/Validate → Ship; trivial work is planless.
+
+## Forge delivery
+
+Use this path for an unqualified action while Forge is enabled and no operation is active. Questions receive direct
+answers. Explicit operations, `unattended`, and directives use normal resolution instead.
+
+Resolve one fitting effective operation under the normal confidence and catalog rules, then load its rules, workflow,
+skills, and material documentation. If the action is ambiguous, clarify it without planning or writing. Do not route a
+Forge action through trivial, lightweight, or standard artifact handling.
+
+For every Forge action, present a concise inline intent envelope with outcome, scope, non-goals, acceptance criteria,
+checks, risks, and external actions. Ask for explicit approval before writes. Approval binds only that visible task;
+when its outcome, scope, non-goals, criteria, risk, permissions, or external actions change, show a revised inline plan
+and ask again. Never write Forge state to `.ai/plans/**`, add a digest or status comment, or offer `Sia resume` for it.
+
+After approval, implement only the inline envelope. Preserve pre-existing work and apply the normal permission,
+external-action, security, and dirty-worktree gates. Use proportionate Build, Review/Validate, and bounded Fix cycles;
+load the effective testing and code-review skills when material. Task size and risk scale plan detail, isolation,
+review depth, and validation, but never promote Forge work to a persisted artifact solely because it is large.
+
+Report checks, findings, fixes, skips, and residual risk. Completion clears the inline task and leaves Forge ready for
+the next action. A new conversation loses the task; use an explicit operation when resumability is desired. Genuine
+scope, permission, credential, external-action, safety, attribution, or validation blockers still stop the task.
 
 ## Route triage
 

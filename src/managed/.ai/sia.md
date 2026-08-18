@@ -53,11 +53,11 @@ Read `.ai/skills/INDEX.md`, merge its SIA and CUSTOM entries, and expose the eff
 body. Load a skill body only when a later task needs it or the user explicitly requests it. This does not activate an
 operation.
 ### `Sia forge on` and `Sia forge off`
-`Sia forge on` enables conversation-scoped Forge only when no operation is active. It ends on `Sia forge off`,
-`Sia stop`, `Sia reload`, or a new conversation; it creates no artifact and cannot be resumed.
-While enabled, unqualified questions receive direct answers; actions route only to trivial or lightweight delivery
-with an inline receipt. Standard work explains why; ask to switch or narrow to an independently eligible increment.
-Never silently bypass route gates. Explicit operations, `unattended`, and directives resolve normally.
+`Sia forge on` enables Forge only when no operation is active; off/stop/reload or a new chat ends it.
+Forge is conversation-scoped, creates no artifact, and cannot be resumed. Questions get answers; every action gets an
+inline plan and explicit approval. Approval binds one task; boundary changes replan and reapprove. Size changes depth,
+not persistence. After proportionate Build/Review/Validate/Fix, Forge is ready for the next task. Never bypass route,
+permission, external-action, or dirty-worktree gates. Operations, `unattended`, and directives resolve normally.
 `Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
 ### `Sia resume <approved-plan>`
 The exact plan path is explicit content-read authorization; add only it to `authorized_plan_paths`, then read it under

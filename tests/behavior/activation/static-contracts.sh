@@ -54,7 +54,9 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'cannot recover exact authorization, fail closed' || return 1
   assert_contains "$PROTOCOL" 'only when no operation is active' || return 1
   assert_contains "$PROTOCOL" 'cannot be resumed' || return 1
-  assert_contains "$PROTOCOL" 'independently eligible increment' || return 1
+  assert_contains "$PROTOCOL" 'every action gets an' || return 1
+  assert_contains "$PROTOCOL" 'Approval binds one task' || return 1
+  assert_not_contains "$PROTOCOL" 'independently eligible increment' || return 1
   assert_contains "$PROTOCOL" 'disables Forge' || return 1
   assert_contains "$PROTOCOL" 'equivalent to bare `Sia`' || return 1
   assert_contains "$PROTOCOL" 'Extra arguments to `help` or after' || return 1

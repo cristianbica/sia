@@ -146,10 +146,11 @@ Sia forge on
 Sia forge off
 ```
 
-Forge answers unqualified questions directly and routes only trivial or lightweight changes, including the inline
-receipt and focused validation. A request that needs standard delivery explains why and asks whether to switch routes or
-narrow the next increment. Forge creates no plan artifact and ends with `Sia forge off`, `Sia stop`, `Sia reload`, or a
-new conversation.
+Forge answers unqualified questions directly. Each action starts a repeating loop: Sia shows a concise inline plan,
+waits for explicit approval, implements, reviews, validates, fixes when needed, and returns ready for the next request.
+Small, medium, and larger tasks use the same artifact-free loop; size and risk only increase planning, review, and test
+depth. Forge writes no `.ai/plans/**` artifact and cannot resume after a new conversation. Use an explicit operation
+when persisted, resumable delivery is wanted. `Sia forge off`, `Sia stop`, or `Sia reload` also ends Forge.
 
 ### Run an operation unattended
 
