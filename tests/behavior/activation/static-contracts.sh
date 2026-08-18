@@ -60,7 +60,7 @@ check_protocol_directives() {
   assert_contains "$PROTOCOL" 'resolve clear terse follow-ups without fresh intake' || return 1
   assert_contains "$PROTOCOL" 'precise bounded imperative authorizes its local write' || return 1
   assert_contains "$PROTOCOL" '`do:` requests that lane' || return 1
-  assert_contains "$PROTOCOL" '`plan:`/`inline plan` or unsafe uncertainty requires approval' || return 1
+  assert_contains "$PROTOCOL" '`plan:`/`inline plan` or uncertainty requires approval' || return 1
   assert_contains "$PROTOCOL" 'prefixed operations stay in Forge' || return 1
   assert_not_contains "$PROTOCOL" 'independently eligible increment' || return 1
   assert_contains "$PROTOCOL" 'disables Forge' || return 1

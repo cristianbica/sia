@@ -59,7 +59,11 @@ ambiguous, risky, destructive, external, or explicitly planned work continues th
 None.
 <!-- sia:approval:end -->
 
-<!-- sia:status build -->
+<!-- sia:status complete -->
 <!-- sia:base a6d43dc7aa3bdbaef59a7715f9e78dc26ae2a3f4 -->
 <!-- sia:dirty .ai/sia.md,.ai/workflows/sia/delivery.md,README.md,docs/orchestration.md,src/managed/.ai/sia.md,src/managed/.ai/workflows/sia/delivery.md,tests/behavior/activation/static-contracts.sh,tests/behavior/routing/static-contracts.sh,tests/behavior/workflows/static-contracts.sh,.ai/plans/2026-08-18-04-forge-immediate-read-only-work.md,.ai/plans/2026-08-18-05-forge-keeps-sia-prefixed-requests.md,.ai/plans/2026-08-18-06-forge-contextual-follow-ups.md -->
 <!-- sia:approved 12d02e3e3860a26cfbab375001e5239791a8203b0b3e9b100a0b956eca859d59 -->
+<!-- sia:progress build: added bounded writes, selectors, fallbacks, docs, contracts, and refreshed projections -->
+<!-- sia:progress drift: HEAD advanced to c5929ed with in-scope work; remaining changes were reviewed against it -->
+<!-- sia:progress review: no findings; focused, static, full, and diff checks pass -->
+<!-- sia:progress ship: managed/runtime projections match; approved scope is complete -->

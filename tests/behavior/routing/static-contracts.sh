@@ -129,8 +129,8 @@ check_forge_contract() {
   assert_contains "$ORCHESTRATION" 'without a plan or approval' || return 1
   assert_contains "$ORCHESTRATION" 'local diagnostics whose purpose' || return 1
   assert_contains "$ORCHESTRATION" 'unexpectedly changes durable state' || return 1
-  assert_contains "$ORCHESTRATION" 'Requested durable changes and external actions' || return 1
-  assert_contains "$ORCHESTRATION" 'request → inline plan → explicit' || return 1
+  assert_contains "$ORCHESTRATION" 'Changes that do not qualify for direct execution and all external actions' || return 1
+  assert_contains "$ORCHESTRATION" 'inline plan → explicit approval' || return 1
   assert_contains "$ORCHESTRATION" 'direct bounded-write lane' || return 1
   assert_contains "$ORCHESTRATION" 'precise imperative is its own authorization' || return 1
   assert_contains "$ORCHESTRATION" '`do:` explicitly requests direct execution' || return 1
@@ -145,7 +145,7 @@ check_forge_contract() {
   assert_contains "$PROTOCOL" 'resolve clear terse follow-ups without fresh intake' || return 1
   assert_contains "$PROTOCOL" 'precise bounded imperative authorizes its local write' || return 1
   assert_contains "$PROTOCOL" '`do:` requests that lane' || return 1
-  assert_contains "$PROTOCOL" '`plan:`/`inline plan` or unsafe uncertainty requires approval' || return 1
+  assert_contains "$PROTOCOL" '`plan:`/`inline plan` or uncertainty requires approval' || return 1
   assert_contains "$PROTOCOL" 'prefixed operations stay in Forge' || return 1
   assert_not_contains "$PROTOCOL" 'every action gets an' || return 1
 }

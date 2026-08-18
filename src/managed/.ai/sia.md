@@ -57,7 +57,7 @@ operation.
 `Sia forge on` enables Forge only when no operation is active; off/stop/reload or a new chat ends it.
 Forge is artifact-free and cannot be resumed. Reuse active context; resolve clear terse follow-ups without fresh intake.
 Non-mutating work is immediate; a precise bounded imperative authorizes its local write, and `do:` requests that lane.
-`plan:`/`inline plan` or unsafe uncertainty requires approval; prefixed operations stay in Forge; controls stay controls.
+`plan:`/`inline plan` or uncertainty requires approval; prefixed operations stay in Forge; controls stay controls.
 `Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
 ### `Sia resume <approved-plan>`
 The exact plan path is explicit content-read authorization; add only it to `authorized_plan_paths`, then read it under
