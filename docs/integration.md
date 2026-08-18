@@ -84,11 +84,13 @@ For local development, run the checkout's `install.sh` script from a target repo
 
 ## Small, explicit safety boundary
 
-The installer requires POSIX `sh`, `git`, and a Git repository root. It rejects symlinked directories it writes under
-`.ai/`, invalid create-once seed paths, malformed or duplicated Sia marker pairs, and a concurrent Sia installer. A
-shared catalog must contain `## CUSTOM` before Sia can insert its section. Before replacing an existing shared file, it
-checks that the content used to prepare the replacement has not changed. This narrows accidental races but cannot lock
-arbitrary editors, so do not edit shared targets while installation is running.
+The installer requires POSIX `sh`, `git`, and a Git repository root. It follows existing symlinked `.ai`, category,
+docs, and `.claude` directories, including links outside the checkout; the repository owner is responsible for that
+target. Dangling links and links resolving to non-directories fail before writes. The installer also rejects invalid
+create-once seed paths, malformed or duplicated Sia marker pairs, and a concurrent Sia installer. A shared catalog must
+contain `## CUSTOM` before Sia can insert its section. Before replacing an existing shared file, it checks that the
+content used to prepare the replacement has not changed. This narrows accidental races but cannot lock arbitrary
+editors, so do not edit shared targets while installation is running.
 
 An interrupted process can leave `<git-common-dir>/sia-install.lock`. If no installer is running, remove that empty
 directory and retry.

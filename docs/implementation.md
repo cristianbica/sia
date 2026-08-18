@@ -146,7 +146,7 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Re-running install replaces only reserved Sia paths and marked Sia blocks.
 - Project rules, docs, plans, custom definitions, CUSTOM text, and surrounding instructions survive install and
   refresh.
-- Malformed markers and symlinked top-level Sia directories fail clearly.
+- Valid symlinked Sia directories are followed; dangling links and links to non-directories fail clearly.
 - The installer does not implement manifests, content digests, transactional recovery, or historical-layout migration.
 - Shipped definitions and SIA catalog fragments stay synchronized with the source layout.
 

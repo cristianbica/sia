@@ -148,18 +148,70 @@ test_malformed_blocks_refuse_before_installing() {
   [ ! -e "$reversed/.ai/sia.md" ] || fail 'wrote managed content after reversed markers'
 }
 
+test_symlinked_directories_are_followed() {
+  for linked in ai docs skills operations workflows claude; do
+    repo=$(new_repo) || return 1
+    outside=$(mktemp -d "$TMP_ROOT/symlink-$linked.XXXXXX") || return 1
+    case $linked in
+      ai)
+        ln -s "$outside" "$repo/.ai" || return 1
+        link_path=$repo/.ai
+        expected=$outside/sia.md
+        ;;
+      docs)
+        mkdir -p "$repo/.ai" || return 1
+        ln -s "$outside" "$repo/.ai/docs" || return 1
+        link_path=$repo/.ai/docs
+        expected=$outside/INDEX.md
+        ;;
+      skills)
+        mkdir -p "$repo/.ai" || return 1
+        ln -s "$outside" "$repo/.ai/skills" || return 1
+        link_path=$repo/.ai/skills
+        expected=$outside/sia/testing/SKILL.md
+        ;;
+      operations)
+        mkdir -p "$repo/.ai" || return 1
+        ln -s "$outside" "$repo/.ai/operations" || return 1
+        link_path=$repo/.ai/operations
+        expected=$outside/sia/implement.md
+        ;;
+      workflows)
+        mkdir -p "$repo/.ai" || return 1
+        ln -s "$outside" "$repo/.ai/workflows" || return 1
+        link_path=$repo/.ai/workflows
+        expected=$outside/sia/delivery.md
+        ;;
+      claude)
+        ln -s "$outside" "$repo/.claude" || return 1
+        link_path=$repo/.claude
+        expected=$outside/CLAUDE.md
+        ;;
+    esac
+
+    run_install "$repo" || return 1
+    [ -L "$link_path" ] || fail "installer replaced symlinked directory: $linked" || return 1
+    assert_nonempty "$expected" || return 1
+  done
+}
+
 test_invalid_seed_layouts_fail_before_installing() {
-  for invalid in docs-file docs-symlink rules-directory docs-index-directory; do
+  for invalid in docs-file docs-dangling docs-file-symlink rules-directory docs-index-directory; do
     repo=$(new_repo) || return 1
     case $invalid in
       docs-file)
         mkdir -p "$repo/.ai" || return 1
         printf 'not a directory\n' >"$repo/.ai/docs"
         ;;
-      docs-symlink)
-        outside=$(mktemp -d "$TMP_ROOT/outside.XXXXXX") || return 1
+      docs-dangling)
         mkdir -p "$repo/.ai" || return 1
-        ln -s "$outside" "$repo/.ai/docs" || return 1
+        ln -s "$repo/missing-docs" "$repo/.ai/docs" || return 1
+        ;;
+      docs-file-symlink)
+        outside_file=$(mktemp "$TMP_ROOT/docs-file.XXXXXX") || return 1
+        printf 'outside sentinel\n' >"$outside_file"
+        mkdir -p "$repo/.ai" || return 1
+        ln -s "$outside_file" "$repo/.ai/docs" || return 1
         ;;
       rules-directory)
         mkdir -p "$repo/.ai/RULES.md" || return 1
@@ -174,8 +226,8 @@ test_invalid_seed_layouts_fail_before_installing() {
       return 1
     fi
     [ ! -e "$repo/.ai/sia.md" ] || fail "partially installed after invalid seed layout: $invalid" || return 1
-    if [ "$invalid" = docs-symlink ]; then
-      [ ! -e "$outside/INDEX.md" ] || fail 'wrote through a symlinked .ai/docs directory' || return 1
+    if [ "$invalid" = docs-file-symlink ]; then
+      assert_equal 'outside sentinel' "$(cat "$outside_file")" 'changed a symlinked non-directory target' || return 1
     fi
   done
 }
@@ -212,6 +264,7 @@ run_case 'tool blocks preserve surrounding project instructions' test_tool_block
 run_case 'an existing Claude import is left alone' test_existing_claude_import_is_left_alone
 run_case 'new repository files honor a restrictive umask' test_new_files_honor_restrictive_umask
 run_case 'malformed markers fail before Sia writes' test_malformed_blocks_refuse_before_installing
+run_case 'valid symlinked directories are followed without replacing links' test_symlinked_directories_are_followed
 run_case 'invalid create-once seed layouts fail before Sia writes' test_invalid_seed_layouts_fail_before_installing
 run_case 'a concurrent installer is refused before Sia writes' test_concurrent_install_lock_fails_without_writing
 run_case 'installer accepts no command arguments' test_arguments_are_not_supported

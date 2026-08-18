@@ -208,7 +208,9 @@ seed() {
 
 check_layout() {
   for path in .ai .ai/docs .ai/skills .ai/operations .ai/workflows .claude; do
-    [ ! -L "$path" ] || fail "refusing symlinked path: $path"
+    if [ -L "$path" ] && [ ! -e "$path" ]; then
+      fail "$path must resolve to a directory"
+    fi
     [ ! -e "$path" ] || [ -d "$path" ] || fail "$path must be a directory"
   done
 }
