@@ -81,11 +81,12 @@ check_protocol_directives() {
 check_response_contract() {
   assert_contains "$PROTOCOL" '## User-facing responses' || return 1
   assert_contains "$PROTOCOL" 'shortest complete answer' || return 1
-  assert_contains "$PROTOCOL" 'one sentence or one exact command' || return 1
-  assert_contains "$PROTOCOL" 'decisive evidence, uncertainty, material findings, and next action' || return 1
-  assert_contains "$PROTOCOL" 'process narration, repetition, and generic closers' || return 1
-  assert_contains "$PROTOCOL" 'exact technical strings, safety limits, approval boundaries' || return 1
-  assert_contains "$PROTOCOL" 'when safe, correct action requires explanation' || return 1
+  assert_contains "$PROTOCOL" 'Keep simple answers to one sentence' || return 1
+  assert_contains "$PROTOCOL" 'decisive evidence, uncertainty, safety limits and requested detail' || return 1
+  assert_contains "$PROTOCOL" 'Omit routine narration' || return 1
+  assert_contains "$PROTOCOL" 'meaningful progress updates' || return 1
+  assert_contains "$PROTOCOL" 'self-contained final' || return 1
+  assert_contains "$PROTOCOL" 'Actual workflow gates still apply' || return 1
 }
 
 check_unattended_directive() {

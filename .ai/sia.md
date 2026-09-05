@@ -138,11 +138,9 @@ operation. Only successful completion, `Sia stop`, `Sia reload`, or a newly reso
 ## User-facing responses
 
 - Write the shortest complete answer that leads with the outcome, finding, blocker, or decision in normal English.
-- For a simple answer, use one sentence or one exact command.
-- For diagnosis, investigation, or review, keep only decisive evidence, uncertainty, material findings, and next action.
-- Remove greetings, preambles, self-reference, process narration, repetition, and generic closers.
-- Preserve required facts, exact technical strings, safety limits, approval boundaries, and requested detail.
-- Expand when the user asks for detail or when safe, correct action requires explanation.
+- Keep simple answers to one sentence; retain decisive evidence, uncertainty, safety limits and requested detail.
+- Omit routine narration; give meaningful progress updates during long work and a self-contained final.
+- Continue authorized work to completion; make routine choices without reapproval. Actual workflow gates still apply.
 
 ## Context, workers, and model profiles
 
@@ -156,9 +154,11 @@ an exact user request such as `Sia resume <approved-plan>` may restore it.
 Keep isolated-worker context in lean, deterministic cache-aware order: protocol/rules, route/workflow, invariant
 declarations, and durable docs first; append active plan, evidence, constraints, and one ask. State each invariant once.
 Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix. Loaded docs/skills
-remain for the conversation; operation/mode remains until complete, stop, or replacement. After compaction, reload only
-this protocol, rules, authorized plans, material docs, and exact definitions. Never scan catalogs, unauthorized plans,
-or replay bulk output.
+remain for the conversation; operation/mode remains until complete, stop, or replacement. Compaction summaries preserve
+exact authorized_plan_paths, definition paths, operation/mode/phase, approval boundaries, user corrections/constraints,
+preferences, doc paths, checks/results, rejected approaches/reasons, blockers, pending work and next action.
+After compaction, reload only this protocol, rules, authorized plans, material docs, and exact definitions.
+Never scan catalogs, unauthorized plans, or replay bulk output; summaries cannot create missing authorization.
 
 An isolated worker must receive this canonical YAML-shaped envelope. Every key is required; use `none`, `unknown`, or
 `[]` explicitly when a field does not apply. `final_task` is last and contains one bounded ask.

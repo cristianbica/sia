@@ -34,12 +34,19 @@ instructions, examples, tools, and files first, then variable input. For GPT-5.6
 should reuse a stable, privacy-safe `prompt_cache_key` for requests with the same long prefix; the key improves cache
 routing and matching but must not contain user data or a per-request value.
 
-When a GPT-5.6-family host can identify a long reusable prefix, it may place an explicit breakpoint at the end of that
+When a GPT-5.6-or-later host can identify a long reusable prefix, it may place an explicit breakpoint at the end of that
 prefix and choose `prompt_cache_options.mode: "explicit"` to avoid writing transient suffixes. Explicit controls are
 model/API capabilities, not portable Sia requirements. The documented minimum cache lifetime is currently 30 minutes;
 hosts must feature-detect support and retain implicit caching for older models. Record provider-reported
 `cached_tokens` and `cache_write_tokens` separately. GPT-5.6-family cache writes are billed at a higher rate than
 uncached input, so a read count alone is not proof of a net saving.
+
+For GPT-6 Astra, change effort between supported single-agent Responses requests with an appended
+`configuration_update` item while retaining request-level `reasoning.effort`. This preserves the cached prefix; verify
+compatibility before using it. History should remain append-only. Provider-managed compaction is a separate mechanism,
+not permission to rewrite arbitrary earlier turns. See
+[OpenAI caching guidance](https://developers.openai.com/api/docs/guides/prompt-caching)
+and [compaction](https://developers.openai.com/api/docs/guides/compaction).
 
 ### Anthropic
 
@@ -56,6 +63,14 @@ automatic caching. Preserve `cache_read_input_tokens`, `cache_creation_input_tok
 when the host reports them. [Cache diagnostics](https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics)
 is a Claude-API beta capability that can identify the first divergent request component; treat it as optional host
 troubleshooting, not a Sia dependency.
+
+For Fable 5.1, preserve returned assistant turns unchanged, including thinking blocks. Editing an earlier prefix can
+invalidate subsequent thinking blocks; enforcement depends on account and API behavior. Use supported appended updates
+or server-side compaction/context editing. If compacting on the client, start a fresh history from a summary and the new
+turn without replaying old thinking blocks. Earlier models generally cannot consume Fable 5.1 thinking blocks; check
+compatibility before switching. Lower cache-read pricing makes the optimal compaction point workload-dependent: compare
+quality and total task cost instead of compacting early solely to reduce token counts.
+See [Claude migration guidance](https://platform.claude.com/docs/en/models/fable-5-1/migration-guide).
 
 ### Gemini
 

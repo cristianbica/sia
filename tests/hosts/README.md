@@ -52,12 +52,18 @@ SIA_HOST_TIMEOUT_SECONDS=90       # per invocation
 SIA_HOST_MAX_OUTPUT_BYTES=1048576 # per invocation
 SIA_CLAUDE_MAX_BUDGET_USD=0.05   # per invocation; eight prompts means at most $0.40
 SIA_CODEX_MODEL=...               # optional explicit test model
+SIA_CODEX_REASONING_EFFORT=low     # default; override for the selected model
 SIA_OPENCODE_MODEL=...            # optional provider/model
 SIA_CLAUDE_MODEL=...              # optional explicit test model
 ```
 
+The Codex runner defaults to `low`, compatible with GPT-6 Astra. Other models may accept different effort levels;
+the host validates model compatibility. The harness accepts known effort names and rejects malformed values before
+live invocation. Model overrides do not automatically select effort. Probe mode ignores live-setting validation.
+
 The artifact directory contains run metadata, version probes, install logs, sanitized command shapes, requested model
-overrides, raw stdout and stderr, extracted responses, per-case results, repository fingerprints, and `summary.tsv`.
+overrides and requested Codex effort, raw stdout and stderr, extracted responses, per-case results, repository
+fingerprints, and `summary.tsv`.
 The temporary repositories are removed at exit. A changed repository fingerprint fails the case even if the textual
 response passes. Model values not reported by the host remain unknown rather than being inferred.
 
@@ -71,3 +77,10 @@ This test exercises `--probe` with version-only shims, then runs the complete lo
 OpenCode, and Claude with deterministic no-model shims. It covers fixture installation, host-specific command
 construction, response extraction, all eight semantic assertions, read-only fingerprints, and private runtime cleanup.
 It never invokes a model and is not evidence of live host-model compliance.
+
+## Long-task regression scenarios
+
+[Continuation scenarios](../behavior/routing/fixtures/model-continuation.md) define expected outcomes for compaction,
+already-authorized steps, scope control, and verification stopping. Static contracts check that guidance and scenarios
+remain present. These scenarios are not run by the eight-case live smoke suite and require a separate authorized
+multi-turn evaluation to certify model behavior.

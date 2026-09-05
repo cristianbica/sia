@@ -99,3 +99,26 @@ It is intentionally not a transactional package manager: it does not hash files,
 interruption shape, preserve every byte-level formatting detail, or migrate unknown historical layouts. Those concerns
 would obscure the two ownership rules above. If a repository has an ambiguous old layout, resolve it deliberately
 before installing rather than asking the installer to guess.
+
+## Frontier model compatibility
+
+Guidance checked against official documentation for GPT-6 Astra and Claude Fable/Mythos 5.1 in September 2026.
+These are host responsibilities; Sia's portable `fast` and `reasoning` profiles neither select an API effort nor
+promise cost or latency. Keep existing model roles and evaluate effort on representative tasks before changing defaults.
+
+- GPT-6 Astra: tool use requires the Responses API. Migrate `none`/`minimal` effort to `low`; remove unsupported
+  sampling and log-probability parameters. See the
+  [OpenAI model guide](https://developers.openai.com/api/docs/guides/latest-model).
+- Claude Fable 5.1: forced `tool_choice` values `any` and `tool` return errors. Use supported selection with explicit
+  instructions and schema validation, checking that a required call actually occurred. Progress visibility may require
+  supported `thinking.display` settings in an API client. See the
+  [Claude migration guide](https://platform.claude.com/docs/en/models/fable-5-1/migration-guide).
+- Context and cache handling: preserve append-only provider history and use supported compaction mechanisms as detailed
+  in [prompt caching](prompt-caching.md). Sia specifies summary contents but cannot control a host's hidden compaction.
+
+Behavioral guidance comes from [OpenAI prompting guidance](https://developers.openai.com/api/docs/guides/latest-model)
+and [Claude prompting guidance][claude-guide].
+Use meaningful progress, complete authorized work, batch independent reads, make targeted edits, retrieve current facts,
+and stop verification when required checks pass. Preserve actual approval gates and scope boundaries.
+
+[claude-guide]: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1

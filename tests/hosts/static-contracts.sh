@@ -31,7 +31,7 @@ probe_uses_only_version_commands() {
   make_host_shims || return 1
   : >"$TMP/invocations.log"
   if ! PATH="$TMP/bin:$PATH" SIA_HOST_SHIM_LOG="$TMP/invocations.log" \
-    SIA_HOST_TIMEOUT_SECONDS=invalid SIA_CLAUDE_MAX_BUDGET_USD=invalid \
+    SIA_HOST_TIMEOUT_SECONDS=invalid SIA_CLAUDE_MAX_BUDGET_USD=invalid SIA_CODEX_REASONING_EFFORT=invalid \
     "$ROOT/scripts/verify-hosts" --probe --artifacts "$TMP/probe" >"$TMP/probe.out" 2>"$TMP/probe.err"
   then
     return 1
@@ -91,7 +91,7 @@ live_mode_exercises_all_hosts_without_a_model() {
   for host in codex opencode claude
   do
     if ! PATH="$TMP/live-bin:$PATH" CODEX_HOME="$TMP/fake-codex-home" \
-      TMPDIR="$TMP/runtime root" SIA_HOST_TIMEOUT_SECONDS=5 \
+      TMPDIR="$TMP/runtime root" SIA_HOST_TIMEOUT_SECONDS=5 SIA_CODEX_REASONING_EFFORT= \
       "$ROOT/scripts/verify-hosts" --live --host "$host" --artifacts "$TMP/live-$host" \
       >"$TMP/live-$host.out" 2>"$TMP/live-$host.err"
     then
@@ -108,9 +108,43 @@ live_mode_exercises_all_hosts_without_a_model() {
     assert_nonempty "$TMP/live-$host/hosts/$host/cases/plan-resume/response.normalized.txt" || return 1
   done
 
+  assert_contains "$TMP/live-codex/metadata.txt" 'codex_requested_reasoning_effort=low' || return 1
+  assert_contains "$TMP/live-codex/hosts/codex/cases/help/command.txt" 'model_reasoning_effort="low"' || return 1
+
   if find "$TMP/runtime root" ! -path "$TMP/runtime root" -print | grep . >/dev/null 2>&1; then
     fail "private host runtime was not cleaned"
   fi
+}
+
+codex_effort_override_matches_command_evidence() {
+  if ! PATH="$TMP/live-bin:$PATH" CODEX_HOME="$TMP/fake-codex-home" \
+    SIA_HOST_TIMEOUT_SECONDS=5 SIA_CODEX_MODEL=gpt-6-astra SIA_CODEX_REASONING_EFFORT=high \
+    SIA_TEST_EXPECTED_EFFORT=high SIA_TEST_EXPECTED_MODEL=gpt-6-astra \
+    "$ROOT/scripts/verify-hosts" --live --host codex --artifacts "$TMP/codex-override" \
+    >"$TMP/codex-override.out" 2>"$TMP/codex-override.err"
+  then
+    return 1
+  fi
+  assert_equal "8" "$(grep -c "${TAB}PASS${TAB}" "$TMP/codex-override/summary.tsv")" \
+    "expected overridden arguments to reach every invocation" || return 1
+  assert_contains "$TMP/codex-override/metadata.txt" 'codex_requested_model=gpt-6-astra' || return 1
+  assert_contains "$TMP/codex-override/metadata.txt" 'codex_requested_reasoning_effort=high' || return 1
+  assert_contains "$TMP/codex-override/hosts/codex/cases/help/command.txt" ' --model gpt-6-astra' || return 1
+  assert_contains "$TMP/codex-override/hosts/codex/cases/help/command.txt" 'model_reasoning_effort="high"'
+}
+
+codex_rejects_invalid_effort_before_invocation() {
+  : >"$TMP/invalid-effort-invocations.log"
+  if PATH="$TMP/bin:$PATH" SIA_HOST_SHIM_LOG="$TMP/invalid-effort-invocations.log" \
+    SIA_CODEX_REASONING_EFFORT='low" invalid' \
+    "$ROOT/scripts/verify-hosts" --live --host codex --artifacts "$TMP/invalid-effort" \
+    >"$TMP/invalid-effort.out" 2>"$TMP/invalid-effort.err"
+  then
+    fail "live mode accepted malformed effort"
+    return 1
+  fi
+  assert_contains "$TMP/invalid-effort.err" 'SIA_CODEX_REASONING_EFFORT must be' || return 1
+  [ ! -s "$TMP/invalid-effort-invocations.log" ] || fail "invalid effort invoked a host"
 }
 
 live_mode_fails_when_requested_supported_host_is_unavailable() {
@@ -134,4 +168,6 @@ run_case "live orchestration passes for all local no-model shims" \
   live_mode_exercises_all_hosts_without_a_model
 run_case "live mode fails when a requested supported host cannot run" \
   live_mode_fails_when_requested_supported_host_is_unavailable
+run_case "Codex effort and model overrides match execution evidence" codex_effort_override_matches_command_evidence
+run_case "Codex rejects malformed effort before invoking a host" codex_rejects_invalid_effort_before_invocation
 finish_tests

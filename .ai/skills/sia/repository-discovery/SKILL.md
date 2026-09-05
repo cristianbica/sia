@@ -28,6 +28,9 @@ Use focused, evidence-led discovery to answer the current task without mapping t
 6. Stop when the evidence is sufficient to plan or document the requested scope.
 
 Prefer filenames, symbols, targeted search, and small directory listings over broad tree dumps or reading every file.
+Batch independent reads and searches when the host supports it; keep dependent reads and permission checks sequential.
+Retrieve current authoritative evidence for changing external facts instead of answering from memory. Stop discovery
+when the task's material questions are answered; repeat a lookup only for new uncertainty or changed evidence.
 Separate direct observations from inference. Cite repository paths for important claims and state confidence when
 evidence is incomplete.
 

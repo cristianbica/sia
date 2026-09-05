@@ -134,7 +134,10 @@ permissions or external actions.
 
 ## Build
 
-Implement only approved scope, including tests and affected documentation. Standard prefers an isolated worker, then a
+Implement only approved scope, including tests and affected documentation. Prefer targeted edits over whole-file
+rewrites unless most of the file must change. Leave unrelated cleanup as a finding. Continue in-scope steps
+without reapproval; ask only at actual workflow gates or when the authorized boundary expands.
+Standard prefers an isolated worker, then a
 fresh conversation, then same-context execution; lightweight uses one bounded Build handoff. Compare the worktree with
 optional `base` and `dirty` comments. Preserve pre-existing work; unsafe overlap or attribution is blocked before
 unattended writes. Do not stash, reset, clean, or overwrite it.

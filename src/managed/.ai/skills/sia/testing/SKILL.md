@@ -23,7 +23,8 @@ Choose validation from the change's behavior, risk, and repository evidence rath
 1. Identify the smallest tests that directly exercise the changed behavior and its important failure modes.
 2. Add or update regression coverage when behavior changes and the repository has an appropriate test layer.
 3. Run focused validation first; add broader checks only when risk, the approved plan, or repository evidence justifies
-   them.
+   them. Stop after required checks pass unless changes, failures, or new evidence justify more validation.
+   Avoid tests that merely mirror implementation or add no coverage of meaningful behavior or failure modes.
 4. Inspect exit status and useful output; distinguish test failure from unavailable dependencies or environment.
 5. Review the final diff for untested branches, documentation impact, and accidental scope.
 

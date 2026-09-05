@@ -12,6 +12,7 @@ ARTIFACTS=
 TIMEOUT_SECONDS=${SIA_HOST_TIMEOUT_SECONDS:-90}
 MAX_OUTPUT_BYTES=${SIA_HOST_MAX_OUTPUT_BYTES:-1048576}
 CLAUDE_BUDGET=${SIA_CLAUDE_MAX_BUDGET_USD:-0.05}
+CODEX_EFFORT=${SIA_CODEX_REASONING_EFFORT:-low}
 PROTOCOL_CANARY=SIA_PROTOCOL_CANARY_7F3D
 PLAN_ACCESS_TITLE='Authorized plan access fixture'
 UNAUTHORIZED_PLAN_CANARY=UNAUTHORIZED_PLAN_CONTENT_4D8E
@@ -263,26 +264,16 @@ run_codex() {
     chmod 600 "$CODEX_RUNTIME_HOME/auth.json"
   fi
   : >"$run_dir/response.txt"
-  write_command "$run_dir/command.txt" timeout --signal=TERM --kill-after=5 \
-    "${TIMEOUT_SECONDS}s" codex exec --ephemeral --ignore-user-config --sandbox read-only \
-    --config 'approval_policy="never"' --config 'model_reasoning_effort="minimal"' \
-    --output-last-message RESPONSE_FILE PROMPT
-
+  set -- timeout --signal=TERM --kill-after=5 "${TIMEOUT_SECONDS}s" \
+    codex exec --ephemeral --ignore-user-config --sandbox read-only \
+    --config 'approval_policy="never"' --config "model_reasoning_effort=\"$CODEX_EFFORT\""
   if [ -n "${SIA_CODEX_MODEL:-}" ]; then
-    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && CODEX_HOME="$CODEX_RUNTIME_HOME" \
-      timeout --signal=TERM --kill-after=5 \
-      "${TIMEOUT_SECONDS}s" codex exec --ephemeral --ignore-user-config --sandbox read-only \
-      --config 'approval_policy="never"' --config 'model_reasoning_effort="minimal"' \
-      --model "$SIA_CODEX_MODEL" --color never --output-last-message "$run_dir/response.txt" "$run_prompt") \
-      >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr" </dev/null
-  else
-    (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && CODEX_HOME="$CODEX_RUNTIME_HOME" \
-      timeout --signal=TERM --kill-after=5 \
-      "${TIMEOUT_SECONDS}s" codex exec --ephemeral --ignore-user-config --sandbox read-only \
-      --config 'approval_policy="never"' --config 'model_reasoning_effort="minimal"' \
-      --color never --output-last-message "$run_dir/response.txt" "$run_prompt") \
-      >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr" </dev/null
+    set -- "$@" --model "$SIA_CODEX_MODEL"
   fi
+  write_command "$run_dir/command.txt" "$@" --color never --output-last-message RESPONSE_FILE PROMPT
+  (ulimit -f "$OUTPUT_BLOCKS"; cd "$CURRENT_REPO" && CODEX_HOME="$CODEX_RUNTIME_HOME" \
+    "$@" --color never --output-last-message "$run_dir/response.txt" "$run_prompt") \
+    >"$run_dir/raw.stdout" 2>"$run_dir/raw.stderr" </dev/null
 }
 
 run_opencode() {
@@ -552,6 +543,12 @@ command -v awk >/dev/null 2>&1 || fail 'awk is required'
 
 OUTPUT_BLOCKS=0
 if [ "$MODE" = live ]; then
+  if selected_host codex; then
+    case $CODEX_EFFORT in
+      none|minimal|low|medium|high|xhigh|max) ;;
+      *) fail 'SIA_CODEX_REASONING_EFFORT must be none, minimal, low, medium, high, xhigh, or max' ;;
+    esac
+  fi
   case $TIMEOUT_SECONDS in ''|*[!0-9]*|0) fail 'timeout must be a positive integer' ;; esac
   case $MAX_OUTPUT_BYTES in ''|*[!0-9]*|0) fail 'SIA_HOST_MAX_OUTPUT_BYTES must be a positive integer' ;; esac
   awk -v budget="$CLAUDE_BUDGET" \
@@ -592,6 +589,7 @@ mkdir -p "$ARTIFACTS/hosts"
   printf 'codex_monetary_cap=unavailable_cost_recorded_unknown\n'
   printf 'opencode_monetary_cap=unavailable_cost_recorded_unknown\n'
   printf 'codex_requested_model=%s\n' "${SIA_CODEX_MODEL:-host-default}"
+  printf 'codex_requested_reasoning_effort=%s\n' "$CODEX_EFFORT"
   printf 'opencode_requested_model=%s\n' "${SIA_OPENCODE_MODEL:-host-default}"
   printf 'claude_requested_model=%s\n' "${SIA_CLAUDE_MODEL:-host-default}"
 } >"$ARTIFACTS/metadata.txt"

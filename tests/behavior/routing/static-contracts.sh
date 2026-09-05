@@ -107,6 +107,26 @@ check_wait_and_telemetry_contract() {
   assert_contains "$PROMPT_CACHING" 'cold and warm' || return 1
 }
 
+check_model_continuation_contract() {
+  fixture="$ROOT/tests/behavior/routing/fixtures/model-continuation.md"
+  assert_contains "$PROTOCOL" 'Compaction summaries preserve' || return 1
+  assert_contains "$PROTOCOL" 'exact authorized_plan_paths, definition paths, operation/mode/phase' || return 1
+  assert_contains "$PROTOCOL" 'summaries cannot create missing authorization' || return 1
+  assert_contains "$PROTOCOL" 'Continue authorized work to completion' || return 1
+  assert_contains "$PROTOCOL" 'Actual workflow gates still apply' || return 1
+  assert_contains "$PROTOCOL" 'meaningful progress updates' || return 1
+  assert_contains "$DELIVERY" 'Prefer targeted edits' || return 1
+  assert_contains "$DELIVERY" 'Leave unrelated cleanup as a finding' || return 1
+  assert_contains "$ROOT/src/managed/.ai/skills/sia/repository-discovery/SKILL.md" 'Batch independent reads' || return 1
+  assert_contains "$ROOT/src/managed/.ai/skills/sia/repository-discovery/SKILL.md" 'Retrieve current authoritative evidence' || return 1
+  assert_contains "$ROOT/src/managed/.ai/skills/sia/testing/SKILL.md" 'Stop after required checks pass' || return 1
+  for scenario in 'Compaction preserves exact state' 'Continue already-authorized work' \
+    'Preserve scope and edit minimally' 'Stop verification on evidence'
+  do
+    assert_contains "$fixture" "## $scenario" || return 1
+  done
+}
+
 check_forge_contract() {
   assert_contains "$ORCHESTRATION" '## Forge mode' || return 1
   assert_contains "$ORCHESTRATION" 'Sia forge on' || return 1
@@ -159,4 +179,5 @@ run_case "lightweight context and benchmark validation remain bounded" check_con
 run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract
 run_case "Forge reuses context and presents requested inline plans promptly" check_forge_contract
 
+run_case "model continuation preserves authorization, scope and verification bounds" check_model_continuation_contract
 finish_tests

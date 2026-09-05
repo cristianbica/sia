@@ -13,8 +13,9 @@ has_ephemeral=false
 has_ignore_user_config=false
 has_read_only=false
 has_never_approval=false
-has_minimal_reasoning=false
+has_expected_reasoning=false
 has_no_color=false
+actual_model=host-default
 while [ "$#" -gt 0 ]
 do
   case $1 in
@@ -36,7 +37,7 @@ do
       ;;
     --config)
       [ "${2:-}" = 'approval_policy="never"' ] && has_never_approval=true
-      [ "${2:-}" = 'model_reasoning_effort="minimal"' ] && has_minimal_reasoning=true
+      [ "${2:-}" = "model_reasoning_effort=\"${SIA_TEST_EXPECTED_EFFORT:-low}\"" ] && has_expected_reasoning=true
       shift 2
       ;;
     --color)
@@ -44,6 +45,7 @@ do
       shift 2
       ;;
     --model)
+      actual_model=$2
       shift 2
       ;;
     --*)
@@ -60,7 +62,8 @@ done
 [ "$has_ignore_user_config" = true ] || exit 97
 [ "$has_read_only" = true ] || exit 96
 [ "$has_never_approval" = true ] || exit 95
-[ "$has_minimal_reasoning" = true ] || exit 94
+[ "$has_expected_reasoning" = true ] || exit 94
+[ "$actual_model" = "${SIA_TEST_EXPECTED_MODEL:-host-default}" ] || exit 91
 [ "$has_no_color" = true ] || exit 93
 [ -n "$output" ] || exit 92
 

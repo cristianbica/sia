@@ -1,7 +1,7 @@
 # Host validation matrix
 
 Sia separates CLI availability from semantic certification. A version probe never invokes a model. A live test installs
-Sia into a temporary repository, adds an activation canary, invokes four read-only prompts, and records exact evidence.
+Sia into a temporary repository, adds an activation canary, invokes eight read-only prompts, and records exact evidence.
 Observed versions are dated evidence, not required or pinned versions; a host update does not disable live validation.
 
 ## Current environment
@@ -47,3 +47,7 @@ effective operation and skill, including CUSTOM-only and override fixtures; docs
 pre-existing plan content stays isolated until an exact resume request authorizes it. Detailed artifacts contain
 versions, commands, prompts, raw output, normalized responses, timing, reported cost, repository fingerprints, and the
 semantic result.
+
+The Codex runner uses `SIA_CODEX_REASONING_EFFORT` (default `low`) independently of `SIA_CODEX_MODEL` and records both
+requested settings. Local shims cover default and overridden arguments; the dated live-certification status above
+remains unchanged. See [host tests](../tests/hosts/README.md) for long-task scenario limitations.

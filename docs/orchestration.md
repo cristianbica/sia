@@ -154,6 +154,11 @@ Load plan content only from exact `authorized_plan_paths`; never scan `.ai/plans
 exact ask after the selected docs, evidence, constraints, exclusions, and recovery information so the worker receives
 one clear task.
 
+Compaction summaries preserve exact authorized plan and definition paths, operation/mode/phase, approval boundaries,
+user corrections, constraints and preferences, doc paths, completed checks/results, rejected approaches/reasons,
+blockers, pending work, and next action. A summary never grants authorization; if exact plan authorization is lost,
+fail closed. Reload only material authorized context. Host-managed compaction may be opaque or outside Sia's control.
+
 For a fresh worker, put `Sia handoff` on the first line and the envelope immediately after it. This preserves the same
 explicit opt-in grammar as a user invocation while allowing planless scouts and reviewers to enter only their assigned
 phase. The host may supply hidden context that Sia cannot inspect. Sia promises a bounded explicit handoff, not control
