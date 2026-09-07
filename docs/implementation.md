@@ -109,7 +109,7 @@ Do not implement native spawning, parallelism, all creator operations, or the co
 - Editing approved visible plan content resets approval; short footer progress comments do not.
 - New plans use minimal operation/workflow/skills frontmatter and optional one-line status comments at EOF.
 - Malformed approval markers, conflicting status comments, or a nonmatching digest prevent resume.
-- `Sia resume <approved-plan>` verifies approved content and enters the recorded delivery phase rather than replanning.
+- `Sia resume <plan>` enters Approve for a valid pending draft; later phases require verified approval content.
 - Plan content is readable only from exact conversation-created or user-authorized paths; broad discovery excludes
   every other `.ai/plans/**` file, and missing authorization after compaction fails closed.
 - Phase handoffs name exact current definition paths; workers do not independently reroute through catalogs.

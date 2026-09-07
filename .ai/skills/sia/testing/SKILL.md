@@ -33,7 +33,10 @@ an unavailable check with a weaker one.
 
 ## Reporting
 
-For every claimed check, report the exact command, outcome, and relevant scope. Keep successful bulk output and broad
+For every claimed check, record the exact command, outcome, and relevant scope in the active plan or handoff when
+one exists. User-facing replies summarize meaningful checks and material limits; include details when requested or
+needed to assess the result. Without an existing evidence location, report the required evidence directly. Keep
+successful bulk output and broad
 diffs in evidence, not later active context; include useful excerpts for failures. Label commands that were not run and
 explain why. Record residual risk and missing evidence. Never imply that skipped, interrupted, or uninspected commands
 passed.

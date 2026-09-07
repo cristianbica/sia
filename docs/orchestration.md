@@ -38,8 +38,11 @@ persisted approval or `Sia resume` uses standard delivery.
 Preferred execution order:
 
 1. Start an isolated native worker when the host can avoid passing the earlier conversation.
-2. Continue in a new user-started host conversation with `Sia resume <artifact>`.
-3. Fall back to a same-conversation phase transition using the bounded handoff, without claiming a context reset.
+2. Otherwise continue in the same conversation using a bounded handoff, without claiming a context reset.
+3. Request a user-started conversation with `Sia resume <artifact>` only for a genuine context limitation.
+
+Unavailable isolation alone does not stop approved work. Standard still has a separate review phase; report whether
+the reviewer was independent. Lightweight uses the core handoff plus the write baseline.
 
 Native spawning is an optimization. Every required workflow must remain semantically usable through persisted artifacts.
 
@@ -139,10 +142,12 @@ normal Sia resolution rather than the Forge loop after Forge is off. While Forge
 
 ## Handoff envelope
 
-Every isolated or resumed phase receives only the information needed to execute its assignment:
+Use the canonical core envelope in `.ai/sia.md`. Artifact-backed work also requires artifact state and next
+transition; writes require the repository base and dirty-path fields. Include supporting context only when useful.
+Full older envelopes remain valid. In particular, carry:
 
 - `handoff_protocol: 1` and one final task;
-- artifact ID or `none`, operation, workflow, execution mode, phase, and next transition;
+- operation, workflow, execution mode, and phase; artifact ID, status, revision, and next transition when applicable;
 - immutable authorization ceiling and explicitly authorized external actions;
 - exact `authorized_plan_paths` created in the conversation or explicitly requested or approved by the user;
 - artifact status and approved revision when approval applies;
@@ -231,13 +236,16 @@ revision, route, status, digest, baseline, permissions, or empty lists. Only `st
 block. Optional one-line comments appear only when relevant:
 `approved`, `base`, `dirty`, `mode`, `route`, `ceiling`, `external`, `progress`, and `blocker`.
 
-The digest is lowercase SHA-256 over normalized bytes between approval markers. An approved standard plan adds
-`<!-- sia:approved <sha256> -->`; changing approved bytes removes that comment and restores
+The canonical digest convention lives in `.ai/sia.md`: hash UTF-8 content between the unique approval markers,
+excluding markers, after converting CRLF and CR to LF; preserve all other whitespace. Use lowercase SHA-256.
+An approved standard plan adds `<!-- sia:approved <sha256> -->`; changing approved bytes removes that comment
+and restores
 `<!-- sia:status pending-approval -->`. Progress comments never repair an invalid digest.
 
 The status comment determines resume: `pending-approval`, `build`, `review-validate`, `fix`, `ship`, `blocked`,
 `complete`, or `cancelled`. A blocked unattended plan adds one concise blocker comment with an observable resume
-condition. Resume treats the exact named artifact as user-authorized, reads only it, rejects
+condition. A valid `pending-approval` draft resumes to Approve and waits; it does not authorize Build.
+Resume treats the exact named artifact as content-read-authorized, reads only it, rejects
 contradictory/complete/cancelled state, and preserves legacy artifacts without migration. Base and dirty comments
 protect attribution when present; unattended ceiling and external comments are immutable. Handoff-only details stay
 in the handoff envelope, not the plan.

@@ -36,7 +36,7 @@ Resolve the remainder after `Sia` in this order:
 `.ai/skills/INDEX.md`; validate and merge each index's SIA and CUSTOM entries under normal override rules.
 Show the general requests `Sia load docs`,
 `Sia load skills`, `Sia forge on` / `Sia forge off`, `Sia unattended <operation> [request]`,
-`Sia resume <approved-plan>`, `Sia stop`, and `Sia reload`, each with a brief purpose.
+`Sia resume <plan>`, `Sia stop`, and `Sia reload`, each with a brief purpose.
 List every effective operation once with its description and effective aliases, labeling project entries and overrides
 as CUSTOM. List every effective skill once on one comma-separated `Skills:` line, labeling project entries and overrides
 as CUSTOM.
@@ -58,14 +58,16 @@ Forge is artifact-free and cannot be resumed. Reuse active context; resolve clea
 Non-mutating work is immediate; a precise bounded imperative authorizes its local write, and `do:` requests that lane.
 `plan:`/`inline plan` or uncertainty requires approval; prefixed operations stay in Forge; controls stay controls.
 `Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
-### `Sia resume <approved-plan>`
+### `Sia resume <plan>`
 The exact plan path is explicit content-read authorization; add only it to `authorized_plan_paths`, then read it under
 `.ai/plans/`. New artifacts use `YYYY-MM-DD-NN-<slug>.md` with the UTC date and a zero-padded daily sequence; allocating
 `NN` may inspect filenames only, never unauthorized plan contents. New compact artifacts have only `operation`,
 `workflow`, and `skills` frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments.
-Existing valid legacy artifacts remain resumable. Refuse ambiguous, missing, unapproved, or contradictory plans.
+Existing valid legacy artifacts remain resumable. Refuse ambiguous, missing, or contradictory plans.
+A valid `pending-approval` draft resumes to Approve, never Build; present its scope and wait for approval.
 
-For compact artifacts, recompute the lowercase SHA-256 from normalized approval-block bytes. Status beyond
+For compact artifacts, hash UTF-8 content between the unique approval markers, excluding the markers: convert CRLF
+and CR to LF, preserve all other whitespace, and compute lowercase SHA-256. Status beyond
 `pending-approval` requires one matching `sia:approved` comment; progress never repairs invalid approval content.
 Optional mode/route/base/dirty/ceiling/external/blocker comments apply only when present; derive phase from status.
 A blocked unattended plan retries only after observable change. Refuse complete/cancelled; Ship requires passing review.
@@ -149,7 +151,7 @@ conversation creates the plan or the user explicitly requests or approves readin
 conversation. Do not add paths inferred from task similarity, status, Git history, discovery, or another plan. Require
 exact entry before reading, searching, diffing, summarizing, or using `.ai/plans/**` content. Filename-only inspection
 is permitted only to allocate a new name. If a new or compacted context cannot recover exact authorization, fail closed;
-an exact user request such as `Sia resume <approved-plan>` may restore it.
+an exact user request such as `Sia resume <plan>` may restore it.
 
 Keep isolated-worker context in lean, deterministic cache-aware order: protocol/rules, route/workflow, invariant
 declarations, and durable docs first; append active plan, evidence, constraints, and one ask. State each invariant once.
@@ -160,14 +162,14 @@ preferences, doc paths, checks/results, rejected approaches/reasons, blockers, p
 After compaction, reload only this protocol, rules, authorized plans, material docs, and exact definitions.
 Never scan catalogs, unauthorized plans, or replay bulk output; summaries cannot create missing authorization.
 
-An isolated worker must receive this canonical YAML-shaped envelope. Every key is required; use `none`, `unknown`, or
-`[]` explicitly when a field does not apply. `final_task` is last and contains one bounded ask.
+An isolated worker receives the core envelope below; every shown key is required. `final_task` is last.
+For artifact-backed work also include artifact_id, artifact_status, approved_revision, and next_transition; for writes,
+include base_ref and staged_paths/unstaged_paths/untracked_paths. Add relevant documentation_paths, evidence, findings,
+command_results, usage, and approved_deviations only when useful. Omitted context grants no authority. Full older
+envelopes remain valid; use `none`, `unknown`, or `[]` for required fields that do not apply.
 
 ```yaml
 handoff_protocol: 1
-artifact_id: none
-artifact_status: none
-approved_revision: none
 execution_mode: interactive
 authorization_ceiling: [current-operation-request]
 authorized_external_actions: []
@@ -175,30 +177,19 @@ authorized_plan_paths: []
 operation: investigate
 workflow: investigation
 phase: investigate
-next_transition: synthesize
 requested_outcome: <outcome>
 approved_scope: [<path-or-behavior>]
 non_goals: []
 acceptance_criteria: [<criterion>]
 repository_root: <absolute-path>
-base_ref: <commit>
-staged_paths: []
-unstaged_paths: []
-untracked_paths: []
 definition_paths:
   operation: <path>
   workflow: <path>
   skills: [<path>]
-documentation_paths: []
 allowed_work: [read]
 exclusions: []
 permissions: unchanged
 do_not_load: [.ai/plans/** except exact authorized_plan_paths]
-evidence: []
-findings: []
-command_results: []
-usage: unknown
-approved_deviations: []
 recovery: <stop-condition-or-recovery>
 requested_model_profile: fast
 model_selection_source: workflow

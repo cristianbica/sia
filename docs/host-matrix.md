@@ -54,9 +54,11 @@ remains unchanged. See [host tests](../tests/hosts/README.md) for long-task scen
 
 ## Approval-boundary coverage
 
-A separate Codex runner, `scripts/verify-approval --live`, exercises writable disposable fixtures and exact-session
-continuation. It checks standard planning before source edits, approval of the presented plan, and trivial,
-lightweight, Forge direct/inline, and unattended controls. It records file snapshots and tool traces; missing
+A separate Codex/Claude runner, `scripts/verify-approval --live --host codex|claude`, exercises writable disposable
+fixtures and exact-session continuation. It checks standard planning before source edits, approval of the presented
+plan, pending-plan resume, remaining approved work, verification stopping, and the existing planless and unattended
+controls.
+It records file snapshots and tool traces; missing
 continuation or unclassifiable preapproval activity is unavailable, never a pass. It does not change the read-only
 smoke suite or the live-certification status above.
 
@@ -64,5 +66,30 @@ smoke suite or the live-certification status above.
 It covers successful routes, premature writes and reverted attempts, invalid/missing plans, invalid digests, host
 failure, missing/unsupported continuation, opaque commands, and timeout. These results validate the harness only.
 Live approval checks remain unrun and need an explicit call budget; see
-[host tests](../tests/hosts/README.md#writable-approval-checks-codex) for invocation, bounded execution, evidence, and
-conservative trace-check limitations.
+[host tests](../tests/hosts/README.md#writable-approval-and-continuation-checks-codex-and-claude) for invocation,
+bounded execution, evidence, and conservative trace-check limitations.
+
+## Model-specific evaluation
+
+Keep the portable approval, scope, and completion rules independent of model tuning. Evaluate the same tasks with
+explicit model and effort settings; advisory `fast`/`reasoning` profiles do not establish equivalent effort or cost
+across providers. Record host versions and instruction hashes alongside responses and traces. Offline harness checks
+validate the measurement machinery, not live model compliance.
+
+[Astra guidance](https://developers.openai.com/api/docs/guides/latest-model) identifies detailed recurring prose,
+sensitivity to skills, and over-broad verification as behaviors to check. Audit conflicting loaded instructions before
+adding more rules. Generic autonomy advice must respect the user's selected interactive approval boundary.
+
+[Claude 5.1
+guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1)
+recommends measuring effort settings again and adjusting observed dense prose, premature stopping, or extra work.
+Prefer readable paragraphs and useful lists over blanket formatting bans. Missing progress updates may be a host display
+issue: API clients must request and render the appropriate progress blocks. Sia cannot configure that through Markdown.
+See [prompt caching](prompt-caching.md) for history and preserved-thinking compatibility; host-owned conversation edits
+and API settings require integration checks, not extra Sia instructions.
+
+Use the opt-in approval runner for repository changes and continuation, and the concise-output benchmark for paired
+language-contract comparisons. Review correctness and scope before readability or token counts. A host that cannot
+expose the needed session, permissions, or trace evidence is unavailable for that assertion; do not report it as
+passing.
+Live comparisons require a separately approved model/access/cost budget and must remain outside ordinary verification.

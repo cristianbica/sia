@@ -155,8 +155,10 @@ Prefer existing patterns, clear names, and direct control flow. Add an abstracti
 only when the current task needs it; do not design for hypothetical future requirements. Readability matters more
 than fewer lines. Comments explain non-obvious reasons. Preserve required error handling, validation, security, and
 compatibility; avoid extra safeguards for scenarios ruled out by verified internal contracts.
-Standard prefers an isolated worker, then a
-fresh conversation, then same-context execution; lightweight uses one bounded Build handoff. Compare the worktree with
+
+Standard prefers an isolated worker when useful and available, otherwise same-context execution. Request a fresh
+user-started conversation only for a genuine context limitation; unavailable isolation alone does not block approved
+work. Lightweight uses one core Build handoff with write-baseline fields. Compare the worktree with
 optional `base` and `dirty` comments. Preserve pre-existing work; unsafe overlap or attribution is blocked before
 unattended writes. Do not stash, reset, clean, or overwrite it.
 
@@ -223,15 +225,17 @@ write empty comments. Valid optional comments are `approved`, `base`, `dirty`, `
 `progress`, and `blocker`; comments are one line and remain after the approval block. `status` is exactly one of
 `pending-approval`, `build`, `review-validate`, `fix`, `ship`, `blocked`, `complete`, or `cancelled`.
 
-`approved` contains the lowercase SHA-256 of normalized approval-block bytes. `base` is the initial commit; `dirty`
-lists only pre-existing paths. `mode: unattended` makes `ceiling` immutable and requires an `external` comment for each
-explicit external action. Omit them for default interactive standard work. `progress` records a concise completed phase,
+`approved` uses lowercase SHA-256 and the UTF-8/LF convention in `.ai/sia.md`; preserve whitespace between markers.
+`base` is the initial commit; `dirty` lists only pre-existing paths. `mode: unattended` makes `ceiling` immutable and
+requires an `external` comment for each explicit external action. Omit them for default interactive standard work.
+`progress` records a concise completed phase,
 check, finding, or deviation. `blocker` names an observable resume condition.
 
 Resume accepts a compact artifact only when it has exactly one nonnested approval marker pair, one status comment, and a
-matching approval digest whenever status is beyond `pending-approval`. It derives the next action from status, checks
-base/dirty comments when present, and refuses contradictory or complete/cancelled artifacts. It accepts existing valid
-legacy artifacts unchanged; never rewrite them merely to compact them.
+matching approval digest whenever status is beyond `pending-approval`. A pending draft enters Approve, never Build.
+It derives the next action from status, checks base/dirty comments when present, and refuses contradictory or
+complete/cancelled artifacts. It accepts existing valid legacy artifacts unchanged; never rewrite them merely to
+compact them.
 
 Changing approval-block bytes removes the approval comment and returns to `pending-approval`; progress comments never
 repair invalid approval content. Load only the named active plan and exact current definitions. At phase boundaries put

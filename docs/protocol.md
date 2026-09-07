@@ -69,7 +69,7 @@ menu. General request shapes include:
 - `Sia load skills`
 - `Sia forge on` / `Sia forge off`
 - `Sia unattended <operation> [request]`
-- `Sia resume <approved-plan>`
+- `Sia resume <plan>`
 - `Sia stop`
 - `Sia reload`
 
@@ -99,13 +99,16 @@ or a missing index is encountered, report that repository documentation is unava
 Read `.ai/skills/INDEX.md`, merge its SIA and CUSTOM entries, and expose the effective catalog. Do not load every skill
 body. Load a skill only when a later task makes it relevant or the user requests it explicitly.
 
-### `Sia resume <approved-plan>`
+### `Sia resume <plan>`
 
-The exact path in this directive authorizes reading that plan and no other pre-existing plan. Verify its visible
-approval digest plus compact status comments. New plans keep only `operation`, `workflow`, and `skills` in frontmatter;
-optional one-line footer comments carry base, dirty paths, unattended authority, and concise progress when needed.
-Existing valid legacy plans remain resumable. Refuse stale, unapproved, ambiguous, or inconsistent plans. Other
-artifact kinds need an envelope.
+The exact path authorizes reading that plan and no other pre-existing plan. Validate its compact status comments;
+status beyond pending approval requires a matching digest using the canonical UTF-8/LF convention in `.ai/sia.md`.
+New plans keep only `operation`, `workflow`, and `skills` in frontmatter. Optional one-line footer comments carry base,
+dirty paths, unattended authority, and concise progress when needed.
+
+Existing valid legacy plans remain resumable. A valid pending draft enters Approve and waits for approval; it never
+authorizes Build. Refuse ambiguous or inconsistent plans and handle base drift through the delivery workflow.
+Other artifact kinds need an envelope.
 
 ### `Sia handoff` followed by an envelope
 
@@ -114,9 +117,10 @@ worker message begins with an exact `Sia handoff` line, followed by `handoff_pro
 [orchestration.md](orchestration.md). It fails closed when required fields conflict or are missing, loads exact
 definition paths instead of catalogs, performs only the assigned phase, returns its result, and ends.
 
-The managed protocol contains the canonical YAML-shaped serialization. Every key is required, absent values are
-explicit, exact definition paths are labeled by kind, `final_task` is the last field, and the worker returns the
-documented `handoff_result: 1` shape. Hosts must not invent a looser envelope.
+The managed protocol contains the canonical YAML-shaped serialization. Every core key is required; artifact state is
+required for artifact-backed work and repository baselines for writes. Evidence-only fields may be omitted when not
+useful. Exact definition paths are labeled by kind, `final_task` is last, and the worker returns `handoff_result: 1`.
+Omitted context grants no authority. Full older envelopes remain valid.
 
 ### `Sia stop`
 
@@ -149,7 +153,7 @@ standard work pauses once for an intent envelope and re-prompts only at a bounda
 For delivery, an unattended plan adds immutable one-line `mode`, `ceiling`, and `external` comments only when needed.
 Sia computes and verifies the approval digest before Build; an interactive user approves the displayed draft in plain
 language and never supplies a digest. Automatic approval identifies accepted plan bytes; it does not prove user review.
-Handoffs retain their own complete fields, and `Sia resume <approved-plan>` inherits unattended authority.
+Handoffs retain their own complete fields, and `Sia resume <plan>` inherits unattended authority.
 
 Unattended mode never expands host permissions, bypasses system or external approval interfaces, weakens project rules
 or dirty-worktree safeguards, or authorizes work outside the initial request. Commit, push, pull request, release,

@@ -18,8 +18,6 @@ BLOCKED_FIXTURE=$ROOT/tests/behavior/workflows/fixtures/unattended-blocked-repla
 check_bounded_handoff() {
   for value in \
     'handoff_protocol: 1' \
-    'artifact_id:' \
-    'approved_revision:' \
     'execution_mode:' \
     'authorization_ceiling:' \
     'authorized_external_actions:' \
@@ -29,11 +27,8 @@ check_bounded_handoff() {
     'phase:' \
     'acceptance_criteria:' \
     'repository_root:' \
-    'base_ref:' \
     'definition_paths:' \
     'do_not_load:' \
-    'command_results:' \
-    'usage:' \
     'requested_model_profile:' \
     'final_task:' \
     'handoff_result: 1'; do
@@ -41,7 +36,25 @@ check_bounded_handoff() {
   done
   assert_contains "$PROTOCOL" 'reroute through catalogs' || return 1
   assert_contains "$PROTOCOL" 'Sia handoff' || return 1
+  assert_contains "$PROTOCOL" 'every shown key is required' || return 1
+  assert_contains "$PROTOCOL" 'For artifact-backed work also include artifact_id, artifact_status, approved_revision, and next_transition' || return 1
+  assert_contains "$PROTOCOL" 'include base_ref and staged_paths/unstaged_paths/untracked_paths' || return 1
+  assert_contains "$PROTOCOL" 'Omitted context grants no authority' || return 1
   assert_contains "$PROTOCOL" '.ai/plans/** except exact authorized_plan_paths' || return 1
+  python3 - "$PROTOCOL" <<'PYTEST'
+import re
+import sys
+from pathlib import Path
+body = Path(sys.argv[1]).read_text().split('```yaml\n', 1)[1].split('```', 1)[0]
+keys = re.findall(r'^([a-z_]+):', body, re.M)
+required = set('handoff_protocol execution_mode authorization_ceiling authorized_external_actions '
+               'authorized_plan_paths operation workflow phase requested_outcome approved_scope non_goals '
+               'acceptance_criteria repository_root definition_paths allowed_work exclusions permissions '
+               'do_not_load recovery requested_model_profile model_selection_source final_task'.split())
+assert set(keys) == required and len(keys) == len(required), 'invalid core handoff fields'
+assert keys[-1] == 'final_task', 'handoff task must be last'
+assert re.search(r'^definition_paths:\n  operation: .+\n  workflow: .+\n  skills: .+', body, re.M)
+PYTEST
 }
 
 check_unattended_delivery() {
@@ -117,6 +130,12 @@ check_delivery_is_resumable() {
   assert_contains "$DELIVERY" 'frontmatter has no ID, status, revision' || return 1
   assert_contains "$DELIVERY" 'legacy artifacts unchanged' || return 1
   assert_contains "$DELIVERY" 'same-context execution' || return 1
+  assert_contains "$DELIVERY" 'unavailable isolation alone does not block approved' || return 1
+  assert_contains "$PROTOCOL" 'draft resumes to Approve, never Build' || return 1
+  assert_contains "$DELIVERY" 'A pending draft enters Approve, never Build' || return 1
+  assert_not_contains "$PROTOCOL" 'Refuse ambiguous, missing, unapproved' || return 1
+  assert_contains "$PROTOCOL" 'hash UTF-8 content between the unique approval markers, excluding the markers' || return 1
+  assert_contains "$PROTOCOL" 'CR to LF, preserve all other whitespace' || return 1
   assert_contains "$DELIVERY" 'one interactive approval for standard work' || return 1
   assert_contains "$DELIVERY" 'directly authorizes a compact receipt' || return 1
   assert_contains "$DELIVERY" 'matching approval digest' || return 1
