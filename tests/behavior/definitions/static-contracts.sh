@@ -19,8 +19,7 @@ check_creators() {
     assert_contains "$file" '120 characters' || return 1
   done
   operation=$ROOT/src/managed/.ai/operations/sia/create-operation.md
-  assert_contains "$operation" '`handoff`' || return 1
-  assert_contains "$operation" '`unattended`' || return 1
+  assert_contains "$operation" 'listed in `.ai/sia.md`' || return 1
 }
 
 check_definition_workflow_boundaries() {

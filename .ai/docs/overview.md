@@ -33,8 +33,9 @@ documentation, and deterministic verification. The root `README.md` is the publi
   zero-padded sequence so plan directories sort chronologically.
 - **Lightweight delivery:** eligible work shows an inline receipt before Build instead of a persisted plan; it cannot be
   resumed with `Sia resume`.
-- **Forge mode:** `Sia forge on` enables conversation-scoped direct questions and rapid trivial/lightweight iteration;
-  `Sia forge off`, `Sia stop`, `Sia reload`, or a new conversation ends it.
+- **Forge mode:** `Sia forge on` enables conversation-scoped questions, qualifying direct changes, and inline plans
+  that need approval before changes. It uses no persisted plan; `Sia forge off`, `Sia stop`, `Sia reload`, or a new
+  conversation ends it.
 - **Installer ownership:** Sia replaces only its reserved paths and marked blocks; project content survives refreshes.
 
 ## Dogfood boundary

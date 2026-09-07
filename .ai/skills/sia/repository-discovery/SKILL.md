@@ -34,6 +34,10 @@ when the task's material questions are answered; repeat a lookup only for new un
 Separate direct observations from inference. Cite repository paths for important claims and state confidence when
 evidence is incomplete.
 
+When source evidence invalidates a loaded documentation claim, report its exact path, claim, and contradictory
+evidence. If correcting it is within the authorized phase and scope, use the documentation skill's update rules;
+otherwise leave that specific correction for a later refresh.
+
 Exclude `.ai/plans/**` from repository-wide search, diff, indexing, and discovery commands. Plan content is available
 only when its exact path appears in the conversation or handoff `authorized_plan_paths`; open those paths directly.
 Filename-only inspection may allocate a new plan name but must not become task evidence.

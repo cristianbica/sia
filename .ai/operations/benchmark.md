@@ -24,8 +24,8 @@ repository; it does not change Sia's shipped source or install benchmark behavio
 Required:
 
 - `tool`: exactly `codex` or `claude`;
-- `task`: a curated task identifier or manifest containing a pinned base, hidden actual implementation, evaluator,
-  setup, and project checks.
+- `task`: a curated task identifier or manifest containing a pinned base, hidden actual implementation or private
+  answer rubric, evaluator, setup, and project checks.
 
 Optional:
 
@@ -33,7 +33,8 @@ Optional:
 - `comparator`: omitted, `vanilla`, or one `sia@<git-ref>` value;
 - `run_id`: a unique safe run identifier.
 
-The actual implementation is mandatory for every run and is always evaluated, even when no comparator is selected. The
+An implementation task requires a hidden actual implementation. A read-only answer task instead requires a private
+evidence rubric and needs no patch oracle. The required reference is always evaluated, even without a comparator. The
 current working tree is the primary Sia candidate. A comparator is never allowed to exceed one value. Sia's internal
 `fast` and `reasoning` profile requests remain advisory and are recorded separately from the actual model.
 
@@ -43,20 +44,23 @@ they must never be passed into a candidate workspace or prompt.
 
 ## Intake and validation
 
-Resolve the task manifest before execution. Reject missing or ambiguous actual references, evaluators, base revisions,
-checks, unsafe setup, private or production-derived data, unsupported services, invalid tools, malformed models, or a
+Resolve the task manifest before execution. Reject missing or ambiguous task references, evaluators, base revisions or
+local fixture fingerprints, checks, unsafe setup, private or production-derived data, unsupported services, invalid
+tools, malformed models, or a
 comparator that is neither `vanilla` nor `sia@<git-ref>`. Snapshot the current Sia HEAD, staged paths, unstaged paths,
 and untracked paths; do not silently discard or clean them.
 
-The project corpus currently enforces one task per repository and no external runtime services. Rails application tasks
-must use SQLite. A task remains pending until its pinned setup and checks have been validated by the coordinator; do not
+The pinned public implementation corpus enforces one task per repository and no external runtime services. Local
+read-only fixtures in `.ai/benchmarks/quality/manifest.json` may form an explicit same-repository follow-up sequence.
+Rails application tasks must use SQLite. A task remains pending until its pinned setup and checks have been validated
+by the coordinator; do not
 present pending commands as already verified.
 
 Use the `benchmark` workflow for all preparation, candidate execution, actual reveal, evaluation, reporting, and
 cleanup. Do not run a benchmark, model, dependency install, network command, or external repository command during
 input validation. Do not expose the actual patch, evaluator oracle, or comparator workspace to a candidate.
-For the current Sia candidate, the workflow must run `document repository` before the implementation prompt and report
-that bootstrap separately from implementation time.
+For both current and revision-comparator Sia candidates, run `document repository` before the task and report that
+bootstrap separately and within total effort. Vanilla retains normal discovery and receives no generated Sia docs.
 
 ## Outcome
 

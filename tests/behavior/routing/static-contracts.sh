@@ -5,7 +5,13 @@ set -u
 ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 . "$ROOT/tests/lib/test.sh"
 
-DELIVERY="$ROOT/src/managed/.ai/workflows/sia/delivery.md"
+# Check shared invariants across the split workflow; route selection is tested separately.
+DELIVERY_CONTEXT=$(mktemp "${TMPDIR:-/tmp}/sia-delivery-contracts.XXXXXX") || exit 1
+trap 'rm -f "$DELIVERY_CONTEXT"' EXIT
+cat "$ROOT/src/managed/.ai/workflows/sia/delivery.md" \
+  "$ROOT"/src/managed/.ai/workflows/sia/delivery/*.md >"$DELIVERY_CONTEXT"
+
+DELIVERY=$DELIVERY_CONTEXT
 IMPLEMENT="$ROOT/src/managed/.ai/operations/sia/implement.md"
 ORCHESTRATION="$ROOT/docs/orchestration.md"
 PROMPT_CACHING="$ROOT/docs/prompt-caching.md"
@@ -37,7 +43,6 @@ check_trivial_contract() {
 
 check_lightweight_contract() {
   assert_contains "$DELIVERY" 'directly authorizes a compact receipt' || return 1
-  assert_contains "$DELIVERY" 'activating request authorizes lightweight' || return 1
   assert_contains "$DELIVERY" 'one Build handoff' || return 1
   assert_contains "$DELIVERY" 'independent review worker' || return 1
   assert_contains "$DELIVERY" 'Promote before a new' || return 1
@@ -46,7 +51,6 @@ check_lightweight_contract() {
   assert_contains "$DELIVERY" 'managed-Sia' || return 1
   assert_contains "$DELIVERY" 'shows an inline compact receipt' || return 1
   assert_contains "$DELIVERY" 'outcome, exact paths or bounded area' || return 1
-  assert_contains "$DELIVERY" 'does not ask for another approval' || return 1
   assert_contains "$DELIVERY" 'does not write `.ai/plans/`' || return 1
   assert_contains "$DELIVERY" 'become a `Sia resume` target' || return 1
   assert_contains "$ORCHESTRATION" 'It does not create a plan artifact' || return 1

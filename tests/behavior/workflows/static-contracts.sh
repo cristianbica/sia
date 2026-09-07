@@ -5,8 +5,14 @@ set -u
 ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 . "$ROOT/tests/lib/test.sh"
 
+# Check shared invariants across the split workflow; route selection is tested separately.
+DELIVERY_CONTEXT=$(mktemp "${TMPDIR:-/tmp}/sia-delivery-contracts.XXXXXX") || exit 1
+trap 'rm -f "$DELIVERY_CONTEXT"' EXIT
+cat "$ROOT/src/managed/.ai/workflows/sia/delivery.md" \
+  "$ROOT"/src/managed/.ai/workflows/sia/delivery/*.md >"$DELIVERY_CONTEXT"
+
 PROTOCOL=$ROOT/src/managed/.ai/sia.md
-DELIVERY=$ROOT/src/managed/.ai/workflows/sia/delivery.md
+DELIVERY=$DELIVERY_CONTEXT
 INVESTIGATION=$ROOT/src/managed/.ai/workflows/sia/investigation.md
 INVESTIGATE=$ROOT/src/managed/.ai/operations/sia/investigate.md
 REVIEW=$ROOT/src/managed/.ai/workflows/sia/review.md

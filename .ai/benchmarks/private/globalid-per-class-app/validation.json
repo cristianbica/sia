@@ -1,0 +1,81 @@
+{
+  "schema": "sia-benchmark-validation-1",
+  "task": "globalid-per-class-app",
+  "visibility": "coordinator-only",
+  "status": "setup-and-reference-validated",
+  "run_directory": "/tmp/sia-benchmark/globalid-validation-20260907",
+  "base_revision": "c81267b4ca2eb41aa1d39178e281fbf38b6e5685",
+  "actual_revision": "c6c7ac61ff17e7af5df89352c6bd934c89e88975",
+  "source": "https://api.github.com/repos/rails/globalid/tarball/<revision>",
+  "archive_sha256": {
+    "base": "9808b828fef2b1607e77ebe9e40e8fbdbb06df4f197a1f6253854d3ee7cb5e22",
+    "actual": "acb9bf33f28343614c49e3d608dad6a5ce7b6155c3b66503164fec9689ce1917"
+  },
+  "ruby": "4.0.5",
+  "bundler": "4.0.12 (lockfile-selected; launcher 4.0.10)",
+  "dependency_lock_sha256": "181e72bbdee1bd5a9fe23e69cbe9738a38279ae5f7148be039fad09fd0dce0f0",
+  "evaluator_sha256": "5f34db171ac5d83c958267e7c57f4044fc2da4f70b60947ddf5b39dbd06f733b",
+  "environment": {
+    "BUNDLE_USER_HOME": "/tmp/sia-benchmark/globalid-validation-20260907/bundler",
+    "BUNDLE_PATH": "/tmp/sia-benchmark/globalid-validation-20260907/gems",
+    "BUNDLE_APP_CONFIG": "/tmp/sia-benchmark/globalid-validation-20260907/<side>-config"
+  },
+  "commands": [
+    {
+      "side": "base",
+      "command": "bundle install",
+      "exit_code": 0,
+      "evidence": "base-setup.log"
+    },
+    {
+      "side": "actual",
+      "command": "bundle install --local",
+      "exit_code": 0,
+      "evidence": "actual-setup.log"
+    },
+    {
+      "side": "base",
+      "command": "bundle exec rake test",
+      "exit_code": 0,
+      "tests": 166,
+      "assertions": 329,
+      "evidence": "base-tests.log"
+    },
+    {
+      "side": "actual",
+      "command": "bundle exec rake test",
+      "exit_code": 0,
+      "tests": 169,
+      "assertions": 335,
+      "evidence": "actual-tests.log"
+    },
+    {
+      "side": "base",
+      "command": "bundle exec ruby -Ilib <coordinator-private>/evaluator.rb",
+      "exit_code": 1,
+      "tests": 6,
+      "assertions": 3,
+      "failures": 1,
+      "errors": 4,
+      "classification": "expected-missing-task-behavior",
+      "evidence": "base-evaluator.log"
+    },
+    {
+      "side": "actual",
+      "command": "bundle exec ruby -Ilib <coordinator-private>/evaluator.rb",
+      "exit_code": 0,
+      "tests": 6,
+      "assertions": 22,
+      "evidence": "actual-evaluator.log"
+    }
+  ],
+  "total_setup_seconds": "unknown",
+  "model_calls": 0,
+  "model_tokens": "not-applicable",
+  "model_cost": "not-applicable",
+  "limits": [
+    "One Ruby/platform/dependency resolution was exercised; no model comparison.",
+    "Test process timings in logs exclude dependency/network setup; total preparation time was not instrumented.",
+    "Base oracle errors are missing requested public methods, not dependency or load failures."
+  ]
+}

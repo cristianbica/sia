@@ -10,9 +10,10 @@ development tooling for this repository, not a shipped Sia workflow.
 
 ## Inputs and invariants
 
-The task manifest is required and must provide a public task description, pinned base revision, hidden actual
-revision or artifact, evaluator, setup and check commands, dependency constraints, and a bounded task scope. A
-missing actual or evaluator blocks before any candidate command.
+The task manifest is required and must provide a public task description, pinned base revision (or local fixture
+fingerprint), task reference, evaluator, setup and check commands, dependency constraints, and a bounded task scope. A
+missing actual or evaluator blocks an implementation task before any candidate command. For a read-only task, use
+a private evidence rubric instead of an actual patch; its public workspace and answer prompt are the candidate input.
 
 Required runtime input:
 
@@ -24,7 +25,8 @@ Optional runtime inputs:
 - `comparator`: omitted, `vanilla`, or exactly one `sia@<git-ref>` value;
 - `run_id`: a unique safe identifier, generated when omitted.
 
-The current Sia checkout is always the primary candidate. The actual implementation is always the oracle. A comparator
+The current Sia checkout is always the primary candidate. The task reference is a hidden actual implementation or,
+for read-only work, a private evidence rubric. A comparator
 is optional but never more than one. Sia's internal `fast` and `reasoning` requests remain advisory; the host chooses
 what it supports. Record the requested profile, requested model, and actual model separately.
 
@@ -55,9 +57,15 @@ its `source_url`, `actual_revision`, or `evaluator` fields into a candidate work
 
 ## Select task
 
+Local quality tasks inherit `quality/manifest.json` defaults for environment, timeout, setup, scope, and checks.
+Validate the complete pinned workspace file/hash map before selection; reject drift instead of silently repinning.
+Empty setup commands mean no dependencies are needed, not missing validation. Private rubric review and workspace
+fingerprinting are the answer-task checks; the coordinator offline command validates fixture readiness only.
+
 Read only the selected task manifest and the minimum repository metadata needed to validate it. Confirm the public task,
-base revision, actual reference, evaluator, setup, checks, timeout, and supported environment. Reject private or
-production-derived data, secrets, unsafe install scripts, unbounded services, or a task that requires an external
+base revision or fixture fingerprint, implementation reference or answer rubric, evaluator, setup, checks, timeout,
+and supported environment. Reject private or production-derived data, secrets, unsafe install scripts, unbounded
+services, or a task that requires an external
 service the approved run cannot provide.
 
 For the initial corpus, enforce one task per repository and SQLite for Rails applications. Treat setup and check
@@ -70,8 +78,10 @@ exclusions. Do not inspect the actual patch, changed files, later commits, or an
 ## Prepare isolated workspaces
 
 Create only run-owned paths below `/tmp/sia-benchmark/<run-id>/`. Materialize a detached target checkout from the pinned
-base for each candidate. Strip remotes, later Git objects, credentials, host-agent files, Sia definitions, sibling
-workspaces, and any implementation-equivalent evidence. The current Sia source snapshot is copied or referenced only
+base for each implementation candidate. Local answer tasks copy only the declared public workspace and task prompt,
+recording its fingerprint; never copy their private rubric or enclosing manifest. Strip remotes, later Git objects,
+credentials, host-agent files, Sia definitions, sibling workspaces, and any implementation-equivalent evidence.
+The current Sia source snapshot is copied or referenced only
 as the installer source for the primary candidate.
 
 Install dependencies only when the approved task manifest and command plan name them. Run setup before candidate
@@ -87,10 +97,10 @@ not contain the actual revision, evaluator oracle, comparator identity, or sibli
 Give every candidate the same validation instruction: run its own proportionate focused checks, but do not run the
 manifest's broad checks. After each candidate exits, the coordinator runs those same manifest checks in isolation.
 
-Before asking Sia to implement the task, bootstrap its repository documentation with the Sia `document repository`
-operation. Run that bootstrap in the candidate target, record its elapsed time and evidence separately, and do not
-include documentation work in the measured implementation time. If documentation bootstrap needs an unapproved action,
-fails, or times out, stop or return `blocked` rather than silently continuing with an unrecorded context.
+Before asking Sia to perform the task, bootstrap its repository documentation with the Sia `document repository`
+operation. Run that bootstrap in the candidate target, record its elapsed time and evidence separately, and distinguish
+implementation time from bootstrap time while including both in total task effort. If documentation bootstrap needs an
+unapproved action, fails, or times out, stop or return `blocked` rather than silently continuing with unrecorded context.
 
 If Sia is installed in the target, use the current checkout snapshot and record its HEAD and dirty paths. Preserve the
 normal Sia workflow and record selected route, route promotions, phase profiles, worker count, isolation mechanism,
@@ -101,6 +111,8 @@ wait behavior, process ID, exit status, timeout, changed paths, and host-reporte
 When `comparator` is omitted, skip this phase. For `vanilla`, run the same task directly through the selected host
 without Sia. For `sia@<git-ref>`, install only that requested Sia revision into a separate target. Hold task, base,
 tool, model request, permissions, timeout, setup, candidate validation instruction, and coordinator checks constant.
+Bootstrap repository documentation equivalently for current Sia and `sia@<git-ref>`; include each bootstrap in its
+totals. Vanilla receives no generated Sia docs and its normal discovery cost remains in its measured task.
 Never let the comparator read the actual or the other candidate's workspace.
 
 Wait for every candidate process to exit or reach its approved timeout, then confirm it is no longer running. Progress
@@ -108,8 +120,14 @@ events, JSONL output, and partial responses are evidence only; they never establ
 
 ## Reveal and evaluate
 
-Only after every candidate has exited, materialize the actual implementation in a separate run-owned workspace. Run the
-approved evaluator and project checks against each candidate and the actual. Keep the actual patch and evaluator oracle
+Snapshot after approved setup/bootstrap; read-only task execution must preserve that workspace. Evaluate answers and
+tool evidence against the private rubric; do not require or reward an implementation patch. For declared follow-up
+tasks, preserve the prior candidate session and
+public evidence only; record every turn and cumulative cost. Missing continuation makes that assertion unavailable.
+
+For implementation tasks, only after every candidate has exited, materialize the actual implementation in a separate
+run-owned workspace. Run the approved evaluator and project checks against each candidate and the actual. Keep the
+actual patch and evaluator oracle
 outside all candidate workspaces and never include them in candidate prompts.
 
 Evaluate correctness and safety before efficiency. Use the `benchmark` skill's task-specific rubric. Distinguish
@@ -122,16 +140,20 @@ Write a report under the approved run-owned evidence path. Include task and revi
 tool, requested model, actual model, and requested profiles; prompts and permissions; process and timeout evidence;
 changed paths and checks; route, worker, wait, isolation, elapsed, and usage telemetry; correctness and code-quality
 scores; failures; residual risk; and cleanup status. Separate setup or documentation bootstrap time from measured
-implementation time. Do not claim a general conclusion from one task or one stochastic run.
+implementation time, and report total cold-start cost and amortized cost across successfully reviewed tasks. Include
+workers, reviews, retries, failures, and user effort; report summed work duration separately from observed wall time.
+Use `.ai/skills/benchmark/report-template.md` and its `accounting.md` schema. Record an explicit reviewed quality verdict
+before interpreting efficiency. Do not claim a general conclusion from one task or one stochastic run.
 
 ## Cleanup and terminal states
 
 After the report, perform only the exact approved cleanup of run-owned workspaces and processes. Preserve logs and
 partial evidence on failure. Never delete current-repository files, unrelated temporary paths, or another run.
 
-Return `complete` only when all required candidate processes and checks have terminal evidence, the actual was revealed
-only afterward, the report is complete, and cleanup is verified. Return `blocked` for missing inputs, approvals,
-environment support, or clean-room separation. Return `failed` for a non-successful runner, evaluator, or required
+Return `complete` only when all required candidate processes and checks have terminal evidence, private reference
+evidence remained hidden throughout candidate execution, the report is complete, and cleanup is verified. Return
+`blocked` for missing inputs, approvals, environment support, or clean-room separation. Return `failed` for a
+non-successful runner, evaluator, or required
 cleanup after preserving evidence. Cancellation stops run-owned processes, performs only approved cleanup, and reports
 residual paths; it does not claim a score.
 

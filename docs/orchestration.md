@@ -29,6 +29,24 @@ Before the first write, state the route and its authorization basis. A standard 
 interactive Build requires approval of the presented plan. Trivial/lightweight requests directly authorize only their
 qualifying scope. Forge names its direct or approved-inline lane, and unattended names its explicit invocation.
 
+## Delivery context loading
+
+The shipped delivery workflow is a route guide. It links three supporting documents: Forge rules, standard
+planning/approval and artifact validation, and shared execution. Load only the current route/phase row. Standard Plan
+loads its approval guidance without Forge or Build instructions; after approval, load execution when needed. Resume
+validates the artifact first, then follows its status. Reuse unchanged guidance already in the conversation.
+
+Supporting documents are managed files under `.ai/workflows/sia/delivery/`, not extra workflow catalog entries.
+CUSTOM workflows own their supporting links; shipped files never attach to an override implicitly. Handoffs carry
+exact required support paths in `definition_paths.support`, alongside the effective operation/workflow/skills.
+Missing required support fails closed instead of loading sibling files speculatively.
+
+`scripts/report-context --baseline-ref <revision>` compares the declared default definition bundles in words and UTF-8
+bytes. It reads only explicit source paths, excluding plans. The report includes a common intake bundle for comparison;
+actual loads vary by operation and host. It excludes project overrides, task docs/code, prior turns, and accumulated
+later phases. It does not measure tokenizer output, cache billing, or improved model behavior. Retain the existing
+line budgets as size guards and use realistic benchmark quality and total-effort results for adoption decisions.
+
 ## Isolation model
 
 Phase isolation reduces steering from rejected planning ideas and builder self-justification. The portable mechanism is

@@ -80,6 +80,17 @@ tasks:
     evaluator:
       method: task-contract-plus-checks
       oracle: actual_revision
+      command: bundle exec ruby -Ilib <coordinator-private>/globalid-per-class-app/evaluator.rb
+      private_path: private/globalid-per-class-app/evaluator.rb
+    validation:
+      status: setup-and-reference-validated
+      evidence: private/globalid-per-class-app/validation.json
+      environment: ruby-4.0.5-bundler-4.0.12-linux-x86_64
+      existing_base_checks: passed-166-tests
+      existing_actual_checks: passed-169-tests
+      evaluator_base: expected-task-failure
+      evaluator_actual: passed-6-tests
+      live_model_comparison: not-run
 
   - id: dry-monads-right-biased-or
     difficulty: light
@@ -188,3 +199,6 @@ tasks:
     evaluator:
       method: task-contract-plus-checks
       oracle: actual_revision
+
+# Local answer tasks use private rubrics, not implementation patch oracles.
+quality_corpus: quality/manifest.json

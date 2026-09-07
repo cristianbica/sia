@@ -1,0 +1,90 @@
+{
+  "schema": "sia-quality-fixtures-1",
+  "workspace": "workspace",
+  "candidate_exclusions": [
+    "private",
+    "manifest.json"
+  ],
+  "tasks": [
+    {
+      "id": "ownership",
+      "mode": "read-only",
+      "prompt": "Sia investigate where receipt formatting belongs and identify the existing call path and pattern for adding a receipt field. Report exact source evidence and the smallest affected area; do not implement anything.",
+      "rubric": "private/rubrics.json#ownership"
+    },
+    {
+      "id": "diagnosis",
+      "mode": "read-only",
+      "prompt": "Sia investigate why inventory falls twice for evt_42 although only one receipt is sent. Use events.json and the implementation. Explain the causal order, distinguish evidence from speculation, and propose one focused regression check without editing.",
+      "rubric": "private/rubrics.json#diagnosis"
+    },
+    {
+      "id": "stale-docs",
+      "mode": "read-only",
+      "prompt": "Sia investigate whether docs/checkout.md matches the implementation. Identify the exact incorrect claim and give its corrected wording with source evidence. Do not edit or refresh unrelated documentation.",
+      "rubric": "private/rubrics.json#stale-docs"
+    },
+    {
+      "id": "review",
+      "mode": "read-only",
+      "prompt": "Sia review proposed.diff against the current files. Request parameters are attacker-controlled; current_user is established by trusted authentication. Report actionable defects with impact and source locations. Do not edit.",
+      "rubric": "private/rubrics.json#review"
+    },
+    {
+      "id": "knowledge-reuse",
+      "mode": "read-only",
+      "requires_prior": "ownership",
+      "prompt": "Sia investigate the smallest change needed to add currency to receipts. Continue from your earlier ownership investigation and its evidence; verify any fact that materially affects this new task. Order dictionaries will supply currency. Report affected code and a focused check without implementation or unrelated discovery.",
+      "rubric": "private/rubrics.json#knowledge-reuse"
+    }
+  ],
+  "workspace_fingerprint": {
+    "algorithm": "sha256-per-file",
+    "files": {
+      "docs/checkout.md": "46c2b132a9c3967ac75984f3d614d4941451ae01fe22ca9797044e3be4b942ec",
+      "events.json": "a45af36be109b84dd68f9745947863c1ac8d6eb2053209981e61de66d9a95b75",
+      "proposed.diff": "f135ff43a2cf831ac94d4aeb10d42b5a62edd7a25b58ac241b930ab134928141",
+      "shop/checkout.py": "f3b7c4bf0b772b8fc35c5b6cf3ecd4653d61b9d8ceb5516c4fabd6766b74d577",
+      "shop/inventory.py": "8064c6258cabebd39d4c8cc7106011c5ed221fbe1f0eec9dbed9481f450c99d9",
+      "shop/receipts.py": "577b8aea502072677f70e4c37f6daec83adc85fca5428c6f1c4be2f595bcb713",
+      "shop/reports.py": "b765f94390cfffdf8faa178409184c2499f99cda9babe1b67445f6d65150ed56"
+    }
+  },
+  "defaults": {
+    "supported_environment": {
+      "os": [
+        "Linux",
+        "macOS"
+      ],
+      "python": ">=3.8",
+      "hosts": [
+        "codex",
+        "claude"
+      ],
+      "external_services": [],
+      "dependencies": []
+    },
+    "timeout_seconds": 120,
+    "scope": "Read-only public workspace after approved Sia bootstrap; no implementation edits.",
+    "setup": {
+      "commands": [],
+      "procedure": "Verify pinned files, copy only workspace into an isolated candidate root, perform approved candidate bootstrap, snapshot files before the task."
+    },
+    "checks": [
+      {
+        "kind": "offline-fixture-contracts",
+        "cwd": "coordinator-source-root",
+        "command": "PYTHONDONTWRITEBYTECODE=1 python3 .ai/skills/benchmark/scripts/test_accounting.py"
+      },
+      {
+        "kind": "workspace-unchanged",
+        "baseline": "post-bootstrap snapshot",
+        "evaluation": "Compare candidate files after task to the recorded snapshot."
+      },
+      {
+        "kind": "private-answer-rubric",
+        "evaluation": "Coordinator reviews answer and tool evidence against the selected task rubric after candidate exit."
+      }
+    ]
+  }
+}

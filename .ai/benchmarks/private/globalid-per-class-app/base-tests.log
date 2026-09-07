@@ -1,0 +1,12 @@
+/home/cristi/.local/share/mise/installs/ruby/4.0.5/bin/ruby -w -I"lib:test" /tmp/sia-benchmark/globalid-validation-20260907/gems/ruby/4.0.0/gems/rake-13.3.0/lib/rake/rake_test_loader.rb "test/cases/global_id_test.rb" "test/cases/global_identification_test.rb" "test/cases/global_locator_test.rb" "test/cases/pattern_matching_test.rb" "test/cases/railtie_test.rb" "test/cases/signed_global_id_test.rb" "test/cases/uri_gid_test.rb" "test/cases/verifier_test.rb" 
+/tmp/sia-benchmark/globalid-validation-20260907/gems/ruby/4.0.0/gems/i18n-1.14.7/lib/i18n/exceptions.rb:3: warning: CGI library is removed from Ruby 4.0. Please use cgi/escape instead for CGI.escape and CGI.unescape features.
+If you need to use the full features of CGI library, Please install cgi gem.
+Run options: --seed 54116
+
+# Running:
+
+......................................................................................................................................................................
+
+Finished in 0.712997s, 232.8201 runs/s, 461.4326 assertions/s.
+
+166 runs, 329 assertions, 0 failures, 0 errors, 0 skips

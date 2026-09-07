@@ -120,7 +120,8 @@ definition paths instead of catalogs, performs only the assigned phase, returns 
 The managed protocol contains the canonical YAML-shaped serialization. Every core key is required; artifact state is
 required for artifact-backed work and repository baselines for writes. Evidence-only fields may be omitted when not
 useful. Exact definition paths are labeled by kind, `final_task` is last, and the worker returns `handoff_result: 1`.
-Omitted context grants no authority. Full older envelopes remain valid.
+Include exact `definition_paths.support` when the effective workflow requires supporting documents.
+Omitted context grants no authority. Full older envelopes remain valid when no required support is missing.
 
 ### `Sia stop`
 

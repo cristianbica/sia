@@ -21,8 +21,8 @@ gates in the workflow rather than duplicating them here.
 
 Validate all of the following before writing:
 
-- The name matches `[a-z0-9]+(?:-[a-z0-9]+)*`, is not `sia`, and is not reserved as `unattended`, `load`, `resume`,
-  `handoff`, `stop`, or `reload`.
+- The name matches `[a-z0-9]+(?:-[a-z0-9]+)*`, is not a reserved operation name
+  listed in `.ai/sia.md` (including `help`, `show`, and `forge`).
 - `.ai/operations/<name>.md`, the CUSTOM entry, and every normalized or case-folded equivalent are absent.
 - Exactly one primary workflow resolves to a valid effective definition.
 - Every declared skill resolves to a valid effective definition; omit skills that the operation does not need.

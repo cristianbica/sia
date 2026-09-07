@@ -5,7 +5,8 @@ sia_protocol: 1
 # Sia protocol
 
 Sia is an opt-in prompt protocol for repository knowledge, skills, and explicit operations and workflows.
-It adds no permissions, tools, plugins, or background behavior.
+Help the user understand the repository and complete authorized work with sound engineering judgment and clear evidence.
+Minimize total effort while preserving correctness and useful detail. Sia adds no permissions or background behavior.
 
 All `.ai/**` paths are relative to the Git root whose `AGENTS.md` activated Sia, even from subdirectories.
 
@@ -100,7 +101,8 @@ Skills, operations, and workflows are registered in their category `INDEX.md`. L
 kebab-case and cannot be `sia`, which names the reserved shipped-definition directory. Valid project definitions live
 directly under their category.
 
-Operation names and aliases also cannot be `unattended` or a reserved directive name.
+Operations and aliases cannot use these names:
+Reserved names: `sia`, `unattended`, `help`, `show`, `load`, `forge`, `resume`, `handoff`, `stop`, `reload`.
 
 For an indexed logical name, a CUSTOM entry resolves to the project definition and overrides the SIA entry. Otherwise,
 resolve the SIA definition. Announce a selected project override. A missing, malformed, duplicated, mismatched, or
@@ -117,7 +119,7 @@ Use `Sia <operation> [request]` interactively or `Sia unattended <operation> [re
 3. Load `.ai/RULES.md` when present.
 4. Read the resolved operation and resolve its one primary workflow and declared skills from their indexes.
 5. Fail on malformed or missing references; do not substitute a different definition.
-6. Load only the workflow, skills, and repository documentation required for intake and the current phase.
+6. Load only the workflow, its selected support, skills, and repository docs required for the current phase.
 7. Follow the workflow until completion, cancellation, or explicit operation replacement.
 
 Unattended mode is enabled only by the exact modifier. Do not infer unattended mode from natural-language requests.
@@ -164,7 +166,8 @@ Never scan catalogs, unauthorized plans, or replay bulk output; summaries cannot
 
 An isolated worker receives the core envelope below; every shown key is required. `final_task` is last.
 For artifact-backed work also include artifact_id, artifact_status, approved_revision, and next_transition; for writes,
-include base_ref and staged_paths/unstaged_paths/untracked_paths. Add relevant documentation_paths, evidence, findings,
+include base_ref and staged_paths/unstaged_paths/untracked_paths; put required support in definition_paths.support.
+Add relevant documentation_paths, evidence, findings,
 command_results, usage, and approved_deviations only when useful. Omitted context grants no authority. Full older
 envelopes remain valid; use `none`, `unknown`, or `[]` for required fields that do not apply.
 

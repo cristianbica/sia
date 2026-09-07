@@ -1,0 +1,38 @@
+Run options: --seed 30915
+
+# Running:
+
+EE.EFE
+
+Finished in 0.060979s, 98.3947 runs/s, 49.1974 assertions/s.
+
+  1) Error:
+PerClassAppContract#test_subclass_inherits_until_it_configures_its_own_default:
+NoMethodError: undefined method 'global_id_app=' for class AppContractFixture::Configured
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:37:in 'PerClassAppContract#configured'
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:68:in 'PerClassAppContract#test_subclass_inherits_until_it_configures_its_own_default'
+
+  2) Error:
+PerClassAppContract#test_class_default_applies_to_normal_signed_and_parameter_aliases:
+NoMethodError: undefined method 'global_id_app=' for class AppContractFixture::Configured
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:37:in 'PerClassAppContract#configured'
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:48:in 'PerClassAppContract#test_class_default_applies_to_normal_signed_and_parameter_aliases'
+
+  3) Error:
+PerClassAppContract#test_explicit_options_win_without_mutating_caller_hash:
+NoMethodError: undefined method 'global_id_app=' for class AppContractFixture::Configured
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:37:in 'PerClassAppContract#configured'
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:59:in 'PerClassAppContract#test_explicit_options_win_without_mutating_caller_hash'
+
+  4) Failure:
+PerClassAppContract#test_aliases_dispatch_to_overridden_methods [/home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:78]:
+Expected: "method-app"
+  Actual: "global-default"
+
+  5) Error:
+PerClassAppContract#test_invalid_class_app_uses_existing_validation:
+NoMethodError: undefined method 'global_id_app=' for class AppContractFixture::Configured
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:37:in 'PerClassAppContract#configured'
+    /home/cristi/Projects/bcd/sia/.ai/benchmarks/private/globalid-per-class-app/evaluator.rb:85:in 'PerClassAppContract#test_invalid_class_app_uses_existing_validation'
+
+6 runs, 3 assertions, 1 failures, 4 errors, 0 skips

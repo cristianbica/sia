@@ -32,8 +32,8 @@ category.
 - Names are unqualified: consumers use `testing`, never `sia/testing`.
 - Case-folding or normalized-name collisions are errors on every platform.
 - The logical name `sia` is reserved for shipped-definition directories in every category.
-- Operation names and aliases `load`, `resume`, `handoff`, `stop`, `reload`, and `unattended` are reserved by the
-  protocol and cannot be created or cataloged.
+- Operation names and aliases must exclude the complete reserved list in the canonical `.ai/sia.md`, including
+  `help`, `show`, and `forge`; creators and validators use that same list.
 
 ## Index contract
 
@@ -125,6 +125,8 @@ skills:
 ```
 
 The body defines intake, operation-specific constraints, and expected outcome. The workflow owns phases and gates.
+A workflow may link supporting documents with explicit when-to-load instructions. Supporting files are not additional
+cataloged workflows; only the effective workflow decides which apply. Keep their exact paths in bounded handoffs.
 Operation aliases remain deterministic triggers. After the explicit `Sia` prefix, a free-form request may select one
 operation only when its action intent and the effective catalog make the match high-confidence; it is never an always-on
 keyword system.

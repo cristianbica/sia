@@ -14,15 +14,9 @@ Reverify existing repository knowledge, repair stale claims, and keep its routin
 ## Intake
 
 - Resolve the requested document, subject, path scope, or stale-claim concern.
-- Read the root router and follow only routes relevant to that target.
-- Use freshness metadata as a clue, not as proof that a document is current or stale.
-
-Use the documentation workflow in refresh mode. Compare claims and routes with current source, tests, configuration,
-and verified commands. Correct unsupported or obsolete content, preserve still-valid knowledge, and update only the
-target documents and nearest indexes. Do not perform a repository-wide rewrite unless the user explicitly requests and
-scopes one.
+- Select refresh mode for that target. A repository-wide request must explicitly define its scope.
 
 ## Outcome
 
-Report refreshed and repaired paths, important claims confirmed or changed, evidence used, unresolved uncertainty, and
-documentation that was deliberately left outside scope. Recommend a delivery operation if source changes are needed.
+Use the documentation workflow for writes, review, and reporting. Return refreshed knowledge with the status of the
+inspected claims; leave unrelated documents outside scope.

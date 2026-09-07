@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Report declared Sia delivery context size; this does not measure model tokens or billing."""
+import argparse
+from pathlib import Path, PurePosixPath
+import re
+import subprocess
+
+ROOT = Path(__file__).resolve().parent.parent
+WORKFLOW = 'src/managed/.ai/workflows/sia/delivery.md'
+COMMON = ['src/managed/.ai/sia.md', 'src/seed/.ai/RULES.md',
+          'src/managed/.ai/operations/sia/implement.md', 'src/seed/.ai/docs/INDEX.md']
+COMMON += [f'src/managed/catalogs/{name}.md' for name in ('operations', 'workflows', 'skills')]
+COMMON += [f'src/managed/.ai/skills/sia/{name}/SKILL.md' for name in ('repository-discovery', 'testing')]
+ROUTES = ('trivial', 'lightweight', 'standard-plan', 'standard-execute', 'standard-resume',
+          'forge-intake', 'forge-execute')
+
+
+def read(path, ref=None):
+    if ref:
+        return subprocess.check_output(['git', 'show', f'{ref}:{path}'], cwd=ROOT, text=True)
+    return (ROOT / path).read_text()
+
+
+def support_map(body):
+    rows = {}
+    for name, links in re.findall(r'^\| ([a-z]+(?:-[a-z]+)?) \| (.+) \|$', body, re.M):
+        if name not in ROUTES:
+            raise ValueError(f'unknown delivery route: {name}')
+        paths = re.findall(r'\]\(([^)]+)\)', links)
+        if name in rows or (not paths and links != 'none'):
+            raise ValueError(f'invalid delivery row: {name}')
+        for path in paths:
+            if not path.startswith('delivery/') or '..' in PurePosixPath(path).parts:
+                raise ValueError(f'invalid delivery support path: {path}')
+        rows[name] = [str(PurePosixPath(WORKFLOW).parent / path) for path in paths]
+    if set(rows) != set(ROUTES):
+        raise ValueError('delivery table must define every route exactly once')
+    return rows
+
+
+def measure(ref=None, legacy=False):
+    body = read(WORKFLOW, ref)
+    routes = {route: [] for route in ROUTES} if legacy else support_map(body)
+    result = {}
+    for route, support in routes.items():
+        paths = list(dict.fromkeys(COMMON + [WORKFLOW] + support))
+        texts = [read(path, ref) for path in paths]
+        result[route] = {'documents': len(paths), 'words': sum(len(s.split()) for s in texts),
+                         'bytes': sum(len(s.encode('utf-8')) for s in texts), 'paths': paths}
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--baseline-ref', help='optional earlier source revision; only explicit definition paths are read')
+    args = parser.parse_args()
+    current = measure()
+    baseline = None
+    if args.baseline_ref:
+        body = read(WORKFLOW, args.baseline_ref)
+        baseline = measure(args.baseline_ref, legacy='## Load only the current route and phase' not in body)
+    print('route\tdocuments\twords\tUTF8_bytes' + ('\tbaseline_words\tword_change' if baseline else ''))
+    for route, values in current.items():
+        row = [route, values['documents'], values['words'], values['bytes']]
+        if baseline:
+            row += [baseline[route]['words'], values['words'] - baseline[route]['words']]
+        print('\t'.join(map(str, row)))
+    print('Static cold-load estimate: common intake definitions plus selected support. Not a model-token or cost claim.')
+    print('Excludes host instructions, project overrides, task docs/code, prior conversation, and later phase accumulation.')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

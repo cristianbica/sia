@@ -104,6 +104,8 @@ Rules:
 - Verify behavior-changing assumptions against current source even when the docs appear current.
 - Treat `last_verified_ref` as a freshness clue, not proof that unrelated later commits invalidated the document.
 - Avoid comprehensive class, function, route, schema, or dependency dumps.
+- If current evidence invalidates a loaded claim, update it within the current phase and authorized scope, or report
+  the exact document, claim, and contradicting evidence for targeted refresh. Do not start a broad automatic audit.
 
 ## Documenting operations
 
@@ -111,8 +113,13 @@ The `document` operation handles initial repository documentation and target-sco
 work. `refresh-docs` performs targeted refresh, stale-claim audit, and index repair. Neither uses the full delivery gate
 unless product/source changes become necessary.
 
+Operations own intake and target selection; the documentation workflow owns phases, permissions, and reporting.
+The documentation skill owns knowledge format, evidence, freshness, and quality checks. Repository documents hold the
+verified facts rather than repeating those instructions.
+
 During delivery, documentation impact is handled in Build or Fix before final review. Ship writes only plan completion
-state by default, then may offer explicit interactive deletion of the exact completed plan; unattended runs retain it.
+state by default and retains the plan without prompting. Deleting an exact completed plan requires a separate explicit
+user request.
 The final handed-off diff—including documentation—has been reviewed and validated.
 
 Approved future work belongs in `.ai/plans/`, not `.ai/docs/`.

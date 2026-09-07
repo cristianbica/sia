@@ -1,0 +1,1 @@
+[{"event_id":"evt_42","quantity":2,"stock_before":10,"stock_after":8,"receipt_sent":true},{"event_id":"evt_42","quantity":2,"stock_before":8,"stock_after":6,"receipt_sent":false}]

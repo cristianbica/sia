@@ -35,6 +35,9 @@ test_clean_install_creates_the_four_owned_shapes() {
     .ai/skills/sia/testing/SKILL.md \
     .ai/operations/sia/implement.md \
     .ai/workflows/sia/delivery.md \
+    .ai/workflows/sia/delivery/forge.md \
+    .ai/workflows/sia/delivery/standard.md \
+    .ai/workflows/sia/delivery/execution.md \
     .ai/RULES.md \
     .ai/docs/INDEX.md \
     .ai/skills/INDEX.md \
@@ -49,6 +52,23 @@ test_clean_install_creates_the_four_owned_shapes() {
   for path in AGENTS.md .claude/CLAUDE.md .ai/RULES.md .ai/docs/INDEX.md .ai/skills/INDEX.md; do
     assert_equal '-rw-r--r--' "$(file_permissions "$repo/$path")" \
       "new repository file has unexpected permissions: $path" || return 1
+  done
+}
+
+test_missing_delivery_support_fails_before_writes() {
+  source_copy="$TMP_ROOT/missing-support"
+  mkdir -p "$source_copy"
+  cp -R "$ROOT/src" "$source_copy/src" || return 1
+  for support in forge standard execution; do
+    missing="$source_copy/src/managed/.ai/workflows/sia/delivery/$support.md"
+    rm "$missing" || return 1
+    repo=$(new_repo) || return 1
+    if (cd "$repo" && SOURCE_DIR="$source_copy" "$INSTALL") >"$TMP_ROOT/support.log" 2>&1; then
+      fail "installed without required $support support"; return 1
+    fi
+    assert_contains "$TMP_ROOT/support.log" 'Sia source file is invalid' || return 1
+    [ ! -e "$repo/.ai" ] || { fail 'invalid source wrote installed files'; return 1; }
+    cp "$ROOT/src/managed/.ai/workflows/sia/delivery/$support.md" "$missing" || return 1
   done
 }
 
@@ -254,6 +274,7 @@ test_arguments_are_not_supported() {
   [ ! -e "$repo/.ai" ] || fail 'unsupported command argument changed the repository'
 }
 
+run_case 'missing delivery support fails before any install writes' test_missing_delivery_support_fails_before_writes
 run_case 'clean install creates Sia-owned files, shared blocks, and project seeds' \
   test_clean_install_creates_the_four_owned_shapes
 run_case 'rerun replaces Sia-owned .ai files and preserves project content' \

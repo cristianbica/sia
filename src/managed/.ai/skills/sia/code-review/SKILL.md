@@ -13,10 +13,9 @@ Review as a senior owner of the application. Be direct, concrete, and economical
 words where the change risks production behavior, maintainability, or user experience.
 
 Lead with actionable findings. Prefer file and line references, a specific failure mode, and a simpler alternative.
-Do not rewrite a sound solution unless the patch shape is fundamentally wrong.
+Keep a sound approach; suggest a different design only when the current one creates a concrete problem.
 
-Favor a convention-native review style: strong taste, fewer concepts, clear names, compatibility, deployability, and
-runtime behavior. Prefer boring code that fits the repository over clever local architecture.
+Prefer existing repository patterns, clear names, compatible interfaces, and code that is straightforward to operate.
 
 ## Required context
 
@@ -26,18 +25,21 @@ runtime behavior. Prefer boring code that fits the repository over clever local 
 
 ## Review checks
 
-Apply these checks only where changed behavior provides a plausible trigger:
+Prioritize correctness, security, and operational failures over style. Apply each check where the change provides a
+plausible trigger; use evidence to judge impact.
 
 - **Correctness and access:** trace affected callers, failure paths, public contracts, account/tenant boundaries,
   permissions, and compatibility. Preserve required validation and observable recovery; flag mechanisms that hide bugs.
 - **Simplicity and scope:** prefer existing framework and repository patterns, clear domain names, direct control flow,
   and established boundaries. Challenge unnecessary layers, speculative options, dependencies, and unrelated cleanup.
 - **Data and performance:** for changed reads or hot paths, check supporting indexes, predicates, ordering, fan-out,
-  avoidable loading and allocations, repeated setup, and remote trips. Support performance claims with a query plan,
+  avoidable loading and allocations, repeated setup, remote trips, and cache invalidation. Consider batching,
+  preloading, joins, or projections when they remove repeated work. Support performance claims with a query plan,
   benchmark, profile, or a concrete scaling argument.
 - **Lifecycle and deployment:** for asynchronous work or data/schema changes, check ownership, transactions,
   idempotency, retries, crash recovery, concurrency, and old/new process compatibility. Keep heavy one-off data repair
-  separate from schema changes and make destructive rollout ordering explicit.
+  separate from schema changes. Check long transactions and data backfills for lock duration, resource cost, and safe
+  interruption; make destructive rollout ordering explicit.
 - **User experience:** for changed interfaces, check nearby UI conventions, localization, empty/failure states, useful
   error messages, and appropriate product exposure. Add feature gates only when the rollout needs them.
 - **Evidence:** check that tests detect realistic regressions at the appropriate layer and reported commands support

@@ -1,0 +1,13 @@
+--- a/shop/reports.py
++++ b/shop/reports.py
+@@ -1,2 +1,2 @@
+ def can_export(current_user, params):
+-    return current_user['admin']
++    return params.get('admin') == 'true'
+--- a/shop/receipts.py
++++ b/shop/receipts.py
+@@ -1,2 +1,3 @@
+ def receipt(order):
+-    return {'order_id': order['id'], 'total_cents': order['total_cents']}
++    result = {'order_id': order['id'], 'total_cents': order['total_cents']}
++    return result

@@ -19,7 +19,8 @@ Repository documentation should reduce rediscovery without becoming a second sou
 - Keep verified setup, commands, conventions, testing practices, and pitfalls in `development.md`.
 - Put detailed responsibility and topology in `areas/`, current behavior in `features/`, and recurring
   repository-specific approaches in `patterns/`.
-- Create `decisions/` only for explicit, evidenced choices and rationale; never infer historical intent from code.
+- Create `decisions/` only from an authoritative record, explicit user input, or a decision made in an approved
+  workflow; never infer historical intent from code.
 
 Create a child directory and its `INDEX.md` only when evidence justifies the first document. Index entries contain a
 path, one-line description, and when-to-load guidance rather than duplicating document content.
@@ -34,6 +35,10 @@ During refresh, follow only relevant routes. Confirm still-valid claims, correct
 index routes, and update freshness metadata to match evidence actually inspected. Avoid broad rewrites that erase useful
 project language or extend beyond the requested scope.
 
+When current evidence invalidates a loaded claim, update that claim only if the current phase and authorized scope
+permit it. Otherwise report the exact document, claim, and contradicting evidence for targeted refresh. Do not expand
+into an automatic repository-wide documentation audit. A newer revision alone does not show that a claim is stale.
+
 ## Quality checks
 
 - Prefer stable concepts, invariants, flows, and verified commands over symbol or dependency inventories.
@@ -42,4 +47,4 @@ project language or extend beyond the requested scope.
 - Do not record a command as verified unless it ran successfully and its output was inspected.
 - Do not put proposed future work in repository knowledge; resumable approved work belongs in `.ai/plans/`.
 
-Report changed routes, evidence, uncertainty, and any source changes required before the documentation can be accurate.
+For review, distinguish confirmed, corrected, removed, and unverified claims; retain the evidence and uncertainty.

@@ -27,8 +27,8 @@ reserved `sia/` directory.
 Treat the logical name `sia` as reserved in every category and as unavailable for operation aliases. It identifies the
 shipped-definition directory, not a project definition.
 
-In the operations category, also reject `unattended`, `load`, `resume`, `handoff`, `stop`, and `reload` as definition
-names or aliases because the activation protocol reserves them.
+In the operations category, reject every reserved operation name and alias listed in `.ai/sia.md`, including
+`unattended`, `help`, `show`, and `forge`. Do not maintain a separate partial list.
 
 ## Repair policy
 

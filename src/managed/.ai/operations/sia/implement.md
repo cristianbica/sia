@@ -9,10 +9,8 @@ skills:
 
 # Implement
 
-Turn the user's request into the smallest complete repository change supported by evidence. Start with delivery route
-triage: use the planless trivial path only for an obvious non-behavioral correction, lightweight only for a narrow
-project-owned definition, documentation, or fully qualified internal source change, and standard for every other
-product/source behavior, policy, public contract, broad scope, or uncertainty. Never classify by line count alone.
+Turn the user's request into the smallest complete change supported by evidence. The effective delivery workflow owns
+route eligibility, authorization, and phase instructions. Load only its current route and phase guidance.
 
 ## Intake
 
@@ -23,10 +21,8 @@ product/source behavior, policy, public contract, broad scope, or uncertainty. N
 - Announce the selected execution route and authorization basis before the first write, including a plan write.
   An explicit request for a full or thorough workflow selects standard delivery.
 
-Use the delivery workflow. Trivial work is planless and exact-file scoped. Lightweight work is directly authorized by
-the request, uses a compact receipt, one bounded Build handoff, and focused coordinator validation. Standard work gets
-one intent-envelope approval and keeps the complete lifecycle. Do not edit product/source before authorization. During
-Build, stay in scope, update relevant tests/docs, and promote immediately when lightweight eligibility ends.
+Follow the selected route's complete lifecycle. During Build, stay in scope, update affected tests/docs, and promote
+before acting beyond a lightweight boundary. A full or thorough request selects standard delivery.
 
 For interactive standard delivery, the implementation request authorizes discovery and a saved plan, not Build.
 Present that plan and wait for its approval before product/source edits. Instructions to implement, work autonomously,

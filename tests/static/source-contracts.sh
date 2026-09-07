@@ -218,10 +218,10 @@ check_operation_references() {
 }
 
 check_operation_aliases() {
-  catalog="$ROOT/src/managed/catalogs/operations.md"
+  catalog=${1:-"$ROOT/src/managed/catalogs/operations.md"}
   names="$TMP_ROOT/operation-names-and-aliases"
   aliases="$TMP_ROOT/operation-aliases"
-  catalog_names operations >"$names"
+  sed -n 's/^- `\([^`]*\)`.*/\1/p' "$catalog" >"$names"
   : >"$aliases"
 
   if ! awk '
@@ -241,18 +241,26 @@ check_operation_aliases() {
     grep -Eo '`[^`]+`' 2>/dev/null |
     sed 's/^`//; s/`$//' >"$aliases" || true
 
+  reserved="$TMP_ROOT/reserved-operation-names"
+  sed -n '/^Reserved names:/p' "$ROOT/src/managed/.ai/sia.md" |
+    grep -Eo '`[^`]+`' | tr -d '`' >"$reserved"
+  [ -s "$reserved" ] || { fail 'canonical reserved operation list is missing'; return 1; }
   failed=0
+  while IFS= read -r name; do
+    if grep -F -x "$name" "$reserved" >/dev/null; then
+      echo "$catalog: operation uses reserved protocol name: $name" >&2
+      failed=1
+    fi
+  done <"$names"
   while IFS= read -r alias; do
     if ! printf '%s\n' "$alias" | grep -E '^[a-z0-9]+(-[a-z0-9]+)*$' >/dev/null 2>&1; then
       echo "$catalog: alias is not normalized lowercase kebab-case: $alias" >&2
       failed=1
     fi
-    case "$alias" in
-      sia|unattended|load|resume|handoff|stop|reload)
-        echo "$catalog: alias uses reserved protocol name: $alias" >&2
-        failed=1
-        ;;
-    esac
+    if grep -F -x "$alias" "$reserved" >/dev/null; then
+      echo "$catalog: alias uses reserved protocol name: $alias" >&2
+      failed=1
+    fi
     if grep -F -x "$alias" "$names" >/dev/null 2>&1; then
       echo "$catalog: duplicate operation name or alias: $alias" >&2
       failed=1
@@ -261,6 +269,23 @@ check_operation_aliases() {
   done <"$aliases"
 
   [ "$failed" -eq 0 ] || fail "operation aliases are ambiguous or invalid"
+}
+
+check_reserved_operation_collisions() {
+  candidate="$TMP_ROOT/reserved-candidate.md"
+  for reserved_name in sia unattended help show load forge resume handoff stop reload; do
+    for position in name alias; do
+      if [ "$position" = name ]; then
+        printf -- '- `%s` — Invalid reserved operation.\n' "$reserved_name" >"$candidate"
+      else
+        printf -- '- `example` — Example.\n  - aliases: `%s`\n' "$reserved_name" >"$candidate"
+      fi
+      if (check_operation_aliases "$candidate") >"$TMP_ROOT/collision.log" 2>&1; then
+        fail "accepted reserved $position: $reserved_name"; return 1
+      fi
+      grep -F 'reserved protocol name' "$TMP_ROOT/collision.log" >/dev/null || return 1
+    done
+  done
 }
 
 check_source_boundaries() {
@@ -287,7 +312,7 @@ check_prompt_sizes() {
     lines=$(wc -l <"$file" | tr -d ' ')
     [ "$lines" -le 500 ] || fail "skill exceeds 500 lines: $file" || return 1
   done
-  for file in "$ROOT"/src/managed/.ai/operations/sia/*.md "$ROOT"/src/managed/.ai/workflows/sia/*.md; do
+  for file in "$ROOT"/src/managed/.ai/operations/sia/*.md "$ROOT"/src/managed/.ai/workflows/sia/*.md "$ROOT"/src/managed/.ai/workflows/sia/delivery/*.md; do
     lines=$(wc -l <"$file" | tr -d ' ')
     [ "$lines" -le 300 ] || fail "definition exceeds 300 lines: $file" || return 1
   done
@@ -313,5 +338,6 @@ run_case "definition names match installed paths" check_definition_names
 run_case "catalog fragments match shipped definitions" check_catalog_sync
 run_case "shipped operation references resolve" check_operation_references
 run_case "operation aliases are normalized and unambiguous" check_operation_aliases
+run_case "reserved names and aliases are rejected" check_reserved_operation_collisions
 
 finish_tests
