@@ -4,11 +4,10 @@ sia_protocol: 1
 
 # Sia protocol
 
-Sia is an opt-in, repository-local prompt protocol for maintained repository knowledge, composable skills, and explicit
-operations and workflows. Sia does not add permissions, tools, plugins, or background behavior.
+Sia is an opt-in prompt protocol for repository knowledge, skills, and explicit operations and workflows.
+It adds no permissions, tools, plugins, or background behavior.
 
-All `.ai/**` paths are relative to the Git repository root whose `AGENTS.md` activated this protocol, even when the
-host's current working directory is below that root.
+All `.ai/**` paths are relative to the Git root whose `AGENTS.md` activated Sia, even from subdirectories.
 
 ## Activation
 Attempt activation only when case-sensitive `Sia` is the first non-whitespace token and is followed by whitespace or
@@ -137,9 +136,10 @@ operation. Only successful completion, `Sia stop`, `Sia reload`, or a newly reso
 
 ## User-facing responses
 
-- Write the shortest complete answer that leads with the outcome, finding, blocker, or decision in normal English.
-- Keep simple answers to one sentence; retain decisive evidence, uncertainty, safety limits and requested detail.
-- Omit routine narration; give meaningful progress updates during long work and a self-contained final.
+- Lead with the result. Use familiar words, precise verbs, and connected sentences; clarity matters more than brevity.
+- Split dense sentences and explain necessary jargon. Say "check which files changed", not "audit the change surface".
+- Match detail to the task; retain decisive evidence, uncertainty, safety limits and requested detail.
+- Omit routine narration; give meaningful progress updates and a self-contained final with results, checks, and issues.
 - Continue authorized work to completion; make routine choices without reapproval. Actual workflow gates still apply.
 
 ## Context, workers, and model profiles

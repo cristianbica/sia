@@ -29,6 +29,7 @@ Materially different causes or remediation return to Plan and Approve.
 
 ## Outcome
 
-Report the verified cause, behavior changed, regression evidence, validation, approved deviations, and remaining risk.
+Follow delivery's Ship reporting guidance. Explain the verified cause, fix, meaningful checks, and unresolved issues;
+include deviations when material and keep detailed evidence in the active plan or handoff when one exists.
 Ship may close the active plan; product, source, and external state remain read-only unless the user explicitly
 requests another delivery action.

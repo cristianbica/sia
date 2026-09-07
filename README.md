@@ -29,9 +29,10 @@ knowledge close to the code and gives different host tools the same explicit voc
 Adoption is progressive: load only the docs index, load only the skills catalog, or invoke a complete operation. Normal
 host sessions remain normal until the user asks for Sia.
 
-When activated, Sia leads with the outcome and uses concise, natural English by default. It removes routine narration
-and repetition while preserving exact technical details, uncertainty, safety constraints, approval boundaries, and
-requested explanations. This does not affect ordinary prompts that did not activate Sia.
+When activated, Sia leads with the result and uses plain language, with enough detail to make the answer easy to follow.
+Code follows existing patterns and solves the current task without unnecessary abstractions or options. Reports focus
+on results, meaningful checks, and unresolved issues. Required evidence and approval boundaries still apply.
+This does not affect ordinary prompts that did not activate Sia.
 
 ## Installation
 

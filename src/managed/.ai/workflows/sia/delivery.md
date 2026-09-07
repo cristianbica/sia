@@ -137,6 +137,10 @@ permissions or external actions.
 Implement only approved scope, including tests and affected documentation. Prefer targeted edits over whole-file
 rewrites unless most of the file must change. Leave unrelated cleanup as a finding. Continue in-scope steps
 without reapproval; ask only at actual workflow gates or when the authorized boundary expands.
+Prefer existing patterns, clear names, and direct control flow. Add an abstraction, dependency, option, or fallback
+only when the current task needs it; do not design for hypothetical future requirements. Readability matters more
+than fewer lines. Comments explain non-obvious reasons. Preserve required error handling, validation, security, and
+compatibility; avoid extra safeguards for scenarios ruled out by verified internal contracts.
 Standard prefers an isolated worker, then a
 fresh conversation, then same-context execution; lightweight uses one bounded Build handoff. Compare the worktree with
 optional `base` and `dirty` comments. Preserve pre-existing work; unsafe overlap or attribution is blocked before
@@ -169,6 +173,11 @@ set status to `blocked` rather than weakening acceptance criteria.
 Ship requires passing review evidence. It writes only `<!-- sia:status complete -->` and a final short progress comment;
 retain the plan for history without asking. Delete an exact completed plan only after a separate explicit user request.
 Commit, push, pull request, release, publish, and deploy require explicit user intent.
+
+Lead the user-facing report with the result, meaningful checks, and unresolved issues. Include paths and deviations
+when they help assess the change. Keep required route, model/usage, and detailed command evidence in the active plan
+or handoff when one exists; report them directly when requested or material to a decision. Do not create an artifact
+solely to hold routine reporting details. This changes presentation, not approval gates or evidence requirements.
 
 ## Compact plan artifact
 

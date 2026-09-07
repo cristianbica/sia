@@ -17,29 +17,34 @@ fail() {
 check_cases() {
   command -v jq >/dev/null 2>&1 || fail 'jq is required'
   [ -s "$CASES" ] || fail "missing cases: $CASES"
-  jq -e '
+  jq -se 'all(.[];
     type == "object" and
     (.id | type == "string" and length > 0) and
     (.prompt | type == "string" and startswith("Sia ")) and
-    (.required | type == "array") and
-    (.forbidden | type == "array")
-  ' "$CASES" >/dev/null || fail 'invalid case record'
+    (.required | type == "array") and (.required | all(.[]; type == "string")) and
+    (.forbidden | type == "array") and (.forbidden | all(.[]; type == "string")) and
+    (.review | type == "string" and length > 0)
+  )' "$CASES" >/dev/null || fail 'invalid case record'
   count=$(wc -l <"$CASES" | tr -d ' ')
-  [ "$count" -eq 8 ] || fail "expected 8 cases, found $count"
+  [ "$count" -gt 0 ] || fail 'expected at least one case'
   duplicate=$(jq -r .id "$CASES" | sort | uniq -d | head -n 1)
   [ -z "$duplicate" ] || fail "duplicate case: $duplicate"
-  printf 'Validated 8 concise-output cases; no model invoked.\n'
+  printf 'Validated %s concise-output cases; no model invoked.\n' "$count"
+}
+
+baseline_contract() {
+  printf '%s\n' \
+    'Write the shortest complete answer that leads with the outcome, finding, blocker, or decision in normal English.' \
+    'Keep simple answers to one sentence; retain decisive evidence, uncertainty, safety limits and requested detail.' \
+    'Omit routine narration; give meaningful progress updates during long work and a self-contained final.' \
+    'Continue authorized work to completion; make routine choices without reapproval. Actual workflow gates still apply.'
 }
 
 candidate_contract() {
-  printf '%s\n' \
-    'Write the shortest complete answer that lets the user understand the outcome and act safely.' \
-    'Lead with the answer, finding, blocker, or decision in normal English.' \
-    'For a simple answer, use one sentence or one exact command.' \
-    'For diagnosis or investigation, give the conclusion, decisive evidence, uncertainty, and one next action only.' \
-    'For review, report material findings first; omit process narration and unrelated repository observations.' \
-    'Remove greetings, preambles, self-reference, repetition, generic closers, and explanations the user did not ask for.' \
-    'Preserve every required fact, exact technical string, safety limit, approval boundary, and requested detail.'
+  awk '/^## User-facing responses$/ { active=1; next } /^## / { active=0 } active' \
+    "$ROOT/src/managed/.ai/sia.md"
+  sed -n '/^Prefer existing patterns,/,/^compatibility; avoid/p' \
+    "$ROOT/src/managed/.ai/workflows/sia/delivery.md"
 }
 
 metric() {
@@ -55,10 +60,9 @@ run_call() {
   arm=$2
   destination=$3
   prompt=$(printf '%s\n' "$case_json" | jq -r .prompt)
-  if [ "$arm" = candidate ]; then
-    prompt=$(printf '%s\n\n<presentation_contract>\n%s\n</presentation_contract>\n' \
-      "$prompt" "$(candidate_contract)")
-  fi
+  contract=$(baseline_contract)
+  [ "$arm" != candidate ] || contract=$(candidate_contract)
+  prompt=$(printf '%s\n\n<task_contract>\n%s\n</task_contract>\n' "$prompt" "$contract")
   printf '%s\n' "$prompt" >"$destination/prompt.txt"
   model_args=
   if [ -n "${SIA_CONCISE_CODEX_MODEL:-}" ]; then
@@ -108,7 +112,7 @@ score_call() {
   chars=$(wc -m <"$response" | tr -d ' ')
   input=$(metric input_tokens "$destination/raw.jsonl")
   output=$(metric output_tokens "$destination/raw.jsonl")
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\tpending\n' \
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\tpending\tpending\tpending\tpending\n' \
     "$arm" "$case_id" "$fidelity" "$chars" "$input" "$output" \
     "$(cat "$destination/elapsed.txt")" >>"$ARTIFACTS/results.tsv"
 }
@@ -124,7 +128,7 @@ command -v timeout >/dev/null 2>&1 || fail 'GNU timeout is required for live mod
 
 mkdir -p "$ARTIFACTS/smoke" "$ARTIFACTS/runs"
 ARTIFACTS=$(CDPATH= cd "$ARTIFACTS" && pwd)
-printf 'arm\tcase\tfidelity\tvisible_chars\tinput_tokens\toutput_tokens\telapsed_seconds\tnatural_english_1_to_5\n' \
+printf '%s\n' 'arm	case	fidelity	visible_chars	input_tokens	output_tokens	elapsed_seconds	readability_1_to_5	correctness	scope	simplicity' \
   >"$ARTIFACTS/results.tsv"
 {
   printf 'revision=%s\n' "$(git -C "$ROOT" rev-parse HEAD)"
@@ -139,7 +143,7 @@ if ! run_call "$smoke" baseline "$ARTIFACTS/smoke"; then
   printf 'Smoke call failed; comparison was not started. Evidence: %s\n' "$ARTIFACTS/smoke" >&2
   exit 1
 fi
-printf 'Smoke call passed; starting 16 comparison calls.\n'
+printf 'Smoke call passed; starting %s comparison calls.\n' "$((count * 2))"
 
 while IFS= read -r case_json; do
   case_id=$(printf '%s\n' "$case_json" | jq -r .id)

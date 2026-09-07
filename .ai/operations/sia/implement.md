@@ -31,6 +31,6 @@ Build, stay in scope, update relevant tests/docs, and promote immediately when l
 ## Outcome
 
 Finish with implemented behavior, proportionate verification, and route-appropriate evidence. Standard delivery keeps a
-separate final review phase; lightweight delivery reports focused validation and any explicit skips. Ship with a
-product-read-only report containing the route, changed paths, deviations, validation evidence, model/usage telemetry
-when available, and remaining risks.
+separate final review phase; lightweight delivery reports focused validation and any explicit skips. Follow delivery's
+Ship reporting guidance: lead with the result, meaningful checks, and unresolved issues. Preserve required internal
+evidence without repeating routine details in the user-facing report.

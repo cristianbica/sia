@@ -268,6 +268,11 @@ Prefer an isolated worker using the approved handoff. After exact definitions re
 docs, unauthorized plans, or prior evidence. Implement only approved scope, add or update tests, preserve pre-existing
 changes, and stop for replanning when material assumptions fail.
 
+Prefer existing patterns, clear names, and direct control flow. New abstractions, dependencies, options, and fallbacks
+need a current requirement; hypothetical future needs do not justify them. Readability matters more than line count.
+Preserve required error handling, validation, security, and compatibility. Verified internal contracts can rule out
+unnecessary defensive branches; assumptions alone cannot.
+
 ### Review and validate
 
 Use a separate review phase and prefer an isolated worker that did not build the change. Compare the complete
@@ -286,7 +291,10 @@ Allow at most three unattended Fix cycles per plan revision; then return a block
 Ship writes only plan completion status and evidence by default, then retains the completed artifact without prompting.
 Deletion requires a separate explicit request and is never inferred from completion or cleanup language. Product,
 source, and external delivery state remain read-only. Confirm the final reviewed artifact and report behavior, files,
-verification, deviations, and risks. Commit, push, pull request, release, publish, and deploy need explicit intent.
+verification, deviations, and risks where they help assess the change. Lead with results, meaningful checks, and
+unresolved issues. Keep required route, model/usage, and detailed command evidence in the existing plan or handoff;
+show these details when requested or material. Do not create an artifact just for routine reporting. Evidence and
+approval requirements remain unchanged. Commit, push, pull request, release, publish, and deploy need explicit intent.
 
 In unattended mode, continue through in-scope Fix and Review/Validate cycles without asking questions. Use conservative,
 reversible assumptions or return a blocked result when no safe in-scope path remains.
