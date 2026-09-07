@@ -173,6 +173,15 @@ After resolution:
    authorized, while standard work requires one intent-envelope approval. Do not infer low risk from size alone.
 7. Follow the selected workflow route until completion, cancellation, or an explicit operation replacement.
 
+For interactive standard delivery, the implementation request authorizes discovery and a saved plan only. Present the
+plan and wait for the user's approval before product/source edits. A generic imperative, reversible work, or a request
+for autonomy is not approval of an unseen plan. A clear reply approving an already-presented plan is sufficient;
+continue within that approval without asking again. State the route and authorization basis before the first write,
+distinguishing permission to write a plan from permission to edit source. Preserve the other routes' authorization.
+
+Sia defines a delivery sequence, not a host permission system. If higher-priority host instructions prevent following
+it, report the conflict; do not silently bypass the gate or retrospectively record approval to claim compliance.
+
 ## Project rules
 
 `.ai/RULES.md` is project-owned and contains hard Sia-specific constraints. Load it for operation execution, delivery

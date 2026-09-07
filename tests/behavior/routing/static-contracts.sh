@@ -66,6 +66,20 @@ check_intent_envelope_contract() {
   assert_contains "$BOUNDARY_FIXTURE" 'requires_new_approval: true' || return 1
 }
 
+check_standard_approval_boundary() {
+  assert_contains "$PROTOCOL" 'the request authorizes Plan only' || return 1
+  assert_contains "$PROTOCOL" 'Build needs approval of the presented plan' || return 1
+  assert_contains "$IMPLEMENT" 'authorization basis before the first write' || return 1
+  assert_contains "$DELIVERY" 'A plan write is not permission for source writes' || return 1
+  assert_contains "$DELIVERY" 'before any product/source edit' || return 1
+  assert_contains "$DELIVERY" 'do not approve a plan that has not' || return 1
+  assert_contains "$DELIVERY" 'Approval of an already-presented plan remains valid' || return 1
+  assert_contains "$DELIVERY" 'Do not create an approval record after editing' || return 1
+  assert_contains "$DELIVERY" 'report the conflict' || return 1
+  assert_contains "$STANDARD_FIXTURE" 'source_unchanged_before_approval: true' || return 1
+  assert_contains "$STANDARD_FIXTURE" 'approval_source: reply-to-presented-plan' || return 1
+}
+
 check_standard_and_backward_compatibility() {
   assert_contains "$DELIVERY" 'legacy artifacts unchanged' || return 1
   assert_contains "$DELIVERY" 'every change not fully qualifying for lightweight' || return 1
@@ -174,6 +188,7 @@ run_case "adaptive route contract is explicit and conservative" check_route_cont
 run_case "trivial work remains planless and exact-file scoped" check_trivial_contract
 run_case "lightweight work is directly authorized and remains bounded" check_lightweight_contract
 run_case "standard intent envelopes distinguish evidence from boundary changes" check_intent_envelope_contract
+run_case "standard source writes require approval of a presented plan" check_standard_approval_boundary
 run_case "standard routing and old-plan compatibility remain explicit" check_standard_and_backward_compatibility
 run_case "lightweight context and benchmark validation remain bounded" check_context_and_benchmark_contract
 run_case "wait and usage telemetry guidance prevents hidden context waste" check_wait_and_telemetry_contract

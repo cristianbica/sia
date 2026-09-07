@@ -25,6 +25,10 @@ Line count is supporting evidence only. An explicit request for a full/thorough 
 classification promotes to `standard`. Unattended mode selects `trivial` or `lightweight` only when eligibility is
 unambiguous, otherwise it selects `standard` or blocks. A route promotion is recorded before newly unauthorized writes.
 
+Before the first write, state the route and its authorization basis. A standard request permits plan creation, while
+interactive Build requires approval of the presented plan. Trivial/lightweight requests directly authorize only their
+qualifying scope. Forge names its direct or approved-inline lane, and unattended names its explicit invocation.
+
 ## Isolation model
 
 Phase isolation reduces steering from rejected planning ideas and builder self-justification. The portable mechanism is
@@ -261,6 +265,14 @@ Eligible lightweight work shows its inline receipt under direct activating-reque
 once for a plain-language intent-envelope approval. In-envelope implementation details become evidence; scope, risk,
 permission, or external-action expansion requires a revised plan. Unattended mode auto-authorizes only inside its
 original outcome. Authorization never expands host permissions or unrelated external actions.
+
+For interactive standard delivery, an instruction to implement starts discovery and planning; it does not approve an
+unseen plan. Present the saved plan and wait for a clear approval reply before source edits, even for reversible work.
+General autonomy guidance does not remove this sequence. Once the plan is approved, continue in scope without asking
+again. Never write an approval record after an early edit to make the sequence appear valid.
+
+This sequence expresses the user's workflow preference. It does not override higher-priority host instructions or
+enforce writes mechanically. Report any conflict that prevents honoring it, rather than silently skipping the gate.
 
 ### Build
 

@@ -51,3 +51,18 @@ semantic result.
 The Codex runner uses `SIA_CODEX_REASONING_EFFORT` (default `low`) independently of `SIA_CODEX_MODEL` and records both
 requested settings. Local shims cover default and overridden arguments; the dated live-certification status above
 remains unchanged. See [host tests](../tests/hosts/README.md) for long-task scenario limitations.
+
+## Approval-boundary coverage
+
+A separate Codex runner, `scripts/verify-approval --live`, exercises writable disposable fixtures and exact-session
+continuation. It checks standard planning before source edits, approval of the presented plan, and trivial,
+lightweight, Forge direct/inline, and unattended controls. It records file snapshots and tool traces; missing
+continuation or unclassifiable preapproval activity is unavailable, never a pass. It does not change the read-only
+smoke suite or the live-certification status above.
+
+`python3 tests/hosts/approval-contracts.py` runs deterministic no-model shims and is included in `scripts/verify`.
+It covers successful routes, premature writes and reverted attempts, invalid/missing plans, invalid digests, host
+failure, missing/unsupported continuation, opaque commands, and timeout. These results validate the harness only.
+Live approval checks remain unrun and need an explicit call budget; see
+[host tests](../tests/hosts/README.md#writable-approval-checks-codex) for invocation, bounded execution, evidence, and
+conservative trace-check limitations.

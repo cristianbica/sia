@@ -119,14 +119,14 @@ Use `Sia <operation> [request]` interactively or `Sia unattended <operation> [re
 7. Follow the workflow until completion, cancellation, or explicit operation replacement.
 
 Unattended mode is enabled only by the exact modifier. Do not infer unattended mode from natural-language requests.
-Default is interactive. Persist mode in artifacts and handoffs. Trivial is planless; lightweight directly authorized;
-standard uses one intent-envelope approval and separate review/fixes. Unattended auto-authorizes in-ceiling artifacts
-or replans. If progress needs new scope, authority, or credentials, return `blocked` rather than asking the user
-or guessing.
+Default is interactive; persist mode in artifacts and handoffs. Trivial is planless; lightweight directly authorized.
+Interactive standard uses one intent-envelope approval and separate review/fixes: the request authorizes Plan only.
+Build needs approval of the presented plan; a generic imperative or reversible edit is not that approval.
+Unattended auto-authorizes in-ceiling artifacts or replans. If progress needs new scope, authority, or credentials,
+return `blocked` rather than asking the user or guessing.
 
-Project rules are hard Sia-specific constraints during operations, resume, and isolated phase execution. They take
-precedence over repository documentation, skills, operations, workflows, and plans, but never over system or host
-safety, permissions, or the user's current explicit instruction. Report material conflicts instead of guessing.
+Project rules constrain operations, resume, and isolated phases. They outrank docs, skills, operations, workflows, and
+plans, but not system or host safety, permissions, or the user's explicit instruction. Report material conflicts.
 Rules and custom definitions may narrow unattended work but cannot activate it or expand its authorization ceiling.
 
 Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or a direct Sia conversation.

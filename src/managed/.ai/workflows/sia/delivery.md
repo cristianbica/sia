@@ -42,6 +42,7 @@ dirty-worktree attribution risk. Active context may supply the target and result
 `change X to Y`, and a contextually specific `add this assertion`; `do:` makes the preference explicit but cannot make
 an ineligible request direct.
 
+Before a Forge write, state its lane and authorization basis: the qualifying request or the approved inline plan.
 The request itself authorizes a qualifying bounded write. Execute only its stated boundary without an inline plan or a
 second approval, apply proportionate review and checks, report changed paths and validation, and leave Forge ready for
 the next request. If discovery reveals material ambiguity, risk, or expansion, stop before acting beyond the bounded
@@ -76,7 +77,9 @@ scope, permission, credential, external-action, safety, attribution, or validati
 
 ## Route triage
 
-Announce `trivial`, `lightweight`, or `standard` and the evidence before writes.
+Announce `trivial`, `lightweight`, or `standard` and the evidence before writes. State the authorization basis too:
+the qualifying request for trivial/lightweight, the request for standard Plan, user approval of the presented plan
+for interactive standard Build, or the explicit unattended request. A plan write is not permission for source writes.
 
 - `trivial`: an obvious requested typo, formatting, comment, or wording correction with no behavior, policy, permission,
   schema, command, or public-contract change. It needs no artifact or approval. Doubt promotes it.
@@ -121,6 +124,17 @@ defaults, so they need no mode or route comment. Record `base` for resume. Add `
 - Purpose: bind permission to a standard intent envelope or record direct lightweight authorization.
 - Gate: one interactive approval for standard work; the activating request authorizes lightweight and unattended work.
 - Writes: only footer comments in the delivery artifact.
+
+An interactive standard implementation request authorizes discovery and a saved plan only. Present the plan and wait
+for approval of that visible scope before any product/source edit, even when the requested edit is local or reversible.
+Generic imperatives such as "implement this" and instructions to work autonomously do not approve a plan that has not
+been presented. Approval may be a clear natural-language reply referring to the presented plan; no special token is
+required. Approval of an already-presented plan remains valid, so do not restart planning or ask again without a
+material boundary change. Do not create an approval record after editing to excuse a skipped gate.
+
+This is the user's selected delivery sequence, not an extra tool-permission prompt. Host instructions retain their
+priority; if they prevent following this sequence, report the conflict and the limit of Sia's guarantee. Never claim
+the gate was honored when it was skipped. Trivial, lightweight, Forge, and unattended retain their stated rules.
 
 For standard work, present outcome, scope, non-goals, criteria, risks, external actions, and path. The intent envelope
 covers implementation approach, step order, focused checks, and in-scope documentation. Ask again only when outcome,
