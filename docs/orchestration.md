@@ -229,6 +229,12 @@ envelope and do not create an artifact merely for isolation. An investigation ma
 delivery plan only when its original request explicitly asks to save a plan; this is not an investigation artifact or
 implementation approval.
 
+Plans explain what will change, why the key decisions matter, and how success will be checked. Use short, concrete
+sentences; do not pack several mechanisms into one bullet. Keep details that affect understanding or approval, including
+material risks. Remove file inventories and repeated safeguards. Shorter text or more bullets alone does not pass.
+See the [writing examples](writing-examples.md) and the worked template in
+[standard planning guidance](../src/managed/.ai/workflows/sia/delivery/standard.md).
+
 New plans keep only the information a reader needs in their header and visible body:
 
 ```markdown

@@ -86,7 +86,8 @@ check_protocol_directives() {
 
 check_response_contract() {
   assert_contains "$PROTOCOL" '## User-facing responses' || return 1
-  assert_contains "$PROTOCOL" 'clarity matters more than brevity' || return 1
+  assert_contains "$PROTOCOL" 'Make the meaning clear on the first read' || return 1
+  assert_contains "$PROTOCOL" 'shorter text and more bullets do not establish clarity' || return 1
   assert_contains "$PROTOCOL" 'Split dense sentences and explain necessary jargon' || return 1
   assert_not_contains "$PROTOCOL" 'Keep simple answers to one sentence' || return 1
   assert_contains "$PROTOCOL" 'decisive evidence, uncertainty, safety limits and requested detail' || return 1

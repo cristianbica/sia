@@ -1,7 +1,7 @@
 # Clear-output and simple-code benchmark
 
 Compare a fixed earlier response contract (`baseline.txt`) with the current canonical response and code-simplicity
-paragraphs using twelve cases. Each independent call runs in a fresh neutral directory outside the repository.
+paragraphs using fifteen cases. Each independent call runs in a fresh neutral directory outside the repository.
 Neither arm loads the installed Sia projection. Both receive the same explicit facts from `context.txt`; the candidate
 cannot silently influence the baseline through shared Sia instructions. This measures response-contract changes,
 not two full Sia releases or repository implementation behavior.
@@ -22,7 +22,7 @@ benchmarks/concise-output/run.sh live /tmp/sia-claude-comparison --host claude -
 
 Model names are requested identifiers, not a claim of account availability. Specify both model and effort; effort
 labels are not comparable across providers. Compare baseline/candidate within each model/effort setting first.
-A run makes at most `24 × repetitions` independent calls, stopping at the first unavailable result. There is no extra
+A run makes at most `30 × repetitions` independent calls, stopping at the first unavailable result. There is no extra
 smoke call. Calls have a 120-second timeout (`--timeout` overrides it), receive `/dev/null` as stdin, and alternate arm
 order by repetition. Captured output is capped at 4 MiB per call; overflow (125) and timeout (124) stop the
 process group and produce an unavailable result. Live calls are never part of the ordinary verifier.
@@ -51,3 +51,8 @@ The three coding cases produce proposed code only. Inspect their full input and 
 long input for port parsing. Use `scripts/verify-approval` and its documented implementation/continuation cases for
 actual repository edits, authorization, repeated checks, and tool-trace evidence; this benchmark does not duplicate
 that infrastructure. Until budgeted live comparisons are completed and reviewed, behavioral improvement is unverified.
+
+The writing cases cover an answer, a TWRP plan excerpt, a progress update, and a final report. Review concrete meaning
+and preserved requirements, including causal links and uncertainty. Dense bullets and compressed jargon fail even
+when short. The [authored examples](../../docs/writing-examples.md) include a fuller TWRP rewrite for manual review.
+The runner tests the general response contract; it does not load or evaluate the delivery plan template.

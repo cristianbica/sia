@@ -9,6 +9,7 @@ This directory is the canonical product, protocol, and implementation specificat
 | --- | --- |
 | [Product and principles](product.md) | Product promise, goals, boundaries, and three-layer model |
 | [Activation protocol](protocol.md) | Exact opt-in grammar and canonical `.ai/sia.md` behavior |
+| [Writing examples](writing-examples.md) | Concrete answers, updates, reports, and a readable TWRP plan |
 | [Repository knowledge](repository-knowledge.md) | Documentation structure, evidence, freshness, and maintenance |
 | [Extensions and catalogs](extensions.md) | Skills, operations, workflows, indexes, overrides, and creators |
 | [Orchestration and workflows](orchestration.md) | Isolation, artifacts, phase contracts, and core workflows |

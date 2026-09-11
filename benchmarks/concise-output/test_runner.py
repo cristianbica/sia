@@ -20,7 +20,7 @@ class RunnerTests(unittest.TestCase):
         self.assertNotEqual(arms['baseline'], arms['candidate'])
         self.assertEqual(arms['baseline'], (runner.HERE / 'baseline.txt').read_text())
         self.assertIn('Prefer existing patterns,', arms['candidate'])
-        self.assertEqual(len(runner.cases()), 12)
+        self.assertEqual(len(runner.cases()), 15)
 
     def test_commands_keep_model_as_one_argument_and_isolation(self):
         for host in ('codex', 'claude'):

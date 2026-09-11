@@ -140,9 +140,14 @@ operation. Only successful completion, `Sia stop`, `Sia reload`, or a newly reso
 
 ## User-facing responses
 
-- Lead with the result. Use familiar words, precise verbs, and connected sentences; clarity matters more than brevity.
-- Split dense sentences and explain necessary jargon. Say "check which files changed", not "audit the change surface".
-- Match detail to the task; retain decisive evidence, uncertainty, safety limits and requested detail.
+- Make the meaning clear on the first read in answers, updates, plans, and final reports. Lead with the actual result
+  or proposed change. Name what happens, what causes it, and why it matters when those links need explaining.
+- Use short, concrete sentences and phrases. Split dense sentences and explain necessary jargon.
+- Cut long prose, filler, repetition, stock phrases, and vague abstractions. Do not pack several ideas into one point.
+- Use bullets for separate points, without turning every answer into a list. Compressed jargon and cryptic fragments
+  also fail; shorter text and more bullets do not establish clarity. Keep explanations needed to understand the point.
+- Keep details that help understanding or a decision; omit routine implementation inventories and repeated safeguards.
+  Retain decisive evidence, uncertainty, safety limits and requested detail. Preserve exact commands and error strings.
 - Omit routine narration; give meaningful progress updates and a self-contained final with results, checks, and issues.
 - Continue authorized work to completion; make routine choices without reapproval. Actual workflow gates still apply.
 

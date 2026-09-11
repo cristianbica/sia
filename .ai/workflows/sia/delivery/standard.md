@@ -15,6 +15,15 @@ Load for Plan, Approve, or validating a resumed artifact. After approval, follow
   required; all other comments appear only when relevant.
 - Model profile: request `reasoning` for ambiguous or risky planning; lightweight may use `fast`.
 
+Write for the person deciding whether to approve the change:
+
+- Start with the proposed behavior. Explain the key decisions and why they matter, using short, concrete sentences.
+- Give each point one main idea. Explain necessary technical terms instead of stacking names and mechanisms.
+- Keep details that affect understanding or approval. Omit file inventories, repeated safeguards, and speculative steps.
+- State observable acceptance checks and material risks. Do not drop scope or safety requirements for brevity.
+- Reread for meaning: can the reader tell what will change and why without translating jargon? Shorter text and more
+  bullets alone do not pass. Avoid both long prose and cryptic fragments; do not impose a word quota.
+
 Persist a compact artifact before Build and immediately add its exact path to the conversation's
 `authorized_plan_paths`. Standard starts with `<!-- sia:status pending-approval -->`; interactive and standard are
 defaults, so they need no mode or route comment. Record `base` for resume. Add `dirty` only for existing paths; add
@@ -58,14 +67,24 @@ workflow: delivery
 skills: [repository-discovery, testing]
 ---
 
-# Short outcome
+# Prevent duplicate webhook processing
 
 <!-- sia:approval:start -->
-## Scope
-...
+Record each webhook's event ID so a repeated delivery does not apply the same update twice.
 
-## Acceptance
-...
+## Changes
+
+- Save the event ID and its update in one database transaction. If the update fails, a retry can still process it.
+- Enforce unique event IDs in the database so simultaneous deliveries cannot both apply the update.
+- Add an event-ID table. Leave existing webhook authentication and payload validation unchanged.
+
+## Checks and limits
+
+- Test repeated and simultaneous deliveries: one update per event ID.
+- Test a failed update followed by a successful retry: the event must not be lost.
+- Run the webhook tests and apply the migration to an isolated test database.
+- Existing events have no recorded IDs; this only prevents duplicates processed after the change is installed.
+- No production migration, deployment, or live webhook calls.
 <!-- sia:approval:end -->
 
 <!-- sia:status pending-approval -->
