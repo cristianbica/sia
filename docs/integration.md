@@ -10,7 +10,7 @@ AGENTS.md
 
 .ai/
   sia.md                     # Sia-owned activation protocol
-  RULES.md                   # project-owned after first creation
+  RULES.md                   # refreshed defaults above the marker; project rules below
   docs/INDEX.md              # project-owned after first creation
   skills/{INDEX.md,sia/,<project-skill>/}
   operations/{INDEX.md,sia/,<project-operation>.md}
@@ -44,18 +44,24 @@ repository whose installer was run from Codex; the bridge remains inert unless C
 
 ## Ownership model
 
-Managed refreshes have only two write modes.
+Managed refreshes replace reserved paths, marked Sia blocks, or the rules prefix through its boundary marker.
 
 | Target | Replace the complete file or directory | Replace only a marked Sia block |
 | --- | --- | --- |
 | `.ai/` | `.ai/sia.md`; `.ai/{skills,operations,workflows}/sia/` | Each category `INDEX.md` SIA section |
+| `.ai/RULES.md` | None | Defaults through the project-specific marker |
 | Host instruction files | None | Root `AGENTS.md`; optional `.claude/CLAUDE.md` |
 
 The intentionally empty host-file/full-replacement cell is important: Sia never takes ownership of a user's whole
 instruction file.
 
-Create-once seeds are outside that replacement matrix. `RULES.md`, `docs/INDEX.md`, and new category indexes are copied
-only when missing, then become project-owned; later installs never refresh them as whole files. Project definitions,
+`src/seed/.ai/RULES.md` supplies the installed defaults. Every install replaces the prefix through
+`<!-- Add project-specific rules below this line. -->` and preserves all bytes below it. Put custom rules below that
+marker; edits above it are replaced. Existing rules files must contain exactly one boundary marker. Missing or duplicate
+markers stop installation before content writes; restore one boundary and move custom rules below it before retrying.
+
+Create-once seeds are outside that replacement matrix. `docs/INDEX.md` and new category indexes are copied only when
+missing, then become project-owned; later installs never refresh them as whole files. Project definitions,
 plans, documentation, text outside Sia markers, and each `CUSTOM` section are also project-owned. The reserved `sia/`
 directories are Sia-owned; projects place their own definitions beside them, not inside them.
 
@@ -87,17 +93,17 @@ For local development, run the checkout's `install.sh` script from a target repo
 The installer requires POSIX `sh`, `git`, and a Git repository root. It follows existing symlinked `.ai`, category,
 docs, and `.claude` directories, including links outside the checkout; the repository owner is responsible for that
 target. Dangling links and links resolving to non-directories fail before writes. The installer also rejects invalid
-create-once seed paths, malformed or duplicated Sia marker pairs, and a concurrent Sia installer. A shared catalog must
-contain `## CUSTOM` before Sia can insert its section. Before replacing an existing shared file, it checks that the
-content used to prepare the replacement has not changed. This narrows accidental races but cannot lock arbitrary
-editors, so do not edit shared targets while installation is running.
+seed paths, missing or duplicate rules boundaries, malformed Sia marker pairs, and a concurrent Sia installer. A shared
+catalog must contain `## CUSTOM` before Sia can insert its section. Before replacing an existing shared file, it checks
+that the content used to prepare the replacement has not changed. This narrows accidental races but cannot lock
+arbitrary editors, so do not edit shared targets while installation is running.
 
 An interrupted process can leave `<git-common-dir>/sia-install.lock`. If no installer is running, remove that empty
 directory and retry.
 
 It is intentionally not a transactional package manager: it does not hash files, track a manifest, recover every
 interruption shape, preserve every byte-level formatting detail, or migrate unknown historical layouts. Those concerns
-would obscure the two ownership rules above. If a repository has an ambiguous old layout, resolve it deliberately
+would obscure the ownership boundaries above. If a repository has an ambiguous old layout, resolve it deliberately
 before installing rather than asking the installer to guess.
 
 ## Frontier model compatibility

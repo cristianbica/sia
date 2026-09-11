@@ -1,6 +1,6 @@
 # Source repository layout
 
-The source tree separates the two managed-refresh modes from create-once project seeds.
+The source tree separates managed content from project-owned content and initial templates.
 
 ```text
 sia/
@@ -47,7 +47,8 @@ sia/
 
 - `src/managed/.ai/` is copied over the corresponding Sia-owned installed paths on every install.
 - `src/managed/catalogs/` contains complete marker-delimited SIA sections inserted into mixed-ownership indexes.
-- `src/seed/.ai/` is copied only when a project file does not yet exist. Its files are project-owned afterwards.
+- `src/seed/.ai/RULES.md` supplies defaults refreshed through the project-specific marker on every install.
+  Content below the marker remains project-owned. Other `src/seed/.ai/` files are copied only when missing.
 - `src/bridges/` contains marker-delimited blocks, never complete user instruction files.
 - `.gitattributes` keeps the shell entrypoint and managed text usable when a clone enables automatic line-ending
   conversion.

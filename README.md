@@ -217,7 +217,7 @@ After installation, Sia keeps its repository-local state under `.ai/`:
 ```text
 .ai/
   sia.md                 # canonical activation protocol; replaced by Sia installs
-  RULES.md               # project-owned Sia constraints
+  RULES.md               # refreshed defaults, then project constraints below the marker
   docs/                  # maintained repository knowledge
   skills/                # Sia and project skills
   operations/            # Sia and project operations
@@ -233,7 +233,7 @@ import. These bridges only tell the host that Sia exists and when to read `.ai/s
 
 Projects can extend Sia without changing shipped definitions:
 
-- put hard Sia-specific constraints in `.ai/RULES.md`;
+- put hard Sia-specific constraints below the project-specific marker in `.ai/RULES.md`;
 - create skills directly under `.ai/skills/<name>/`;
 - create operations directly under `.ai/operations/<name>.md`;
 - create workflows directly under `.ai/workflows/<name>.md`;
@@ -261,7 +261,8 @@ correctness requirements.
 - Sia fails closed when its activation protocol is missing, invalid, or incompatible.
 - Re-running install replaces `.ai/sia.md` and the reserved `sia/` definition directories.
 - It replaces only marked Sia blocks in catalog indexes, `AGENTS.md`, and Claude compatibility instructions.
-- Repository docs, rules, plans, project definitions, and `CUSTOM` catalog content remain project-owned.
+- Repository docs, rules below the project-specific marker, plans, project definitions, and `CUSTOM` catalog content
+  remain project-owned. Installs refresh default rules above the marker from `src/seed/.ai/RULES.md`.
 - Unattended mode pre-authorizes only in-scope Sia gates, preserves its original ceiling, and bounds automatic retries.
 - Ship closes and retains the active plan; deleting that exact completed plan requires a separate explicit request.
   Product, source, and external state remain read-only unless the user explicitly requests another delivery action.

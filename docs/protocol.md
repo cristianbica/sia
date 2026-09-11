@@ -189,7 +189,8 @@ it, report the conflict; do not silently bypass the gate or retrospectively reco
 
 ## Project rules
 
-`.ai/RULES.md` is project-owned and contains hard Sia-specific constraints. Load it for operation execution, delivery
+`.ai/RULES.md` contains hard Sia-specific constraints. Installs refresh defaults from `src/seed/.ai/RULES.md` through
+the project-specific marker and preserve project-owned rules below it. Load it for operation execution, delivery
 resume, and any isolated phase execution. Do not load it for `Sia load docs`, `Sia load skills`, `Sia reload`, help, or
 a direct conversation, because those paths intentionally leave the host's normal workflow in control.
 
