@@ -28,6 +28,9 @@ After resolution, do not reread catalogs, broad docs, unauthorized plans, or pri
 
 ## Review/Validate
 
+Compare the result with both the original request and the approved plan, including later explicit user changes.
+Challenge unnecessary capabilities and mechanisms even when the plan introduced them; plan inclusion alone is not
+evidence of necessity. If correcting the plan changes its approved boundary, use the existing replanning gate.
 Inspect correctness, scope, regressions, security/operational risk, documentation, and command claims. Standard prefers
 a reviewer who did not build; lightweight uses focused coordinator testing and a focused diff/scope check. A
 material lightweight finding promotes to standard before Fix or Ship. Append one short progress comment; set status to
@@ -52,4 +55,3 @@ Lead the user-facing report with the result, meaningful checks, and unresolved i
 when they help assess the change. Keep required route, model/usage, and detailed command evidence in the active plan
 or handoff when one exists; report them directly when requested or material to a decision. Do not create an artifact
 solely to hold routine reporting details. This changes presentation, not approval gates or evidence requirements.
-

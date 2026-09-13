@@ -95,9 +95,9 @@ check_forge_inline_delivery() {
   assert_contains "$DELIVERY" 'stop before acting beyond the bounded' || return 1
   assert_contains "$DELIVERY" 'vague or outcome-oriented request such as `handle #5`' || return 1
   assert_contains "$DELIVERY" 'output and cadence instruction, not approval' || return 1
-  assert_contains "$DELIVERY" 'minimum safety-critical discovery' || return 1
-  assert_contains "$DELIVERY" 'Stop discovery as soon as that envelope is safe' || return 1
-  assert_contains "$DELIVERY" 'until after approval unless it could materially change the envelope' || return 1
+  assert_contains "$DELIVERY" 'inspect enough existing behavior, callers, and repository patterns' || return 1
+  assert_contains "$DELIVERY" 'Stop when the consequential decisions are grounded' || return 1
+  assert_contains "$DELIVERY" 'that cannot change the approach or scope until implementation' || return 1
   assert_contains "$DELIVERY" 'without routine command narration' || return 1
   assert_contains "$DELIVERY" 'Ask for explicit approval before the change or external action' || return 1
   assert_contains "$DELIVERY" 'Approval binds' || return 1

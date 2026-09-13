@@ -159,7 +159,7 @@ check_forge_contract() {
   assert_contains "$ORCHESTRATION" 'reopening files or repeating searches' || return 1
   assert_contains "$ORCHESTRATION" 'one focused clarification' || return 1
   assert_contains "$ORCHESTRATION" '`inline plan` request is a cadence instruction' || return 1
-  assert_contains "$ORCHESTRATION" 'only minimum' || return 1
+  assert_contains "$ORCHESTRATION" 'repository patterns to ground consequential decisions' || return 1
   assert_contains "$ORCHESTRATION" 'without routine command' || return 1
   assert_contains "$ORCHESTRATION" '`done and move to next one. inline plan`' || return 1
   assert_contains "$ORCHESTRATION" 'reads the file and returns the result directly' || return 1

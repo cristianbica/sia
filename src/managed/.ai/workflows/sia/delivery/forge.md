@@ -48,9 +48,9 @@ ambiguous, ask one focused clarification without planning or acting. Do not use 
 standard artifact handling.
 
 An explicit request for an `inline plan` or equivalent is an output and cadence instruction, not approval. Reuse loaded
-context and perform only the minimum safety-critical discovery needed to state outcome, scope, non-goals, acceptance,
-checks, risks, and external actions. Stop discovery as soon as that envelope is safe. Defer deeper seam, caller,
-analogue, and regression-detail discovery until after approval unless it could materially change the envelope. Present
+context and inspect enough existing behavior, callers, and repository patterns to support the proposed approach,
+scope, acceptance checks, and material risks. Stop when the consequential decisions are grounded; defer details
+that cannot change the approach or scope until implementation. State the approach and its evidence briefly. Present
 the plan directly and ask for approval without routine command narration, repeated evidence, or a discovery transcript.
 
 For the approval path, present a concise inline intent envelope with outcome, scope, non-goals, acceptance criteria,

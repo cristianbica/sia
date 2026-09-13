@@ -6,7 +6,8 @@ Load for Plan, Approve, or validating a resumed artifact. After approval, follow
 ## Plan
 
 - Purpose: produce a readable, executable standard plan; no product/source writes.
-- Output: the visible plan states only outcome, scope, non-goals, acceptance, checks, risks, and external actions.
+- Output: the visible plan states outcome, scope, the evidence-backed approach, non-goals, acceptance, checks, risks,
+  and external actions.
 - Filename: every new artifact is `.ai/plans/YYYY-MM-DD-NN-<slug>.md`, using the UTC creation date and a two-digit,
   zero-padded daily sequence. Inspect filenames only (never unauthorized plan contents) to select the next unused `NN`
   for that date; this makes directory order chronological and deterministic.
@@ -17,6 +18,9 @@ Load for Plan, Approve, or validating a resumed artifact. After approval, follow
 
 Write for the person deciding whether to approve the change:
 
+- Establish the current behavior and where the change belongs before proposing a mechanism. Briefly explain the
+  chosen approach and the repository evidence behind consequential decisions. Distinguish verified facts from
+  unresolved assumptions; a restatement of the requested outcome is not an implementation approach.
 - Open with one or two plain-language sentences: what result is intended, and why does it matter?
 - Make the rest scannable. Describe what will change in short points, with one main idea per point. Split independent
   requirements instead of joining them with semicolons or packing several sentences into one bullet.

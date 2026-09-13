@@ -146,10 +146,10 @@ selectors express cadence and never bypass eligibility or safety gates. Thus `ma
 work, and external actions require a plan. If direct discovery reveals material ambiguity, risk, or expansion, Forge
 stops before crossing the bounded request, reports any completed in-bound work, and presents an inline plan.
 
-An explicit `inline plan` request is a cadence instruction. Forge uses loaded evidence, performs only minimum
-safety-critical discovery, stops when the envelope can be stated safely, and presents it without routine command
-narration or evidence dumps. Deeper seam, caller, analogue, and regression discovery moves after approval unless it
-could materially change scope, criteria, risk, permissions, or external actions. For example,
+An explicit `inline plan` request is a cadence instruction. Forge reuses loaded evidence and inspects enough existing
+behavior, callers, and repository patterns to ground consequential decisions. It presents the approach and supporting
+evidence briefly, without routine command narration or evidence dumps. Details that cannot change the approach or
+scope can wait until implementation. For example,
 `done and move to next one. inline plan` should resolve the next loaded item and promptly present its envelope.
 
 Forge remains enabled and ready for the next request. Its usual permission, external-action, security,
@@ -294,7 +294,10 @@ Plan → Approve → Build → Review + Validate → Fix ─┐
 ### Plan
 
 Load the smallest relevant docs and skills, perform focused read-only discovery, inspect analogous code and tests, and
-produce an executable plan. Do not edit product/source code.
+produce an executable plan. Establish current behavior, where the change belongs, and why the chosen approach fits
+the repository. New capabilities and mechanisms need an explicit requirement or demonstrated necessity; explain why
+a simpler existing approach is insufficient when the choice matters. Keep the plan concise without omitting the
+evidence behind consequential decisions. Do not edit product/source code.
 
 ### Approve
 

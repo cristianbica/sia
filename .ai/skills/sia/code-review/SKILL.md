@@ -20,7 +20,7 @@ Prefer existing repository patterns, clear names, compatible interfaces, and cod
 ## Required context
 
 - Review target, base revision, dirty-worktree baseline, scope, and exclusions.
-- User request or approved plan and acceptance criteria when available.
+- Original user request, later explicit user changes, and approved plan and acceptance criteria when available.
 - Relevant repository documentation, tests, command evidence, and operational constraints.
 
 ## Review checks
@@ -53,8 +53,10 @@ plausible trigger; use evidence to judge impact.
 3. Apply the checks above proportionately to the change. Check assumptions, compatibility, authorization,
    concurrency, security, and operational impact where they have a plausible trigger.
 4. Assess whether tests would detect realistic regressions and whether reported commands support the claims made.
-5. Compare the result with requested scope; identify accidental changes, missing work, unsupported behavior, and
-   validation gaps.
+5. Compare the result with both the user request and the approved plan; identify accidental changes, missing work,
+   unsupported behavior, and validation gaps. Challenge features and mechanisms without a requirement or demonstrated
+   necessity, even if the plan introduced them. When the original request is unavailable, report that review limit
+   rather than treating plan inclusion as evidence that a capability was requested.
 
 Do not modify reviewed files. Do not report theoretical possibilities without a plausible trigger and concrete impact.
 Do not claim proof of correctness merely because no finding was identified.

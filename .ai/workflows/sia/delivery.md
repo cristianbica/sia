@@ -9,6 +9,15 @@ First select the route below. Standard follows Plan → Approve → Build → Re
 lightweight follows direct authorization → Build → focused Review/Validate → Ship; trivial work is planless.
 Forge follows its direct or approved inline lane. Keep the protocol's authority and permission rules in every route.
 
+## Engineering decisions
+
+Ground the approach in the existing behavior, affected callers, and relevant repository patterns. Prefer extending
+an existing mechanism when it meets the request. Each added feature, abstraction, dependency, option, or fallback
+must serve an explicit requirement or a demonstrated necessity for the requested behavior; otherwise omit it.
+For consequential choices, explain why the simpler existing approach is insufficient. Do not invent alternatives
+for obvious edits or expand discovery beyond what could change the decision. Apply these criteria during planning
+as well as implementation; approval of a broad outcome does not justify unrelated capabilities.
+
 ## Load only the current route and phase
 
 Read only the matching row's supporting documents. Paths are relative to this workflow file. Reuse already-loaded
