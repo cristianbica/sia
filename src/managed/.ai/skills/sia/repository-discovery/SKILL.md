@@ -9,47 +9,13 @@ use_when:
 
 # Repository discovery
 
-Use focused, evidence-led discovery to answer the current task without mapping the whole repository.
+Start with the user's question and `.ai/docs/INDEX.md` when initialized. Follow only relevant routes, then verify
+behavior-changing assumptions against current code. Trace callers, tests, and analogous implementations until the
+important decisions are grounded. Avoid broad inventories and repeated reads of unchanged evidence.
 
-## Required context
+Use repository-specific commands only after checking their conventions. Separate observed facts, documented claims,
+and inference. If a document is wrong, identify its exact claim and contrary source evidence; correct it only within
+the authorized task, otherwise report it. Stop discovery when further reads would not change the answer or approach.
 
-- The user's requested outcome and explicit constraints.
-- The current workflow phase and its allowed reads and writes.
-- `.ai/docs/INDEX.md` when initialized, followed only along relevant routes.
-- Existing host or project instructions already in scope.
-
-## Procedure
-
-1. Establish the repository root and inspect the narrowest likely entrypoints.
-2. Consult relevant repository documentation, but verify behavior-changing claims against current source.
-3. Trace outward only as needed through callers, dependencies, data flow, configuration, and representative tests.
-4. Look for analogous implementations before proposing a new pattern.
-5. Identify verified commands, conventions, invariants, pre-existing changes, and unresolved assumptions.
-6. Stop when the evidence is sufficient to plan or document the requested scope.
-
-Prefer filenames, symbols, targeted search, and small directory listings over broad tree dumps or reading every file.
-Batch independent reads and searches when the host supports it; keep dependent reads and permission checks sequential.
-Retrieve current authoritative evidence for changing external facts instead of answering from memory. Stop discovery
-when the task's material questions are answered; repeat a lookup only for new uncertainty or changed evidence.
-Separate direct observations from inference. Cite repository paths for important claims and state confidence when
-evidence is incomplete.
-
-When source evidence invalidates a loaded documentation claim, report its exact path, claim, and contradictory
-evidence. If correcting it is within the authorized phase and scope, use the documentation skill's update rules;
-otherwise leave that specific correction for a later refresh.
-
-Exclude `.ai/plans/**` from repository-wide search, diff, indexing, and discovery commands. Plan content is available
-only when its exact path appears in the conversation or handoff `authorized_plan_paths`; open those paths directly.
-Filename-only inspection may allocate a new plan name but must not become task evidence.
-
-## Constraints
-
-- Do not edit product or source code while using this skill for a read-only phase.
-- Do not treat generated files, stale docs, or similarly named code as authoritative without verification.
-- Do not claim a command works unless it was run successfully and its result inspected.
-- Do not expand into adjacent areas merely to make the map feel complete.
-
-## Output
-
-Return the relevant entrypoints, flows, invariants, commands, tests, risks, unknowns, and paths that support them. The
-result should be compact enough to use as plan or documentation input without replaying discovery.
+Exclude `.ai/plans/**` from repository-wide searches, diffs, and history. Read only exact conversation-authorized plans;
+filenames may be inspected solely to allocate a new name. Do not infer a past plan from a similar task.

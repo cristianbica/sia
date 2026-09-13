@@ -4,7 +4,7 @@ operation: implement
 workflow: delivery
 status: in-progress
 next_phase: build
-expected_route: standard
 ---
 
-This fixture intentionally omits `execution_route`; resume must treat it as a standard delivery plan.
+Historical metadata example, not a complete approved plan. Missing route metadata does not remove the saved
+approval requirement. Resolve status and approval under the recorded legacy contract; refuse incomplete evidence.

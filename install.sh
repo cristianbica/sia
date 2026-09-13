@@ -288,7 +288,7 @@ check_source() {
   source_dir "$managed/operations/sia"
   source_dir "$managed/workflows/sia"
   source_file "$managed/sia.md"
-  for support in forge standard execution; do
+  for support in forge standard handoff; do
     source_file "$managed/workflows/sia/delivery/$support.md"
   done
   for path in "$seeds/RULES.md" "$seeds/docs/INDEX.md" "$seeds/skills/INDEX.md" \

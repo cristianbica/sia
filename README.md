@@ -1,304 +1,98 @@
 # Sia
 
-> Perception, understanding, and disciplined work for coding agents.
+Sia helps coding agents understand a repository and make the changes a developer asks for. It provides repository
+knowledge, reusable skills, and a few explicit operations. It works through readable files with Codex, Claude Code,
+OpenCode, and Cursor; it requires no runtime, plugin, database, or MCP server.
 
-Sia is the personification of perception, understanding, and intellectual insight in Egyptian mythology. The name fits
-the job: help coding agents perceive a repository, understand how it works, and carry out changes through explicit,
-reviewable workflows.
+Sia is opt-in. Ordinary host sessions remain ordinary until you start a message with the exact token `Sia`.
 
-Sia is an opt-in, prompt-based, repository-local power-up designed for Codex, OpenCode, Claude Code, and Cursor. It
-provides:
+## Install
 
-- concise, maintained repository documentation;
-- composable Sia and project skills;
-- repeatable operations and workflows such as Plan → Approve → Build → Review/Validate → Fix → Ship.
-
-It requires no plugin, MCP server, database, or Sia runtime. The host coding agent still reads files, edits code, runs
-commands, and starts isolated workers when it supports them.
-
-> [!IMPORTANT]
-> Sia is an early release. Its source, prompt packages, installer, and deterministic verification are implemented.
-> Live host-model certification remains separate and is reported without treating an installed CLI as proof.
-
-## Why Sia
-
-Coding agents repeatedly rediscover the same architecture, conventions, commands, and domain rules. That consumes
-context and still leaves larger changes vulnerable to planning drift and self-review bias. Sia keeps compact repository
-knowledge close to the code and gives different host tools the same explicit vocabulary for using it.
-
-Adoption is progressive: load only the docs index, load only the skills catalog, or invoke a complete operation. Normal
-host sessions remain normal until the user asks for Sia.
-
-When activated, Sia leads with the result and uses plain language, with enough detail to make the answer easy to follow.
-Code follows existing patterns and solves the current task without unnecessary abstractions or options. Reports focus
-on results, meaningful checks, and unresolved issues. Required evidence and approval boundaries still apply.
-This does not affect ordinary prompts that did not activate Sia.
-
-## Installation
-
-Run the readable installer from the root of the repository Sia should support:
+From the repository root:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | sh
 ```
 
-When read from standard input, `install.sh` makes a shallow temporary clone of the current
-`https://github.com/cristianbica/sia.git` default branch, runs the same readable installer against its plain `src/`
-files, and removes the clone. Review the script at the URL above before executing it. `curl`, `git`, and POSIX `sh`
-are required.
+Review the installer before running it. It requires Git, curl, and POSIX sh; it clones the current public source into a
+temporary directory, installs its files, and removes that clone. To pin a revision, set `REF` for the `sh` invocation.
+To install from a local Sia checkout, run `/path/to/sia/install.sh` from the target repository root. Re-run to refresh.
+Local checkout installation uses its current `src/` files and does not download or switch revisions.
 
-The installer does not detect or install Codex, OpenCode, Claude Code, or Cursor. It installs the small repository
-entrypoints for every supported host: root `AGENTS.md` serves Codex, OpenCode, and Cursor, while a Claude import bridge
-is added when needed. Unused entrypoints are inert.
+Review and commit the intended installed files for your team. Updates preserve project docs, custom definitions,
+CUSTOM entries, and project rules below their marker. Managed Sia files and default rules are refreshed.
+Use `Sia reload` in an existing conversation after updating.
 
-### Install from a source checkout
-
-To install from a local Sia checkout, run its installer from the target repository root:
-
-```sh
-/absolute/path/to/sia/install.sh
-```
-
-The installer targets POSIX `sh` on Linux and macOS. WSL is an intended compatible environment but remains uncertified
-until the same suite is run there. Run it from the Git repository root. Re-run `install.sh` to refresh Sia from current
-GitHub source:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | sh
-```
-
-To install a particular remote branch or tag, set `REF`; a local checkout always installs the files currently in
-that checkout:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/cristianbica/sia/HEAD/install.sh | REF=v0.1.0 sh
-```
-
-The installer does not inspect application source or generate repository documentation.
-
-After installation, review `git diff` and commit the intended `.ai/`, `AGENTS.md`, and Claude bridge changes so the
-team receives the same Sia behavior. Decide separately whether `.ai/plans/` should be committed for shared handoffs or
-ignored as local task state.
-
-After refreshing Sia in an existing conversation, use `Sia reload`. It rereads the current protocol without restarting
-the host, preserves persisted plans, and does not start work.
-
-## Quick start
-
-Sia is inactive during ordinary use of the host tool. Activate only the part you want by making `Sia` the exact first
-non-whitespace token of the prompt.
-
-You can also talk to Sia directly. Clear action language such as `Sia work on the billing export`, `Sia fix this`, or
-`Sia adjust the retry behavior` may select the best matching operation when the intent is unambiguous. Questions such as
-`Sia what do you think about this design?` remain read-only Sia conversations and do not start a workflow.
-
-### Make repository documentation available
-
-```text
-Sia load docs
-```
-
-This loads only `.ai/docs/INDEX.md`. The host can follow a documented route later when it becomes relevant to normal
-work; it does not start a Sia workflow.
-
-For a repository that has not been documented yet:
+## Use it
 
 ```text
 Sia document repository
-```
-
-### Make skills discoverable
-
-```text
-Sia load skills
-```
-
-This loads the skill catalog, not every skill body. The host selects a skill only when a later task needs it.
-
-### Run an operation
-
-```text
+Sia load docs
 Sia implement subscription pausing
 Sia fix duplicate renewal charges
 Sia review the current branch
 Sia investigate intermittent webhook failures
-Sia investigate intermittent webhook failures and save an implementation plan
-Sia document the billing area
-Sia refresh-docs billing
+Sia investigate the checkout design and save an implementation plan
 ```
 
-An operation selects a workflow and relevant skills. `Sia implement` chooses a conservative route: trivial wording or
-formatting corrections are planless; eligible narrow documentation, definitions, and internal fixes are directly
-authorized by the request, show an inline compact receipt, and get focused validation; product/source or uncertain work
-uses standard delivery. The receipt lists the outcome, bounded paths, checks, documentation impact, and external
-actions; it is not persisted or a second approval gate. Standard delivery plans once, stops for one intent-envelope
-approval, then builds, reviews, fixes, and reports. In-envelope implementation details do not cause another approval;
-expanded scope, risk, permissions, or external actions do. An explicit request for a full or thorough workflow selects
-standard delivery.
+`implement` and `fix` normally inspect the code, make the change, check it, and report the result. They do not require
+route labels, receipts, saved plans, or workers. An explicit planning request stops before implementation for approval.
+A clear approval of the presented plan authorizes its work. Material scope changes and host permissions still matter.
 
-Investigation keeps product, source, existing plans, and external state read-only. If its original request explicitly
-asks to save an implementation plan, its coordinating session may create one new `pending-approval` delivery plan and
-report the exact `Sia resume <path>` command; it never approves or executes that plan.
+**Changed default:** earlier versions created approval plans for most source changes. Normal coding now proceeds from
+the request. Existing saved plans keep their approval checks; a pending plan is never automatically approved.
 
-For rapid, conversation-scoped iteration, use Forge:
+Repository docs are pointers to relevant architecture, conventions, and verified commands. `load docs` loads only their
+index; `load skills` exposes only the skills catalog. Both augment the host without starting an operation. Source
+remains the authority when documentation is stale. `refresh-docs <subject>` updates a requested documentation area.
+
+## Plans and follow-ups
+
+Ask for a plan when you want to review the approach first. Ask to save it when you need to resume later:
 
 ```text
-Sia forge on
-Sia forge off
+Sia resume .ai/plans/2026-09-13-01-subscription-pausing.md
 ```
 
-Forge answers questions and performs non-mutating local work immediately: reads, searches, listings, diffs,
-status/history, inspection, review, and safe diagnostics need no plan or approval. A precise bounded imperative also
-authorizes its stated local, reversible write directly. Vague outcomes, planned requests, risky or destructive work,
-external actions, and material scope expansion use a repeating loop: inline plan, explicit approval, implementation,
-review, validation, fixes when needed, then the next request. Size alone does not select a lane. Forge writes no
-`.ai/plans/**` artifact and cannot resume after a new conversation. Use an explicit operation when persisted,
-resumable delivery is wanted. `Sia forge off`, `Sia stop`, or `Sia reload` also ends Forge.
+Only that exact plan is authorized for reading. Resume preserves its status and approval; it does not approve a draft.
+Existing compact and valid legacy formats remain supported. Sia does not search unrelated historical plans.
 
-Use `do:` to request direct execution and `plan:` or `inline plan` to request approval first. These are cadence
-selectors, not safety overrides. `Mark #4 done` or `do: change this label to Completed` can execute directly when the
-target and result are clear. `Handle #5` and `plan: handle #5` require a plan. If direct work uncovers material
-ambiguity, risk, or expansion, Forge stops before crossing the stated boundary and presents an inline plan.
+For a continuous session, `Sia forge on` makes the prefix optional for follow-ups. Forge uses the same coding behavior;
+`do:` asks for implementation, while `plan:` or `inline plan` asks for approval first. Clear follow-ups such as “next
+one” reuse the conversation. Forge keeps no saved task state and cannot resume in a new conversation.
+`Sia forge off` ends it. Reserved directives and explicit `unattended` retain their meaning.
 
-While Forge is enabled, `Sia` is an optional prefix: `Sia Read …` stays immediate, and `Sia implement …` or
-`Sia fix …` stays in the inline Forge loop. Exact operation names and aliases do not start persisted delivery until
-Forge is turned off. Reserved directives and `unattended` keep their explicit meanings.
+`Sia unattended implement <request>` works within the original request without asking for additional authority.
+It blocks if necessary scope, credentials, or permissions are missing. It does not create a plan by default or bypass
+an explicit planning-only request, project limits, or host controls. External actions need explicit authorization.
 
-Forge also treats terse follow-ups as commands over active context. It resolves `done`, `next one`, item numbers, and
-clear pronouns from already loaded content instead of restarting intake. When asked for an `inline plan`, it reuses that
-evidence, performs only minimum safety-critical discovery, and presents the envelope promptly; deeper implementation
-discovery follows approval unless it could change the approved boundary.
-
-### Run an operation unattended
-
-```text
-Sia unattended implement the restocking report
-```
-
-`unattended` is an exact modifier before the operation name. It gives upfront authorization for Sia workflow gates
-within the original request. Sia uses the same conservative routes, asks no questions, and returns a blocker instead of
-guessing when it cannot proceed safely. It does not claim that the user reviewed a generated plan.
-
-The plan preserves an immutable authorization ceiling and explicit external-action list across replans and resume.
-A blocked resume retries only after its recorded condition changes; identical failures and Fix cycles are bounded.
-
-Unattended mode does not bypass host or system permissions, external approval interfaces, project rules, safety checks,
-or dirty-worktree safeguards. It does not imply permission to commit, push, open a pull request, release, publish,
-deploy, perform destructive work, or take other external actions unless the initial request explicitly includes them.
-
-If delivery continues in a fresh conversation or isolated worker, Sia persists the approved plan. New plans use
-`YYYY-MM-DD-NN-<slug>.md`: the UTC date followed by the next zero-padded daily sequence, so they sort chronologically:
-
-```text
-Sia resume .ai/plans/2026-07-13-01-subscription-pausing.md
-```
-
-Plan contents are conversation-isolated. Sia may read plans it created in the current conversation and exact plan paths
-the user explicitly requests or approves. Every plan that existed before the conversation is content-inaccessible by
-default; filename-only inspection is allowed to allocate a new sequence. `Sia resume <exact-plan>` authorizes only its
-named artifact. A worker receives the same exact allowlist and excludes every other `.ai/plans/**` path.
-
-Stop active orchestration without pretending already loaded context can be erased:
-
-```text
-Sia stop
-```
-
-## How Sia is organized
-
-| Layer | Purpose | Examples |
-| --- | --- | --- |
-| Repository documentation | Current, evidence-linked understanding of the repository | Architecture, areas, features |
-| Skills | Reusable expertise loaded only when relevant | Testing, bug triage, safe refactoring |
-| Operations and workflows | User intent, phases, gates, artifacts, and completion | Implement, fix, review, document |
-
-After installation, Sia keeps its repository-local state under `.ai/`:
-
-```text
-.ai/
-  sia.md                 # canonical activation protocol; replaced by Sia installs
-  RULES.md               # refreshed defaults, then project constraints below the marker
-  docs/                  # maintained repository knowledge
-  skills/                # Sia and project skills
-  operations/            # Sia and project operations
-  workflows/             # Sia and project workflows
-  plans/                 # approved or pre-authorized resumable delivery plans
-```
-
-The installer also adds a bounded activation block to root `AGENTS.md`. When necessary, it adds a Claude compatibility
-import. These bridges only tell the host that Sia exists and when to read `.ai/sia.md`; they do not activate Sia or load
-`.ai/**` during ordinary startup.
+`Sia stop` ends the task and Forge. `Sia reload` rereads the protocol and stops orchestration without deleting plans.
+Neither can erase already loaded context. Bare `Sia`, `Sia help`, and `Sia show help` list available commands and
+skills.
 
 ## Project customization
 
-Projects can extend Sia without changing shipped definitions:
+Installed content lives under `.ai/`: the protocol, default/project rules, docs, skills, operations, workflows, and
+optional plans. The root `AGENTS.md` bridge handles activation; Claude receives an import bridge when needed.
 
-- put hard Sia-specific constraints below the project-specific marker in `.ai/RULES.md`;
-- create skills directly under `.ai/skills/<name>/`;
-- create operations directly under `.ai/operations/<name>.md`;
-- create workflows directly under `.ai/workflows/<name>.md`;
-- register project definitions in the `CUSTOM` section of the relevant `INDEX.md`.
+Add project constraints below the marker in `.ai/RULES.md`. Custom definitions live directly in their category and
+are registered in the index's CUSTOM section. They override same-named shipped definitions deliberately; upgrades
+preserve them. Use `create-skill`, `create-operation`, `create-workflow`, or `reconcile-catalogs` when useful.
+Custom workflows keep their own chosen behavior. See [extensions](docs/extensions.md).
 
-Sia ships `create-skill`, `create-operation`, `create-workflow`, and `reconcile-catalogs` so definitions and catalog
-entries are created consistently. A valid project definition overrides a same-named shipped definition and Sia
-announces the override when selected.
+## Development and evidence
 
-## Portability and model routing
-
-Sia uses the same prompt vocabulary and workflow semantics across target hosts. Native worker isolation and model
-selection remain host capabilities, not Sia requirements.
-
-The dated [host matrix](docs/host-matrix.md) distinguishes CLI availability, no-model harness validation, and live
-semantic certification. Never interpret an installed CLI or passing shim as proof of model behavior.
-
-Workflows may request the advisory profiles `fast` or `reasoning`. `fast` is a latency hint, not a price tier. The host
-chooses the actual model it can provide, and Sia records that model when the host reports it. An unavailable profile
-never changes approval gates, permissions, or
-correctness requirements.
-
-## Safety and ownership
-
-- Sia fails closed when its activation protocol is missing, invalid, or incompatible.
-- Re-running install replaces `.ai/sia.md` and the reserved `sia/` definition directories.
-- It replaces only marked Sia blocks in catalog indexes, `AGENTS.md`, and Claude compatibility instructions.
-- Repository docs, rules below the project-specific marker, plans, project definitions, and `CUSTOM` catalog content
-  remain project-owned. Installs refresh default rules above the marker from `src/seed/.ai/RULES.md`.
-- Unattended mode pre-authorizes only in-scope Sia gates, preserves its original ceiling, and bounds automatic retries.
-- Ship closes and retains the active plan; deleting that exact completed plan requires a separate explicit request.
-  Product, source, and external state remain read-only unless the user explicitly requests another delivery action.
-- Host system, developer, user, permission, and safety rules always remain authoritative.
-
-## Project status and documentation
-
-The repository contains the first usable implementation and its design contracts:
-
-- [Design and implementation index](docs/README.md)
-- [Product and principles](docs/product.md)
-- [Activation protocol](docs/protocol.md)
-- [Repository knowledge](docs/repository-knowledge.md)
-- [Extensions and catalogs](docs/extensions.md)
-- [Orchestration and workflows](docs/orchestration.md)
-- [Tool integration and installation](docs/integration.md)
-- [Source repository layout](docs/source-layout.md)
-- [Host validation matrix](docs/host-matrix.md)
-- [Implementation and acceptance](docs/implementation.md)
-
-Run source, prompt-contract, installer ownership, GitHub-download, and no-model host-harness verification with:
+Canonical source lives under `src/`; `.ai/` in this checkout is the installed copy plus project content. After source
+changes run `./install.sh`. See [source layout](docs/source-layout.md) and [design docs](docs/README.md).
 
 ```sh
-scripts/verify
-```
-
-Probe installed host versions without invoking a model:
-
-```sh
+sh scripts/verify
+scripts/report-context
 scripts/verify-hosts --probe
 ```
 
-Live host tests are deliberately separate because they send the installed fixture and prompts to external model
-services. Explicitly authorized live host certification remains external evidence and is not claimed by the local
-deterministic suite.
-
-## License
+The verifier checks package structure, installation, and offline host harnesses. It does not prove that prompts produce
+better code. Live comparisons require explicit model access and a run limit. The simplified workflow's practical
+benefit remains unverified until actual outputs are reviewed; see [evaluation](docs/implementation.md).
 
 [MIT](LICENSE) © 2026 Cristian Bica.

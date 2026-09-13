@@ -2,228 +2,98 @@
 sia_protocol: 1
 ---
 
-# Sia protocol
+# Sia
 
-Sia is an opt-in prompt protocol for repository knowledge, skills, and explicit operations and workflows.
-Help the user understand the repository and complete authorized work with sound engineering judgment and clear evidence.
-Minimize total effort while preserving correctness and useful detail. Sia adds no permissions or background behavior.
+Help the developer work with this repository. Use relevant project knowledge and complete the requested task.
+Sia adds no tools or permissions. Host instructions and the user's explicit choices take priority.
+All `.ai/**` paths are relative to the Git root containing the activating `AGENTS.md`.
 
-All `.ai/**` paths are relative to the Git root whose `AGENTS.md` activated Sia, even from subdirectories.
+## Activation and routing
 
-## Activation
-Attempt activation only when case-sensitive `Sia` is the first non-whitespace token and is followed by whitespace or
-the end of the message. `sia`, `SIA`, `Sia:`, and incidental mentions do not activate Sia.
+Activate only when case-sensitive `Sia` is the first non-whitespace token, followed by whitespace or end of message.
+Require this readable regular file to start with `---`, `sia_protocol: 1`, `---` and have a nonempty body. Otherwise
+report a Sia installation-integrity error; do not reconstruct the protocol from other files.
 
-For a valid invocation, first require this file's exact header lines `---`, `sia_protocol: 1`, and `---`, followed by a
-nonempty body. If it is missing, empty, unreadable, or invalid, report an installation-integrity error and stop; never
-reconstruct Sia behavior from other files, prior conversations, or general knowledge.
+Resolve the remainder in this order:
 
-Resolve the remainder after `Sia` in this order:
+1. Empty, exact `help`, or exact `show help`: show help only.
+2. Exact first token `unattended`: require an operation or alias, not a reserved directive.
+3. A reserved directive below: follow it. Invalid arguments are errors, not operation requests.
+4. With Forge enabled, handle other requests through Forge.
+5. Resolve an exact operation or alias. Otherwise infer one only for an unambiguous action request and announce it.
+6. Answer other requests as direct, read-only conversations using relevant context.
 
-1. An empty remainder or either exact help form, `help` or `show help`, shows the same concise help covering docs,
-   skills, Forge, interactive and unattended operations, resume, stop, and reload; it does nothing else.
-2. An exact `unattended` first token sets unattended mode and requires the next token to be an operation or alias. It
-   accepts an operation, not a reserved directive.
-3. A valid reserved directive form runs only that directive.
-4. A reserved directive name in an invalid form reports an arity or syntax error and does not fall back.
-5. With Forge enabled and no operation, route any unhandled remainder through Forge; `Sia` does not trigger operations.
-6. An exact operation or alias resolves in interactive mode and receives the remaining tokens as its request.
-7. Without an exact match, infer one operation only when the request clearly asks for an action and one effective
-   operation fits with high confidence; announce the inference before running it. Never infer unattended mode.
-8. Otherwise, answer as a direct Sia conversation: load only relevant context, do not start a workflow, and do not edit.
+An active task continues through follow-ups, including approval; a new operation needs a new explicit Sia invocation.
+Help, context loading, and side questions do not replace it. Completion, stop, reload, or a new resolved operation ends
+it. Do not infer activation or task state from another conversation.
 
-## Reserved directives
-`Sia help` and `Sia show help` are exact forms equivalent to bare `Sia`. Read only `.ai/operations/INDEX.md` and
-`.ai/skills/INDEX.md`; validate and merge each index's SIA and CUSTOM entries under normal override rules.
-Show the general requests `Sia load docs`,
-`Sia load skills`, `Sia forge on` / `Sia forge off`, `Sia unattended <operation> [request]`,
-`Sia resume <plan>`, `Sia stop`, and `Sia reload`, each with a brief purpose.
-List every effective operation once with its description and effective aliases, labeling project entries and overrides
-as CUSTOM. List every effective skill once on one comma-separated `Skills:` line, labeling project entries and overrides
-as CUSTOM.
-Malformed, duplicated, or ambiguous entries in either index produce an error instead of a partial or inferred list.
-Do not read operation or skill bodies, other catalogs, docs, workflows, or rules, or start or replace an operation.
-Extra arguments to `help` or after `show help` are syntax errors and do not fall back to conversation or operation
-inference.
-### `Sia load docs`
-Read only `.ai/docs/INDEX.md` and expose its routes to the host's normal workflow. Follow no links until a later task
-requires them, and do not activate an operation. If the index is missing or `status: not-initialized`, report repository
-documentation unavailable and suggest `Sia document repository`.
-### `Sia load skills`
-Read `.ai/skills/INDEX.md`, merge its SIA and CUSTOM entries, and expose the effective catalog. Do not read every skill
-body. Load a skill body only when a later task needs it or the user explicitly requests it. This does not activate an
-operation.
-### `Sia forge on` and `Sia forge off`
-`Sia forge on` enables Forge only when no operation is active; off/stop/reload or a new chat ends it.
-Forge is artifact-free and cannot be resumed. Reuse active context; resolve clear terse follow-ups without fresh intake.
-Non-mutating work is immediate; a precise bounded imperative authorizes its local write, and `do:` requests that lane.
-`plan:`/`inline plan` or uncertainty requires approval; prefixed operations stay in Forge; controls stay controls.
-`Sia forge off` disables Forge without starting an operation or erasing loaded context; if it is off, report that.
-### `Sia resume <plan>`
-The exact plan path is explicit content-read authorization; add only it to `authorized_plan_paths`, then read it under
-`.ai/plans/`. New artifacts use `YYYY-MM-DD-NN-<slug>.md` with the UTC date and a zero-padded daily sequence; allocating
-`NN` may inspect filenames only, never unauthorized plan contents. New compact artifacts have only `operation`,
-`workflow`, and `skills` frontmatter, one approval marker pair, one `sia:status` comment, and optional footer comments.
-Existing valid legacy artifacts remain resumable. Refuse ambiguous, missing, or contradictory plans.
-A valid `pending-approval` draft resumes to Approve, never Build; present its scope and wait for approval.
+## Directives
 
-For compact artifacts, hash UTF-8 content between the unique approval markers, excluding the markers: convert CRLF
-and CR to LF, preserve all other whitespace, and compute lowercase SHA-256. Status beyond
-`pending-approval` requires one matching `sia:approved` comment; progress never repairs invalid approval content.
-Optional mode/route/base/dirty/ceiling/external/blocker comments apply only when present; derive phase from status.
-A blocked unattended plan retries only after observable change. Refuse complete/cancelled; Ship requires passing review.
+- `Sia help`, `Sia show help`, or bare `Sia`: read only operations and skills indexes. Merge SIA/CUSTOM entries and
+  validate names and aliases. List every effective operation with description and aliases, and every skill on one
+  `Skills:` line. Label CUSTOM additions/overrides. Include these directives and `Sia unattended <operation> [request]`
+  with brief purposes. Invalid catalogs
+  produce an error, not a partial list. Do not load bodies, rules, docs, or workflows. Extra help arguments are errors.
+- `Sia load docs`: read only `.ai/docs/INDEX.md`; follow its routes later when needed. Missing or `not-initialized`
+  means documentation is unavailable; suggest `Sia document repository`. Do not start an operation.
+- `Sia load skills`: expose the merged skills index. Load individual bodies only when relevant or explicitly requested.
+- `Sia forge on` / `Sia forge off`: on requires no active operation. Read rules when present and resolve the effective
+  delivery workflow; load its declared Forge support. Off ends Forge without erasing context. Report if already off.
+  Only `on` or `off` is valid.
+- `Sia resume <plan>`: authorize that exact `.ai/plans/` path, then load
+  [saved-plan support](workflows/sia/delivery/standard.md) before reading and validating it. Pending approval remains
+  pending; never turn resume into approval. Use the artifact's effective operation/workflow, including CUSTOM behavior.
+- `Sia handoff` followed by `handoff_protocol: 1` and an envelope: load
+  [worker support](workflows/sia/delivery/handoff.md). Reject an incomplete envelope without starting another operation.
+- `Sia stop`: stop the active operation and Forge. Already loaded context remains.
+- `Sia reload`: validate and reread this protocol, stop orchestration and Forge, preserve plans, and load nothing else.
+  Apply the new protocol later without claiming old context was erased.
 
-Compare current HEAD and changed paths with optional base/dirty comments and progress evidence. In unattended mode,
-unsafe overlap or attribution returns `blocked`; never auto-authorize around it. Otherwise, boundary drift returns
-standard work to Plan; record nonmaterial drift without rewriting the base.
+Directives accept exactly their stated arguments. `unattended` requires an operation and is never inferred.
 
-At the phase boundary, resolve the current effective operation, workflow, and skills. Put their exact paths in the
-handoff. Report a definition-path or resolution change; a material conflict returns to Plan and Approve.
+## Definitions
 
-### `Sia handoff` followed by a bounded handoff envelope
-A fresh worker started by an active Sia operation uses this directive. First line must be exactly `Sia handoff`; the
-remaining message must begin with `handoff_protocol: 1` and contain the complete nonempty envelope below.
-Validate the assigned operation, workflow, phase, artifact status when applicable, exact definition paths, allowed
-work, exclusions, `do_not_load` paths, and final task. Load `.ai/RULES.md`, this protocol, and only exact named paths.
-Never reroute through catalogs, choose another operation, coordinate approval, or expand the phase. Return the requested
-result envelope and end the worker's Sia activity; refuse incomplete, contradictory, or permission-expanding handoffs.
-
-### `Sia stop`
-Stop active Sia orchestration and disable Forge for later turns; do not claim already loaded context was erased.
-`Sia reload` rereads current `.ai/sia.md`, stops orchestration and Forge while preserving plans, and applies it later.
-It loads no catalogs, docs, skills, or work; old context remains, and the current valid protocol takes precedence.
-
-The public reserved directives require exact arity; help requires exactly `Sia help` or `Sia show help`, `Sia handoff`
-requires its structured body, `unattended` requires an operation, and Forge requires exactly `on` or `off`. Extra or
-missing arguments are errors.
-## Catalogs and resolution
-Skills, operations, and workflows are registered in their category `INDEX.md`. Logical names are normalized lowercase
-kebab-case and cannot be `sia`, which names the reserved shipped-definition directory. Valid project definitions live
-directly under their category.
-
-Operations and aliases cannot use these names:
+Skills, operations, and workflows are registered in their category `INDEX.md`. Names are lowercase kebab-case.
 Reserved names: `sia`, `unattended`, `help`, `show`, `load`, `forge`, `resume`, `handoff`, `stop`, `reload`.
+Operations and aliases cannot use reserved names; no definition can be named `sia`.
 
-For an indexed logical name, a CUSTOM entry resolves to the project definition and overrides the SIA entry. Otherwise,
-resolve the SIA definition. Announce a selected project override. A missing, malformed, duplicated, mismatched, or
-ambiguous CUSTOM definition is an error and never falls back to SIA. Unindexed files are not discoverable.
+For a logical name, a CUSTOM entry selects the direct project definition and replaces the shipped SIA definition.
+Announce a selected override. Otherwise use the indexed definition under `sia/`. Unindexed files are not discoverable.
+Missing, malformed, duplicated, mismatched, or ambiguous entries are errors; never fall back from an invalid override.
+Operation aliases appear only on the index entry's nested `aliases:` line and resolve uniquely. A CUSTOM override
+replaces the entire shipped alias set, including removing aliases when none are declared.
 
-Operation aliases appear only in the `aliases:` metadata line below an operation index entry. They use the same naming
-rules, cannot be `sia`, `unattended`, or a reserved directive name, and resolve uniquely after the explicit `Sia`
-prefix. A CUSTOM override replaces the complete shipped alias set; an omitted alias is unavailable.
-## Operation execution
-Use `Sia <operation> [request]` interactively or `Sia unattended <operation> [request]` for unattended execution:
+For an operation, resolve its index entry, read `.ai/RULES.md` when present, then its body and referenced workflow and
+skills through their indexes. Load only relevant support and repository docs. Do not append shipped workflow rules to
+a CUSTOM workflow. Project rules outrank Sia definitions and docs, but not host instructions or explicit user choices.
+Do not load rules for help, docs/skills loading, or direct conversation.
 
-1. Read `.ai/operations/INDEX.md` and resolve the exact operation or alias.
-2. Announce the effective operation and whether it is a project override.
-3. Load `.ai/RULES.md` when present.
-4. Read the resolved operation and resolve its one primary workflow and declared skills from their indexes.
-5. Fail on malformed or missing references; do not substitute a different definition.
-6. Load only the workflow, its selected support, skills, and repository docs required for the current phase.
-7. Follow the workflow until completion, cancellation, or explicit operation replacement.
+## Working together
 
-Unattended mode is enabled only by the exact modifier. Do not infer unattended mode from natural-language requests.
-Default is interactive; persist mode in artifacts and handoffs. Trivial is planless; lightweight directly authorized.
-Interactive standard uses one intent-envelope approval and separate review/fixes: the request authorizes Plan only.
-Build needs approval of the presented plan; a generic imperative or reversible edit is not that approval.
-Unattended auto-authorizes in-ceiling artifacts or replans. If progress needs new scope, authority, or credentials,
-return `blocked` rather than asking the user or guessing.
+Normal implementation requests authorize local in-scope work. Follow the effective workflow; planning requests and
+existing saved approvals retain their boundaries. Ask about decisions that materially change the outcome, not routine
+implementation choices. Preserve unrelated work and report unsafe overlap. Do not invent repository facts or results.
+Commit, push, publish, deployment, and other external actions require explicit user intent and host permission.
 
-Project rules constrain operations, resume, and isolated phases. They outrank docs, skills, operations, workflows, and
-plans, but not system or host safety, permissions, or the user's explicit instruction. Report material conflicts.
-Rules and custom definitions may narrow unattended work but cannot activate it or expand its authorization ceiling.
-
-Do not load `.ai/RULES.md` for help, `Sia load docs`, `Sia load skills`, or a direct Sia conversation.
-
-Help, docs loading, skills loading, Forge, a direct conversation, and an invalid handoff do not replace an active
-operation. Only successful completion, `Sia stop`, `Sia reload`, or a newly resolved operation ends or replaces it.
+Unattended work stays within the original request and authorized external actions. It cannot grant credentials,
+permissions, or broader scope. If those are missing, report `blocked` rather than guessing or asking for more authority.
+Stop after three unsuccessful fix cycles; retry a blocked task only after an observable change. Custom rules may narrow
+this authority. Unattended mode never overrides an explicit planning-only request.
 
 ## User-facing responses
 
-- Make the meaning clear on the first read in answers, updates, plans, and final reports. Lead with the actual result
-  or proposed change. Name what happens, what causes it, and why it matters when those links need explaining.
-- Use short, concrete sentences and phrases. Split dense sentences and explain necessary jargon.
-- Cut long prose, filler, repetition, stock phrases, and vague abstractions. Do not pack several ideas into one point.
-- Use bullets for separate points, without turning every answer into a list. Compressed jargon and cryptic fragments
-  also fail; shorter text and more bullets do not establish clarity. Keep explanations needed to understand the point.
-- Keep details that help understanding or a decision; omit routine implementation inventories and repeated safeguards.
-  Retain decisive evidence, uncertainty, safety limits and requested detail. Preserve exact commands and error strings.
-- Omit routine narration; give meaningful progress updates and a self-contained final with results, checks, and issues.
-- Continue authorized work to completion; make routine choices without reapproval. Actual workflow gates still apply.
+Speak plainly. Explain what changed or what you found, why it matters, and the checks or uncertainties that affect the
+answer. Use concrete code behavior instead of process jargon. Keep routine bookkeeping out of the response.
 
-## Context, workers, and model profiles
+## Context boundaries
 
-Maintain conversation-scoped `authorized_plan_paths`. It starts empty, adds an exact repository-relative path when this
-conversation creates the plan or the user explicitly requests or approves reading it, and resets only in a new
-conversation. Do not add paths inferred from task similarity, status, Git history, discovery, or another plan. Require
-exact entry before reading, searching, diffing, summarizing, or using `.ai/plans/**` content. Filename-only inspection
-is permitted only to allocate a new name. If a new or compacted context cannot recover exact authorization, fail closed;
-an exact user request such as `Sia resume <plan>` may restore it.
+Maintain `authorized_plan_paths` for this conversation. Add a path only when creating that plan or when the user
+explicitly requests or approves reading that exact path. Require that authorization before reading, searching,
+diffing, or using `.ai/plans/**` content, including Git history. Exclude other plans from discovery. Filename-only
+inspection is allowed solely to allocate a new plan name. Never infer permission from a matching topic or status.
 
-Keep isolated-worker context in lean, deterministic cache-aware order: protocol/rules, route/workflow, invariant
-declarations, and durable docs first; append active plan, evidence, constraints, and one ask. State each invariant once.
-Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix. Loaded docs/skills
-remain for the conversation; operation/mode remains until complete, stop, or replacement. Compaction summaries preserve
-exact authorized_plan_paths, definition paths, operation/mode/phase, approval boundaries, user corrections/constraints,
-preferences, doc paths, checks/results, rejected approaches/reasons, blockers, pending work and next action.
-After compaction, reload only this protocol, rules, authorized plans, material docs, and exact definitions.
-Never scan catalogs, unauthorized plans, or replay bulk output; summaries cannot create missing authorization.
-
-An isolated worker receives the core envelope below; every shown key is required. `final_task` is last.
-For artifact-backed work also include artifact_id, artifact_status, approved_revision, and next_transition; for writes,
-include base_ref and staged_paths/unstaged_paths/untracked_paths; put required support in definition_paths.support.
-Add relevant documentation_paths, evidence, findings,
-command_results, usage, and approved_deviations only when useful. Omitted context grants no authority. Full older
-envelopes remain valid; use `none`, `unknown`, or `[]` for required fields that do not apply.
-
-```yaml
-handoff_protocol: 1
-execution_mode: interactive
-authorization_ceiling: [current-operation-request]
-authorized_external_actions: []
-authorized_plan_paths: []
-operation: investigate
-workflow: investigation
-phase: investigate
-requested_outcome: <outcome>
-approved_scope: [<path-or-behavior>]
-non_goals: []
-acceptance_criteria: [<criterion>]
-repository_root: <absolute-path>
-definition_paths:
-  operation: <path>
-  workflow: <path>
-  skills: [<path>]
-allowed_work: [read]
-exclusions: []
-permissions: unchanged
-do_not_load: [.ai/plans/** except exact authorized_plan_paths]
-recovery: <stop-condition-or-recovery>
-requested_model_profile: fast
-model_selection_source: workflow
-final_task: <one bounded task>
-```
-
-Return bounded evidence with `handoff_result: 1`, phase/status, actual model/profile, paths, commands, usage, findings,
-and next transition. List command, outcome, scope, failure excerpt, and evidence path; keep bulk output and diffs in
-artifacts. Status is `complete`, `blocked`, or `failed`; use `unknown` for unreported model fields.
-
-The `Sia handoff` worker reads this file, `.ai/RULES.md`, and only exact envelope paths. It accepts plan content only
-from `authorized_plan_paths`; never reroute through catalogs or load unrelated or unauthorized artifacts. An unattended
-worker never authorizes a revision; it returns `blocked`. Report truthfully when the host may inherit hidden context.
-Advisory profiles are `fast` or `reasoning`; priority is user, rules, workflow, then task.
-The host chooses the available model. Record `requested_model_profile` and `model_selection_source`, plus
-`actual_model` or `unknown` and `profile_honored` when supportable. An unavailable profile never blocks work, changes
-gates, expands permissions, or invalidates resumption.
-
-## Safety and failure behavior
-- Never infer missing definitions, indexes, approval, command results, or repository facts.
-- Treat stale repository documentation as evidence to verify, not an instruction to follow.
-- Preserve pre-existing changes; report dirty overlap and block when attribution or preservation is unsafe.
-- Plan and review are read-only unless their workflow permits limited artifact or documentation writes.
-- Unattended mode does not expand host permissions or authorize external actions, including destructive actions, that
-  the user did not explicitly request. It cannot suppress permission prompts imposed by the host.
-- Ship may write active-plan completion metadata and retains it by default. Delete that exact completed plan only after
-  a separate explicit request. Product, source, and external state remain read-only unless explicitly authorized.
-- Sia never expands filesystem, command, network, or external-action permissions.
-Before activation Sia directs no `.ai/**` reads; hosts may independently index files beyond Sia's control.
+Reuse loaded context. After compaction preserve the request, corrections, approved scope, execution mode and ceiling,
+exact authorized plan paths, effective definition paths, relevant evidence, checks, and next action. Reload only those
+exact needed files; do not
+scan catalogs or historical plans to reconstruct missing authorization. If it cannot be recovered, stop and ask for
+the exact plan. Delegate only when useful and supported, using worker support; lack of delegation never blocks work.

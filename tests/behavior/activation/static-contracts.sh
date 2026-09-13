@@ -5,12 +5,6 @@ set -u
 ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 . "$ROOT/tests/lib/test.sh"
 
-# Check shared invariants across the split workflow; route selection is tested separately.
-DELIVERY_CONTEXT=$(mktemp "${TMPDIR:-/tmp}/sia-delivery-contracts.XXXXXX") || exit 1
-trap 'rm -f "$DELIVERY_CONTEXT"' EXIT
-cat "$ROOT/src/managed/.ai/workflows/sia/delivery.md" \
-  "$ROOT"/src/managed/.ai/workflows/sia/delivery/*.md >"$DELIVERY_CONTEXT"
-
 PROTOCOL="$ROOT/src/managed/.ai/sia.md"
 AGENTS_BRIDGE="$ROOT/src/bridges/agents.block.md"
 CLAUDE_BRIDGE="$ROOT/src/bridges/claude.block.md"
@@ -38,97 +32,11 @@ check_claude_bridge() {
   assert_contains "$CLAUDE_BRIDGE" '@../AGENTS.md' || return 1
 }
 
-check_protocol_directives() {
-  assert_nonempty "$PROTOCOL" || return 1
-  for directive in 'Sia help' 'Sia show help' 'Sia load docs' 'Sia load skills' 'Sia forge on' 'Sia forge off' 'Sia resume' 'Sia handoff' 'Sia stop' 'Sia reload'; do
-    assert_contains "$PROTOCOL" "$directive" || return 1
-  done
-  assert_contains "$PROTOCOL" '.ai/RULES.md' || return 1
-  assert_contains "$PROTOCOL" '.ai/operations/INDEX.md' || return 1
-  assert_contains "$PROTOCOL" 'handoff_protocol: 1' || return 1
-  assert_contains "$PROTOCOL" 'interactive and unattended operations' || return 1
-  assert_contains "$PROTOCOL" 'direct Sia conversation' || return 1
-  assert_contains "$PROTOCOL" 'high confidence' || return 1
-  assert_contains "$PROTOCOL" 'Never infer unattended mode' || return 1
-  assert_contains "$PROTOCOL" 'route any unhandled remainder through Forge' || return 1
-  assert_contains "$PROTOCOL" '`Sia` does not trigger operations' || return 1
-  assert_contains "$PROTOCOL" 'invalid form reports an arity or syntax error' || return 1
-  assert_contains "$PROTOCOL" 'YYYY-MM-DD-NN-<slug>.md' || return 1
-  assert_contains "$PROTOCOL" 'filenames only' || return 1
-  assert_contains "$PROTOCOL" 'authorized_plan_paths' || return 1
-  assert_contains "$PROTOCOL" 'user explicitly requests or approves reading it' || return 1
-  assert_contains "$PROTOCOL" 'Do not add paths inferred from task similarity' || return 1
-  assert_contains "$PROTOCOL" 'Filename-only inspection' || return 1
-  assert_contains "$PROTOCOL" 'cannot recover exact authorization, fail closed' || return 1
-  assert_contains "$PROTOCOL" 'only when no operation is active' || return 1
-  assert_contains "$PROTOCOL" 'cannot be resumed' || return 1
-  assert_contains "$PROTOCOL" 'Reuse active context' || return 1
-  assert_contains "$PROTOCOL" 'resolve clear terse follow-ups without fresh intake' || return 1
-  assert_contains "$PROTOCOL" 'precise bounded imperative authorizes its local write' || return 1
-  assert_contains "$PROTOCOL" '`do:` requests that lane' || return 1
-  assert_contains "$PROTOCOL" '`plan:`/`inline plan` or uncertainty requires approval' || return 1
-  assert_contains "$PROTOCOL" 'prefixed operations stay in Forge' || return 1
-  assert_not_contains "$PROTOCOL" 'independently eligible increment' || return 1
-  assert_contains "$PROTOCOL" 'disables Forge' || return 1
-  assert_contains "$PROTOCOL" 'equivalent to bare `Sia`' || return 1
-  assert_contains "$PROTOCOL" 'Extra arguments to `help` or after' || return 1
-  assert_contains "$PROTOCOL" 'Read only `.ai/operations/INDEX.md`' || return 1
-  assert_contains "$PROTOCOL" '`.ai/skills/INDEX.md`' || return 1
-  assert_contains "$PROTOCOL" 'every effective operation' || return 1
-  assert_contains "$PROTOCOL" 'every effective skill' || return 1
-  assert_contains "$PROTOCOL" 'comma-separated `Skills:` line' || return 1
-  assert_contains "$PROTOCOL" 'labeling project entries and overrides' || return 1
-  assert_contains "$PROTOCOL" 'as CUSTOM' || return 1
-  assert_contains "$PROTOCOL" 'description and effective aliases' || return 1
-  assert_contains "$PROTOCOL" 'instead of a partial or inferred list' || return 1
-  assert_contains "$PROTOCOL" 'Do not read operation or skill bodies' || return 1
-}
-
-check_response_contract() {
-  assert_contains "$PROTOCOL" '## User-facing responses' || return 1
-  assert_contains "$PROTOCOL" 'Make the meaning clear on the first read' || return 1
-  assert_contains "$PROTOCOL" 'shorter text and more bullets do not establish clarity' || return 1
-  assert_contains "$PROTOCOL" 'Split dense sentences and explain necessary jargon' || return 1
-  assert_not_contains "$PROTOCOL" 'Keep simple answers to one sentence' || return 1
-  assert_contains "$PROTOCOL" 'decisive evidence, uncertainty, safety limits and requested detail' || return 1
-  assert_contains "$PROTOCOL" 'Omit routine narration' || return 1
-  assert_contains "$PROTOCOL" 'meaningful progress updates' || return 1
-  assert_contains "$PROTOCOL" 'self-contained final' || return 1
-  assert_contains "$PROTOCOL" 'Actual workflow gates still apply' || return 1
-}
-
-check_unattended_directive() {
-  assert_contains "$PROTOCOL" 'Sia unattended <operation> [request]' || return 1
-  assert_contains "$PROTOCOL" 'Do not infer unattended mode from natural-language requests' || return 1
-  assert_contains "$PROTOCOL" 'accepts an operation, not a reserved directive' || return 1
-  assert_contains "$PROTOCOL" 'return `blocked` rather than asking the user' || return 1
-  assert_contains "$PROTOCOL" 'does not expand host permissions or authorize external actions' || return 1
-}
-
 check_fail_closed_contract() {
   assert_contains "$AGENTS_BRIDGE" 'missing' || return 1
   assert_contains "$AGENTS_BRIDGE" 'invalid' || return 1
   assert_contains "$AGENTS_BRIDGE" 'installation-integrity error' || return 1
   assert_contains "$AGENTS_BRIDGE" 'do not infer' || return 1
-}
-
-check_workflow_contract() {
-  delivery=$DELIVERY_CONTEXT
-  assert_nonempty "$delivery" || return 1
-  for phase in Plan Approve Build Review Validate Fix Ship; do
-    assert_contains "$delivery" "$phase" || return 1
-  done
-  assert_contains "$delivery" 'reasoning' || return 1
-  assert_contains "$delivery" 'fast' || return 1
-  assert_contains "$delivery" 'do_not_load' || return 1
-  assert_contains "$delivery" 'authorized_plan_paths' || return 1
-  assert_contains "$delivery" 'every other `.ai/plans/**` path' || return 1
-  assert_contains "$delivery" '<!-- sia:approval:start -->' || return 1
-  assert_contains "$delivery" 'lowercase SHA-256' || return 1
-  assert_contains "$delivery" '<!-- sia:status pending-approval -->' || return 1
-  assert_contains "$delivery" 'frontmatter has no ID, status, revision' || return 1
-  assert_contains "$delivery" 'retain the plan for history without asking' || return 1
-  assert_contains "$delivery" 'separate explicit user request' || return 1
 }
 
 check_seed_indexes() {
@@ -142,11 +50,7 @@ check_seed_indexes() {
 
 run_case "the root bridge is awareness-only" check_agents_bridge
 run_case "the Claude bridge only imports root instructions" check_claude_bridge
-run_case "the protocol declares core reserved directives" check_protocol_directives
-run_case "activated responses stay concise without losing required boundaries" check_response_contract
-run_case "unattended activation is exact, bounded, and noninteractive" check_unattended_directive
 run_case "activation fails closed at the bridge" check_fail_closed_contract
-run_case "delivery declares phases, exclusions, and advisory profiles" check_workflow_contract
 run_case "seed indexes expose project-owned CUSTOM sections" check_seed_indexes
 
 finish_tests

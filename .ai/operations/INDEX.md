@@ -10,7 +10,7 @@
   - aliases: `document-repository`, `document-area`
 - `fix` — Diagnose and fix a defect with root-cause evidence and regression coverage.
   - aliases: `bug`, `fix-bug`
-- `implement` — Route a repository change to proportionate planning, implementation, validation, and delivery.
+- `implement` — Implement the requested change using repository evidence and suitable checks.
   - aliases: `build`
 - `investigate` — Investigate read-only evidence and optionally save an explicitly requested delivery plan.
 - `reconcile-catalogs` — Reconcile project definitions and CUSTOM entries through targeted safe repairs.

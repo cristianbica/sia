@@ -55,7 +55,8 @@ remains unchanged. See [host tests](../tests/hosts/README.md) for long-task scen
 ## Approval-boundary coverage
 
 A separate Codex/Claude runner, `scripts/verify-approval --live --host codex|claude`, exercises writable disposable
-fixtures and exact-session continuation. It checks standard planning before source edits, approval of the presented
+fixtures and exact-session continuation. It checks explicit saved planning before source edits, approval of the
+presented
 plan, pending-plan resume, remaining approved work, verification stopping, and the existing planless and unattended
 controls.
 It records file snapshots and tool traces; missing
@@ -63,7 +64,8 @@ continuation or unclassifiable preapproval activity is unavailable, never a pass
 smoke suite or the live-certification status above.
 
 `python3 tests/hosts/approval-contracts.py` runs deterministic no-model shims and is included in `scripts/verify`.
-It covers successful routes, premature writes and reverted attempts, invalid/missing plans, invalid digests, host
+It covers successful coding and planning requests, premature writes and reverted attempts, invalid/missing plans,
+invalid digests, host
 failure, missing/unsupported continuation, opaque commands, and timeout. These results validate the harness only.
 Live approval checks remain unrun and need an explicit call budget; see
 [host tests](../tests/hosts/README.md#writable-approval-and-continuation-checks-codex-and-claude) for invocation,

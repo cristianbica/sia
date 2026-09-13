@@ -64,7 +64,7 @@ class ApprovalHarness(unittest.TestCase):
             for path in artifacts.rglob('instructions.json'):
                 self.assertEqual(len(json.loads(path.read_text())['sha256']), 64)
 
-    def test_all_routes(self):
+    def test_all_request_modes(self):
         for host in ('codex', 'claude'):
             self.exercise(case=None, expected=0, host=host)
 
@@ -98,15 +98,17 @@ class ApprovalHarness(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 runner.completed_plan(changed)
 
-    def test_route_announcement_precedes_edit(self):
-        with self.assertRaisesRegex(AssertionError, 'before route'):
+    def test_source_edit_requires_approval_when_planning(self):
+        with self.assertRaisesRegex(AssertionError, 'premature source'):
             runner.trace_check([{'type': 'item.started', 'item': {'type': 'file_change',
-                'changes': [{'path': '.ai/plans/example.md'}]}}], True)
+                'changes': [{'path': 'app.py'}]}}], True)
 
-    def test_read_before_announcement_is_allowed(self):
+    def test_reads_and_direct_writes_need_no_announcement(self):
         events = [{'type': 'item.started', 'item': {'type': 'command_execution', 'command': 'cat app.py'}}]
         self.assertFalse(runner.trace_check(events, False))
         self.assertFalse(runner.trace_check(events, True))
+        runner.trace_check([{'type': 'item.started', 'item': {'type': 'file_change',
+            'changes': [{'path': 'app.py'}]}}], False)
 
     def test_plan_reads_are_exact_and_opaque_reads_unavailable(self):
         allowed = '.ai/plans/current.md'
@@ -148,8 +150,7 @@ class ApprovalHarness(unittest.TestCase):
                 events = [{'type': 'item.started', 'item': {'type': 'command_execution', 'command': command}}]
                 with self.assertRaises(runner.Unavailable):
                     runner.trace_check(events, True)
-                with self.assertRaisesRegex(AssertionError, 'before route'):
-                    runner.trace_check(events, False)
+                runner.trace_check(events, False)  # normal coding is already authorized
 
     def test_explicit_live_required(self):
         result = subprocess.run([str(ROOT / 'scripts/verify-approval')], capture_output=True)

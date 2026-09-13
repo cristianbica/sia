@@ -15,7 +15,7 @@ sia/
         skills/sia/<skill>/SKILL.md
         operations/sia/<operation>.md
         workflows/sia/<workflow>.md
-        workflows/sia/delivery/{forge,standard,execution}.md
+        workflows/sia/delivery/{forge,standard,handoff}.md
       catalogs/
         skills.md
         operations.md

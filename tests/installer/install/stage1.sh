@@ -37,7 +37,7 @@ test_clean_install_creates_the_four_owned_shapes() {
     .ai/workflows/sia/delivery.md \
     .ai/workflows/sia/delivery/forge.md \
     .ai/workflows/sia/delivery/standard.md \
-    .ai/workflows/sia/delivery/execution.md \
+    .ai/workflows/sia/delivery/handoff.md \
     .ai/RULES.md \
     .ai/docs/INDEX.md \
     .ai/skills/INDEX.md \
@@ -59,7 +59,7 @@ test_missing_delivery_support_fails_before_writes() {
   source_copy="$TMP_ROOT/missing-support"
   mkdir -p "$source_copy"
   cp -R "$ROOT/src" "$source_copy/src" || return 1
-  for support in forge standard execution; do
+  for support in forge standard handoff; do
     missing="$source_copy/src/managed/.ai/workflows/sia/delivery/$support.md"
     rm "$missing" || return 1
     repo=$(new_repo) || return 1

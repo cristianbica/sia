@@ -117,8 +117,8 @@ Operations own intake and target selection; the documentation workflow owns phas
 The documentation skill owns knowledge format, evidence, freshness, and quality checks. Repository documents hold the
 verified facts rather than repeating those instructions.
 
-During delivery, documentation impact is handled in Build or Fix before final review. Ship writes only plan completion
-state by default and retains the plan without prompting. Deleting an exact completed plan requires a separate explicit
+During coding, update affected documentation before final review. For saved work, Ship writes only plan completion
+state and retains the plan without prompting. Deleting an exact completed plan requires a separate explicit
 user request.
 The final handed-off diff—including documentation—has been reviewed and validated.
 

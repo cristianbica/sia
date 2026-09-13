@@ -1,75 +1,17 @@
-# Standard planning and approval
+# Saved plans and resume
 
-Supporting guidance for the effective delivery workflow; not a separately invokable workflow.
-Load for Plan, Approve, or validating a resumed artifact. After approval, follow the workflow's execution guidance.
+Load only when saving or resuming a plan, or implementing one already approved. This support preserves existing plan
+contracts; normal coding does not need an artifact. Resolve the artifact's effective operation, workflow, and skills.
+A CUSTOM workflow owns its lifecycle; do not append shipped delivery rules to it.
 
-## Plan
+## Save and approve
 
-- Purpose: produce a readable, executable standard plan; no product/source writes.
-- Output: the visible plan states outcome, scope, the evidence-backed approach, non-goals, acceptance, checks, risks,
-  and external actions.
-- Filename: every new artifact is `.ai/plans/YYYY-MM-DD-NN-<slug>.md`, using the UTC creation date and a two-digit,
-  zero-padded daily sequence. Inspect filenames only (never unauthorized plan contents) to select the next unused `NN`
-  for that date; this makes directory order chronological and deterministic.
-- Header: exactly `operation`, `workflow`, and declared `skills`; the filename is the plan identity.
-- Footer: state is optional one-line `<!-- sia:<name> <value> -->` comments after the approval block. `status` is
-  required; all other comments appear only when relevant.
-- Model profile: request `reasoning` for ambiguous or risky planning; lightweight may use `fast`.
+Create `.ai/plans/YYYY-MM-DD-NN-<slug>.md` using the UTC date and next zero-padded daily sequence. Inspect filenames
+only to allocate it. Immediately add the exact new path to `authorized_plan_paths`.
 
-Write for the person deciding whether to approve the change:
-
-- Establish the current behavior and where the change belongs before proposing a mechanism. Briefly explain the
-  chosen approach and the repository evidence behind consequential decisions. Distinguish verified facts from
-  unresolved assumptions; a restatement of the requested outcome is not an implementation approach.
-- Open with one or two plain-language sentences: what result is intended, and why does it matter?
-- Make the rest scannable. Describe what will change in short points, with one main idea per point. Split independent
-  requirements instead of joining them with semicolons or packing several sentences into one bullet.
-- Group related points when it helps the reader find an area quickly. Use bullets, short descriptions, or subheadings
-  as needed; bold labels, nesting, and a fixed set of sections are not required. Simple plans can stay small.
-- Explain behavior before mechanisms. Include technical detail only when it clarifies an important decision, risk,
-  or scope boundary. Put routine file, command, and implementation inventories in handoffs or progress evidence.
-- Give the main observable success checks and limits briefly. Do not retell the scope as delivery steps and again as
-  tests. Include a sequence only when order matters to understanding or approval.
-- Preserve required behavior, actors, permissions, exceptions, and material risks. Moving execution notes must not
-  hide a decision or weaken the approval boundary. Explain necessary jargon; terse labels are not descriptions.
-- Reread as an approver: can a quick scan find the intent, changes, success checks, and limits? Can each point be
-  understood on its own without decoding a dense paragraph? Revise for those answers, not word or bullet counts.
-
-Persist a compact artifact before Build and immediately add its exact path to the conversation's
-`authorized_plan_paths`. Standard starts with `<!-- sia:status pending-approval -->`; interactive and standard are
-defaults, so they need no mode or route comment. Record `base` for resume. Add `dirty` only for existing paths; add
-`mode`, `route`, `ceiling`, or `external` only when they differ from those defaults or are nonempty.
-
-## Approve
-
-- Purpose: bind permission to a standard intent envelope or record direct lightweight authorization.
-- Gate: one interactive approval for standard work; the activating request authorizes lightweight and unattended work.
-- Writes: only footer comments in the delivery artifact.
-
-An interactive standard implementation request authorizes discovery and a saved plan only. Present the plan and wait
-for approval of that visible scope before any product/source edit, even when the requested edit is local or reversible.
-Generic imperatives such as "implement this" and instructions to work autonomously do not approve a plan that has not
-been presented. Approval may be a clear natural-language reply referring to the presented plan; no special token is
-required. Approval of an already-presented plan remains valid, so do not restart planning or ask again without a
-material boundary change. Do not create an approval record after editing to excuse a skipped gate.
-
-This is the user's selected delivery sequence, not an extra tool-permission prompt. Host instructions retain their
-priority; if they prevent following this sequence, report the conflict and the limit of Sia's guarantee. Never claim
-the gate was honored when it was skipped. Trivial, lightweight, Forge, and unattended retain their stated rules.
-
-For standard work, present outcome, scope, non-goals, criteria, risks, external actions, and path. The intent envelope
-covers implementation approach, step order, focused checks, and in-scope documentation. Ask again only when outcome,
-scope, non-goals, criteria, risk, permissions, or external actions expand.
-
-Digest only the visible bytes between `sia:approval` markers. After approval, append `<!-- sia:approved <sha256> -->`
-and change status to `build`; never ask users to compare a digest. A change inside the envelope is progress; a boundary
-change removes the approval comment, restores `pending-approval`, and presents the updated plan. Unattended may replace
-the approval comment only inside its unchanged ceiling; otherwise it blocks instead of asking. Neither mode expands host
-permissions or external actions.
-
-## Compact plan artifact
-
-New plans use this shape (for example, `.ai/plans/2026-07-14-06-short-outcome.md`):
+Keep frontmatter to `operation`, `workflow`, and `skills`. Put the proposed outcome, approach, scope, non-goals,
+acceptance checks, and material risks/external actions in one approval block. Use readable prose or bullets, not a
+mandatory set of headings. Footer state uses one-line comments; omit empty optional fields.
 
 ```markdown
 ---
@@ -78,46 +20,51 @@ workflow: delivery
 skills: [repository-discovery, testing]
 ---
 
-# Prevent duplicate webhook processing
+# Show currency on receipts
 
 <!-- sia:approval:start -->
-Prevent repeated webhook deliveries from applying the same update twice, while allowing failed updates to be retried.
-
-## Changes
-
-- Add a table of processed event IDs, with database uniqueness to prevent simultaneous duplicates.
-- Save the ID and update in one transaction. A failed update must leave the event available for retry.
-- Keep existing webhook authentication and payload validation.
-
-## Checks and limits
-
-- Verify one update per event ID, including simultaneous deliveries and a retry after failure.
-- Run webhook tests; apply the migration only to an isolated test database.
-- Protection starts after installation; older events have no recorded IDs.
-- No production migration, deployment, or live webhook calls.
+Add the order's currency to the existing receipt formatter and its caller. Keep the current amount formatting.
+Check receipts for two currencies and preserve existing receipt fields. No new currency conversion or external calls.
 <!-- sia:approval:end -->
 
 <!-- sia:status pending-approval -->
-<!-- sia:base 4d3f... -->
+<!-- sia:base <commit> -->
 ```
 
-The frontmatter has no ID, status, revision, digest, baseline, route, permission, or external-action fields. Do not
-write empty comments. Valid optional comments are `approved`, `base`, `dirty`, `mode`, `route`, `ceiling`, `external`,
-`progress`, and `blocker`; comments are one line and remain after the approval block. `status` is exactly one of
-`pending-approval`, `build`, `review-validate`, `fix`, `ship`, `blocked`, `complete`, or `cancelled`.
+Present the plan and wait for approval before any product/source edit. Resume alone or an earlier generic imperative
+is not approval. A clear reply referring to the presented plan is sufficient; do not ask again for routine steps.
+Compute lowercase SHA-256 of UTF-8 content between the unique approval markers, excluding the markers: normalize CRLF
+and CR to LF, preserve all other whitespace. Append `<!-- sia:approved <sha256> -->` only after approval; set status to
+`build`. Changing the approved boundary removes that approval and returns to `pending-approval` before further work.
+Implementation details within the boundary belong in progress, not a rewritten approval block.
 
-`approved` uses lowercase SHA-256 and the UTF-8/LF convention in `.ai/sia.md`; preserve whitespace between markers.
-`base` is the initial commit; `dirty` lists only pre-existing paths. `mode: unattended` makes `ceiling` immutable and
-requires an `external` comment for each explicit external action. Omit them for default interactive standard work.
-`progress` records a concise completed phase,
-check, finding, or deviation. `blocker` names an observable resume condition.
+Explicit unattended saved work may approve only within its original ceiling; record `mode`, `ceiling`, and authorized
+`external` actions. These cannot expand during replans. A planning-only request stays pending even in unattended mode.
 
-Resume accepts a compact artifact only when it has exactly one nonnested approval marker pair, one status comment, and a
-matching approval digest whenever status is beyond `pending-approval`. A pending draft enters Approve, never Build.
-It derives the next action from status, checks base/dirty comments when present, and refuses contradictory or
-complete/cancelled artifacts. It accepts existing valid legacy artifacts unchanged; never rewrite them merely to
-compact them.
+## Validate and resume
 
-Changing approval-block bytes removes the approval comment and returns to `pending-approval`; progress comments never
-repair invalid approval content. Load only the named active plan and exact current definitions. At phase boundaries put
-definition paths, authorized plan paths, evidence, and worker-only state in the handoff envelope, not the plan.
+Require exact content-read authorization before opening a plan. Compact plans need one ordered, nonnested approval
+marker pair, one valid status, and a matching digest whenever status is beyond `pending-approval`. Reject empty,
+missing, ambiguous, or contradictory artifacts. A pending draft enters approval, never Build. Refuse complete or
+cancelled plans. Valid legacy artifacts remain resumable under their recorded approval and workflow contracts;
+do not convert them merely to simplify the format. If their meaning cannot be established, stop rather than guessing.
+
+Valid statuses are `pending-approval`, `build`, `review-validate`, `fix`, `ship`, `blocked`, `complete`, and
+`cancelled`.
+Optional comments are `approved`, `base`, `dirty`, `mode`, `route`, `ceiling`, `external`, `progress`, and `blocker`.
+`base` records initial HEAD; `dirty` names pre-existing changes. Older `route` values are compatibility metadata,
+not instructions to remove approvals. Progress cannot repair invalid approval content.
+
+Compare HEAD and changed paths with base/dirty metadata and progress evidence. Record harmless drift without changing
+the original base. Preserve unrelated work; unsafe overlap blocks unattended execution. A material boundary change
+requires a revised plan and approval, or blocks unattended work outside its ceiling. Resolve current exact definition
+paths at phase boundaries and report changes. Definition rewrites do not retroactively grant approval.
+
+## Execute and finish
+
+Build within approval, then set `review-validate` and review/check the result. Record concise evidence in progress;
+use `fix` for in-scope corrections and recheck them. `ship` requires passing review and writes only completion metadata.
+Set `complete` only after required implementation and checks finish. Keep the plan; delete it only on a separate
+explicit
+request. A blocker records what must change before retry. Unattended work stops after three unsuccessful fix cycles.
+Preserve exact authorized plan/definition paths and approval state across handoffs or compaction.

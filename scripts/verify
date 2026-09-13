@@ -8,12 +8,8 @@ SUITE=${1:-all}
 run_static() {
   sh "$ROOT/tests/static/source-contracts.sh" &&
     sh "$ROOT/tests/behavior/activation/static-contracts.sh" &&
-    sh "$ROOT/tests/behavior/workflows/static-contracts.sh" &&
-    sh "$ROOT/tests/behavior/routing/static-contracts.sh" &&
     PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/tests/behavior/routing/context-contracts.py" &&
-    sh "$ROOT/tests/behavior/model-routing/static-contracts.sh" &&
-    sh "$ROOT/tests/behavior/definitions/static-contracts.sh" &&
-    sh "$ROOT/tests/behavior/documentation/static-contracts.sh" &&
+    PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/tests/coding/test_fixtures.py" &&
     sh "$ROOT/tests/hosts/static-contracts.sh" &&
     PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/tests/hosts/approval-contracts.py" &&
     PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/benchmarks/concise-output/test_runner.py" &&

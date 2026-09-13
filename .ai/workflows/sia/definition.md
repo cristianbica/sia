@@ -3,63 +3,24 @@ name: definition
 description: Safely create or reconcile project definitions and their CUSTOM catalog registrations.
 ---
 
-# Definition workflow
+# Project definitions
 
-Use this lightweight workflow for project skills, operations, workflows, and catalog reconciliation. It normally
-finishes in one context and never edits shipped definitions or managed SIA catalog blocks.
+Use for creator operations and catalog reconciliation. The operation supplies the target schema and requested change;
+this workflow owns shared validation and writes. Shipped `sia/` definitions and SIA blocks are not project edit targets.
 
-## Inspect
+Before writing, resolve the requested category and check its index and direct project paths:
 
-- Purpose: establish the requested definition kind, intended behavior, target name, current catalog state, and
-  effective references.
-- Model profile: request `reasoning` for schema or lifecycle design; use `fast` only for mechanical catalog inspection.
-- Reads: project rules, the selected operation, this workflow, relevant category indexes, referenced definitions, and
-  the exact project paths needed for collision checks.
-- Writes: none.
-- Transition: Draft when intent and ownership are clear; stop with exact conflicts otherwise.
+- Names match `[a-z0-9]+(?:-[a-z0-9]+)*`, agree with path/frontmatter, and have no normalized or case-folded collision.
+  No definition is named `sia`; operations and aliases also exclude the protocol's reserved names.
+- The index has one valid CUSTOM section and one ordered managed marker pair. References resolve through effective
+  catalogs; missing or ambiguous definitions are errors.
+- Creation does not overwrite an existing or partially registered definition. Use reconciliation for partial state.
+  Report a deliberate shipped override and require explicit authorization for that override, including unattended work.
+- The candidate preserves host permissions and the selected workflow's user gates. It cannot activate itself or
+  broaden unattended authority. Validate any declared phases, artifacts, and recovery rules before writing.
 
-Resolve project-over-Sia behavior before drafting. A planned same-name override, destructive reconciliation, rename,
-or ambiguous repair requires exact authorization before Write. In unattended mode, proceed only when the activating
-request already names that action; otherwise return `blocked` rather than asking or inferring consent.
-
-## Draft
-
-- Purpose: prepare the complete definition and exact CUSTOM edit as one candidate change.
-- Inputs: validated name, requested behavior, schema contract, resolved references, existing descriptions, and override
-  status.
-- Writes: none outside temporary host-managed scratch space; do not stage candidates under `.ai/**`.
-- Transition: Validate with the complete candidate.
-
-Keep the candidate concise and preserve unrelated CUSTOM text exactly. Do not copy operation lifecycle into skills or
-workflow detail into operations.
-
-## Validate
-
-- Purpose: reject invalid candidates before repository writes.
-- Checks: normalized and reserved names, case-folded collisions, path/frontmatter agreement, required fields, aliases,
-  effective workflow and skill references, lifecycle boundaries, permissions, marker structure, and override behavior.
-- Writes: none.
-- Transition: Write when all checks pass and required authorization exists; otherwise return to Draft or stop.
-
-## Write
-
-- Purpose: commit the project definition and CUSTOM registration as one logical change.
-- Allowed writes: the exact direct project definition path, justified sibling skill resources, and only the relevant
-  lines inside the category's CUSTOM section.
-- Forbidden writes: any path below a category's `sia/` directory, any SIA marker or block, `.ai/sia.md`, repository
-  docs, plans, product source, or unrelated catalog text.
-- Transition: Verify after both sides are written.
-
-Preflight all destinations immediately before writing. Prefer one bounded edit batch. If a later write or verification
-fails, repair or revert only changes made by this operation; never discard pre-existing project work.
-
-## Verify
-
-- Purpose: prove the resulting definition and catalog resolve consistently.
-- Checks: reread changed files, rerun schema and collision checks, resolve effective references, confirm exactly one
-  CUSTOM registration, confirm SIA content is unchanged, and inspect the complete diff.
-- Writes: only a targeted repair of this operation's own incomplete change.
-- Output: changed paths, validation evidence, override status, preserved text, and any partial or unresolved state.
-
-Cancellation before Write changes nothing. Cancellation or failure after a partial Write reports the exact state and
-must not claim the definition is usable until both the file and CUSTOM entry validate.
+Write only the requested direct project definition, necessary support, and its CUSTOM entry. Preserve other entries,
+order, comments, SIA blocks, and shipped content. Keep catalog entries within 120 characters. Recheck the written
+schema, references, and effective override together; a definition and its registration form one logical change.
+If writing fails partway, repair or revert only this operation's changes. Report actual changed paths and any partial
+state; do not claim the definition works until both files validate. Cancellation before writes changes nothing.

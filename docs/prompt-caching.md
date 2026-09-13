@@ -11,7 +11,7 @@ For a phase prompt or bounded handoff, put these reusable items first and preser
 requests:
 
 1. Protocol and project rules.
-2. Resolved route, workflow, definitions, and only task-relevant invariant tool/context declarations.
+2. Resolved workflow, definitions, and only task-relevant invariant tool/context declarations.
 3. Durable documentation pointers and other reusable references.
 
 State each invariant once. Prefer exact paths and focused excerpts to replaying whole documents, catalogs, plans, tool

@@ -133,19 +133,9 @@ keyword system.
 
 ## Workflow contract
 
-A workflow defines phases and transitions. Each phase specifies:
-
-- name and purpose;
-- gate, if any;
-- isolation preference;
-- optional advisory model profile, `fast` or `reasoning`;
-- input and output artifact requirements;
-- documentation and skills to resolve;
-- allowed work and writes;
-- success, failure, and replanning transitions.
-
-The workflow body also defines completion criteria and cancellation behavior. The minimal schema should remain readable
-Markdown rather than becoming a workflow language.
+A workflow describes the work, allowed changes, any approval, completion checks, and failure/cancellation handling.
+Phases, artifacts, isolation, and their transitions are optional: define them only when the workflow needs them.
+Keep the schema readable Markdown. Reference skills for expertise instead of duplicating their procedures.
 
 ## Creation and reconciliation
 

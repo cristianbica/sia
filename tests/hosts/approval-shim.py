@@ -79,8 +79,6 @@ plan = ('---\noperation: implement\nworkflow: delivery\nskills: [repository-disc
         '# Greeting\n\n<!-- sia:approval:start -->' + block + '<!-- sia:approval:end -->\n\n')
 case = Path.cwd().name
 standard = case in ('standard', 'continuation', 'passing-checks', 'pending-resume')
-route = 'standard' if standard else 'Forge' if case.startswith('forge') else case
-say(f'{route} route; authorization is the request or presented plan approval.')
 if prompt == 'Sia forge on':
     say('Forge enabled.')
 elif (standard and not prompt.startswith('Sia approved')) or 'Sia plan:' in prompt:
@@ -122,10 +120,8 @@ else:
         if fault != 'missing-check':
             for _ in range(2 if fault == 'repeated-check' else 1):
                 emit('item.completed', item={'type': 'command_execution', 'command': 'python3 -B -m unittest -v', 'exit_code': 0})
-    if standard or case == 'unattended':
+    if standard:
         content = plan + '<!-- sia:status complete -->\n<!-- sia:approved ' + digest + ' -->\n'
-        if case == 'unattended':
-            content += '<!-- sia:mode unattended -->\n<!-- sia:ceiling local fixture changes only -->\n'
         if fault == 'wrong-digest':
             content = content.replace(digest, '0' * 64)
         write(plan_path, content)

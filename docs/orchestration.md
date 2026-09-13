@@ -1,388 +1,68 @@
-# Orchestration and workflows
+# Coding, planning, and saved work
 
-Operations select workflows. Workflows coordinate phases and load only the documentation and skills needed for the
-current phase. Route triage chooses the smallest safe execution path before writes: planless trivial work, inline
-lightweight delivery, or standard delivery. A phase may use an isolated worker, a fresh user-started session, or the
-active session.
+The [delivery workflow](../src/managed/.ai/workflows/sia/delivery.md) owns ordinary coding behavior. It inspects
+relevant
+code, implements the request, checks the result, and continues through in-scope corrections. There are no ordinary
+trivial/lightweight/standard routes, receipts, phase artifacts, or mandatory handoffs.
 
-## Adaptive delivery routes
+An implementation request authorizes its local scope. Ask about a missing decision when it would materially change
+the outcome, or when permission is needed. Preserve unrelated changes. Host controls and explicit project/user limits
+remain authoritative. An explicit planning request is not permission to implement.
 
-Sia's `implement` operation uses the following route contract:
+## Planning
 
-- `trivial`: exact-file, non-behavioral wording/formatting/comment correction; no plan, approval artifact, or worker.
-- `lightweight`: narrow project-owned definition/documentation change, or one internal source behavior change whose
-  exact seam, paths, criteria, and focused test are evidenced. It excludes public/serialization contracts, migrations,
-  configuration, permission, security, concurrency, external, compatibility, multi-consumer, broad-refactor,
-  managed-Sia, lifecycle, dirty-attribution, and unresolved-assumption risk. Its activating request directly authorizes
-  an inline compact receipt, one bounded Build handoff, and focused validation without a reviewer or Fix loop. The
-  receipt states the outcome, exact paths or bounded area, acceptance checks, documentation impact, and external
-  actions before Build. It does not create a plan artifact, request another approval, or support `Sia resume`.
-- `standard`: every source change not fully qualifying for lightweight, plus operations/workflows, public contracts,
-  migrations, security, external or destructive work, broad scope, unsafe attribution, or uncertainty; use the complete
-  delivery lifecycle.
+A useful plan explains the existing behavior, where the change belongs, the proposed approach, important choices, and
+how to check it. It need not list every file or follow fixed headings. Do enough repository discovery to ground the
+approach, including relevant callers and existing patterns. Do not replace engineering decisions with a restated goal.
 
-Line count is supporting evidence only. An explicit request for a full/thorough workflow selects `standard`; uncertain
-classification promotes to `standard`. Unattended mode selects `trivial` or `lightweight` only when eligibility is
-unambiguous, otherwise it selects `standard` or blocks. A route promotion is recorded before newly unauthorized writes.
+Present a requested plan and wait for approval. Once approved, continue within its boundary without repeated prompts.
+Routine implementation-detail changes do not invalidate that approval; expanded scope, risk, permissions, or external
+actions must be made explicit before proceeding.
 
-Before the first write, state the route and its authorization basis. A standard request permits plan creation, while
-interactive Build requires approval of the presented plan. Trivial/lightweight requests directly authorize only their
-qualifying scope. Forge names its direct or approved-inline lane, and unattended names its explicit invocation.
+## Saved plans
 
-## Delivery context loading
+Save only when requested. The optional [saved-plan support](../src/managed/.ai/workflows/sia/delivery/standard.md) owns
+naming, approval hashes, states, and resume. New ordinary coding tasks do not load it. Current compact formats and
+valid legacy plans remain supported; no migration is required. A pending draft resumes to approval, never Build.
+A completed or contradictory artifact is refused. Metadata cannot grant authority absent from the user's request.
 
-The shipped delivery workflow is a route guide. It links three supporting documents: Forge rules, standard
-planning/approval and artifact validation, and shared execution. Load only the current route/phase row. Standard Plan
-loads its approval guidance without Forge or Build instructions; after approval, load execution when needed. Resume
-validates the artifact first, then follows its status. Reuse unchanged guidance already in the conversation.
+Plan content is conversation-isolated. Only exact authorized paths can be read, searched, or inspected in history.
+Filename-only inspection may allocate a new name, not discover a related old task. Preserve authorization and pending
+work across compaction. If exact authorization is lost, ask for the path rather than guessing.
 
-Supporting documents are managed files under `.ai/workflows/sia/delivery/`, not extra workflow catalog entries.
-CUSTOM workflows own their supporting links; shipped files never attach to an override implicitly. Handoffs carry
-exact required support paths in `definition_paths.support`, alongside the effective operation/workflow/skills.
-Missing required support fails closed instead of loading sibling files speculatively.
-
-`scripts/report-context --baseline-ref <revision>` compares the declared default definition bundles in words and UTF-8
-bytes. It reads only explicit source paths, excluding plans. The report includes a common intake bundle for comparison;
-actual loads vary by operation and host. It excludes project overrides, task docs/code, prior turns, and accumulated
-later phases. It does not measure tokenizer output, cache billing, or improved model behavior. Retain the existing
-line budgets as size guards and use realistic benchmark quality and total-effort results for adoption decisions.
-
-## Isolation model
-
-Phase isolation reduces steering from rejected planning ideas and builder self-justification. The portable mechanism is
-an explicit handoff artifact, not native subagent support. Lightweight receipts remain inline; work that needs a
-persisted approval or `Sia resume` uses standard delivery.
-
-Preferred execution order:
-
-1. Start an isolated native worker when the host can avoid passing the earlier conversation.
-2. Otherwise continue in the same conversation using a bounded handoff, without claiming a context reset.
-3. Request a user-started conversation with `Sia resume <artifact>` only for a genuine context limitation.
-
-Unavailable isolation alone does not stop approved work. Standard still has a separate review phase; report whether
-the reviewer was independent. Lightweight uses the core handoff plus the write baseline.
-
-Native spawning is an optimization. Every required workflow must remain semantically usable through persisted artifacts.
-
-## Advisory model routing
-
-Sia uses only two logical model profiles: `fast` and `reasoning`. They express the kind of work, not a vendor, concrete
-model, price tier, or guaranteed capability. `fast` is a latency hint, not a cost guarantee.
-
-- Plan, synthesis, ambiguous diagnosis, architecture or security work, and standard Review/Validate request `reasoning`.
-- Bounded scouts and mechanical Build or Fix work may request `fast`; lightweight work may inherit the host default or
-  request `fast` without implying cheaper execution.
-- A risky or complex Build/Fix phase may elevate its request to `reasoning`.
-
-An explicit user choice takes precedence, followed by project guidance in `.ai/RULES.md`, then the workflow's profile
-and Sia's task assessment. The host always chooses the actual available model. A host that cannot honor or expose the
-choice uses its default; this never blocks a phase, alters a gate, expands permissions, or invalidates resumption.
-
-Handoffs record `requested_model_profile` and its selection source. Results record `actual_model` when the host reports
-it and `unknown` otherwise. They may record whether the request was honored only when that can be established. Sia does
-not install vendor-specific agent files or lock a plan to a model.
-
-## Execution modes
-
-Operations use `interactive` mode by default. The exact form `Sia unattended <operation> [request]` starts an operation
-in `unattended` mode. `unattended` is a modifier, not an operation or alias, and protocol 1 does not use it to switch an
-existing interactive artifact.
-
-Unattended mode provides standing authorization for Sia-owned workflow gates that remain within the original operation
-request. Sia applies the selected route: trivial work stays planless, lightweight work shows an inline compact receipt
-with focused validation, and standard work performs separate Review/Validate and bounded Fix cycles. It does not ask
-questions: it uses conservative, reversible assumptions or returns a blocked result when a necessary decision would
-expand scope or cannot be made safely. A generated standard plan accepted this way is automatically approved under
-standing authorization, not represented as a plan the user reviewed.
-
-The initial plan stores an immutable authorization ceiling and explicit external-action list. Replans may narrow or
-reinterpret implementation details inside that ceiling but cannot edit either authorization field. Workers receive the
-same fields and never authorize revisions themselves.
-
-The mode cannot expand host or system permissions, suppress external approval interfaces, override project safety or
-dirty-worktree safeguards, or authorize unrequested destructive or external actions. Commit, push, pull request,
-release, publish, and deploy remain unavailable unless the initial request explicitly includes them. Host permission,
-credential, safety, attribution, or material-scope blockers end unattended work with an exact blocked result.
+Saved work keeps its original approval while definitions are updated. Resolve the current effective definitions at
+phase boundaries, report changes, and return to approval for material conflicts. New defaults cannot retroactively
+authorize edits. Saved-plan Ship requires passing review and writes only completion metadata; retain the plan.
 
 ## Forge mode
 
-`Sia forge on` enables a conversation-scoped iterative mode when no operation is active; `Sia forge off`, `Sia stop`,
-`Sia reload`, or a new conversation ends it. Questions receive direct answers; non-mutating local work runs immediately
-without a plan or approval. This includes reads, searches, listings, diffs, status/history, inspection, review, and safe
-local diagnostics whose purpose is evidence rather than durable change. For example, `Read tmp/review-mandates.md`
-reads the file and returns the result directly.
+`Sia forge on` enables conversation follow-ups when no operation is active. It uses the same delivery behavior, with
+an optional `Sia` prefix and clear references such as “next one”. `do:` requests implementation; `plan:` or `inline
+plan`
+requests approval first. There is no separate eligibility table. Read-only requests run directly.
 
-The `Sia` prefix is optional while Forge is enabled. `Sia Read tmp/review-mandates.md` follows the same immediate path.
-`Sia implement feature X`, `Sia fix bug Y`, exact operation names, aliases, and otherwise inferred operations remain
-Forge requests instead of starting persisted delivery. Turn Forge off first when persisted interactive delivery is
-wanted.
+Operation names and aliases stay within Forge. Reserved directives and explicit unattended invocations keep normal
+routing. Forge stores no task artifact; off, stop, reload, or a new conversation ends it. For saved work, turn Forge off
+and explicitly request a saved plan. Details live in [Forge
+support](../src/managed/.ai/workflows/sia/delivery/forge.md).
 
-Forge is context-first for terse follow-ups. Phrases such as `done`, `next one`, `same`, item numbers, and pronouns
-resolve from recent conversation state, loaded content, and the current task when the referent is clear. Forge reuses
-established findings, decisions, ordering, and verified evidence instead of reopening files or repeating searches. A
-user-stated completion or transition is current context unless a small relevant check contradicts it. Genuine material
-ambiguity gets one focused clarification, not speculative discovery.
+## Unattended work
 
-Safe diagnostics may create normal transient temporary or cache output. A command known to rewrite durable repository
-state is a change; if an immediate diagnostic unexpectedly changes durable state, Forge stops and reports the exact
-change without retaining, reverting, or cleaning it silently.
+Only `Sia unattended <operation> [request]` enables it. The original request and authorized external actions define its
+limit; missing authority or credentials blocks work rather than inviting guesses. Ordinary unattended coding is
+planless. Explicitly saved work records its mode and ceiling; a planning-only request stays pending. Bound retries to
+three failed fix cycles and retry a blocker only after observable change. Custom workflows may narrow this authority.
 
-Changes that do not qualify for direct execution and all external actions use the repeating delivery loop: request →
-inline plan → explicit approval → Build → Review/Validate → bounded Fix → completion → next request. The plan states
-outcome, scope, non-goals, acceptance criteria, checks, risks, and external actions. Approval binds one visible task; a
-boundary change presents a revised plan and requires approval again. Forge writes no `.ai/plans/**`, digest, or status
-and cannot use `Sia resume`. Task size and risk scale plan detail, isolation, review depth, and validation, not
-persistence.
+## Review and workers
 
-Forge also has a direct bounded-write lane. A precise imperative is its own authorization when it has one clear target
-and result, a local reversible effect, predictable scope, and no material ambiguity, external action, destructive
-effect, permission or security concern, migration, broad refactor, or dirty-worktree attribution risk. Active context
-may make the target clear. Forge executes only the stated boundary, applies proportionate review and checks, and
-reports the changed paths and validation without asking for a second approval.
+Review both the original request and any approved plan. Extra features can be wrong even when the plan proposed them.
+Independent review is useful when it adds confidence, but a worker is optional. Use host delegation only for a bounded
+useful assignment. The [handoff support](../src/managed/.ai/workflows/sia/delivery/handoff.md) carries exact paths,
+permissions, evidence, and approved scope. Existing fuller envelopes remain valid. Model selection and telemetry are
+host concerns, not mandatory Sia task records. Never claim isolation the host does not provide.
 
-`do:` explicitly requests direct execution. `plan:` and `inline plan` explicitly request the approval path. These
-selectors express cadence and never bypass eligibility or safety gates. Thus `mark #4 done` and a sufficiently specific
-`do: change this label to Completed` may execute directly, while `handle #5`, `plan: handle #5`, risky or destructive
-work, and external actions require a plan. If direct discovery reveals material ambiguity, risk, or expansion, Forge
-stops before crossing the bounded request, reports any completed in-bound work, and presents an inline plan.
+## Other operations
 
-An explicit `inline plan` request is a cadence instruction. Forge reuses loaded evidence and inspects enough existing
-behavior, callers, and repository patterns to ground consequential decisions. It presents the approach and supporting
-evidence briefly, without routine command narration or evidence dumps. Details that cannot change the approach or
-scope can wait until implementation. For example,
-`done and move to next one. inline plan` should resolve the next loaded item and promptly present its envelope.
-
-Forge remains enabled and ready for the next request. Its usual permission, external-action, security,
-dirty-worktree, scope, review, and validation gates still apply. A new conversation loses any inline state; when the
-user wants resumability, they can choose an explicit operation. Explicit operations, `unattended`, and directives use
-normal Sia resolution rather than the Forge loop after Forge is off. While Forge is on, valid reserved directives and
-`unattended` retain normal resolution; ordinary operation names and aliases do not escape Forge.
-
-## Handoff envelope
-
-Use the canonical core envelope in `.ai/sia.md`. Artifact-backed work also requires artifact state and next
-transition; writes require the repository base and dirty-path fields. Include supporting context only when useful.
-Full older envelopes remain valid. In particular, carry:
-
-- `handoff_protocol: 1` and one final task;
-- operation, workflow, execution mode, and phase; artifact ID, status, revision, and next transition when applicable;
-- immutable authorization ceiling and explicitly authorized external actions;
-- exact `authorized_plan_paths` created in the conversation or explicitly requested or approved by the user;
-- artifact status and approved revision when approval applies;
-- requested outcome, approved scope, non-goals, and acceptance criteria;
-- repository root, base revision, and pre-existing dirty-worktree baseline;
-- relevant documentation paths and exact resolved operation, workflow, and skill paths;
-- requested model profile and whether it came from the user, project rules, workflow, or task assessment;
-- allowed work, exclusions, and unchanged host permissions;
-- explicit `do_not_load` paths, including unrelated docs, broad trees, and every unauthorized plan artifact;
-- current evidence, findings, command results, and approved deviations.
-
-Load plan content only from exact `authorized_plan_paths`; never scan `.ai/plans/` for similar work. Put the phase's
-exact ask after the selected docs, evidence, constraints, exclusions, and recovery information so the worker receives
-one clear task.
-
-Compaction summaries preserve exact authorized plan and definition paths, operation/mode/phase, approval boundaries,
-user corrections, constraints and preferences, doc paths, completed checks/results, rejected approaches/reasons,
-blockers, pending work, and next action. A summary never grants authorization; if exact plan authorization is lost,
-fail closed. Reload only material authorized context. Host-managed compaction may be opaque or outside Sia's control.
-
-For a fresh worker, put `Sia handoff` on the first line and the envelope immediately after it. This preserves the same
-explicit opt-in grammar as a user invocation while allowing planless scouts and reviewers to enter only their assigned
-phase. The host may supply hidden context that Sia cannot inspect. Sia promises a bounded explicit handoff, not control
-over host internals.
-
-When a coordinator waits for a worker, prefer one event-driven or longest-safe host wait. Do not poll every few seconds
-or emit progress turns while no new evidence exists; each polling turn may resend the full conversation context. If the
-host exposes only polling, use its longest safe interval and report the actual wait behavior.
-
-## Context budget
-
-Keep the stable, cacheable prefix lean and byte-for-byte stable: project rules, route contract, task-relevant invariant
-tool/context declarations, and durable documentation pointers come first. State each invariant once and render them in
-deterministic order, then put the variable suffix last: the active plan, focused diff, current evidence, constraints,
-and one final ask. Do not put timestamps, run IDs, volatile telemetry, or request-specific text in the stable prefix.
-Reference canonical files by path, load only the current phase's excerpts, and name broad or unauthorized paths in
-`do_not_load`. Never paste a complete repository, catalog, unauthorized plan, successful bulk output, or broad diff
-into a bounded handoff; preserve authorized evidence and return its path plus a concise outcome instead.
-
-See [prompt caching](prompt-caching.md) for provider controls, telemetry names, and the portable fallback. Those details
-are host capabilities, not workflow gates.
-
-Every envelope contains `execution_mode: interactive` or `execution_mode: unattended`. An unattended worker performs
-only its assignment and returns `blocked` to the coordinator instead of asking the user for approval or clarification.
-
-When the host reports usage, a handoff result may include `elapsed_ms`, `input_tokens`, `cached_input_tokens`,
-`cache_read_input_tokens`, `cache_write_input_tokens`, `output_tokens`, and `reasoning_output_tokens`. Preserve a
-provider's read/write values when exposed, retain `cached_input_tokens` for generic compatibility, and never estimate
-missing fields or child-worker usage from coordinator counters. Record `unknown` instead; these are telemetry, not
-workflow gates. Evaluate equivalent cold and warm runs with correctness, total and uncached input, cache reads/writes,
-output/reasoning tokens, and latency. Estimate provider cost only when the host has all applicable provider rates; a
-cache hit alone is not a cost guarantee.
-
-## Plan artifacts
-
-Persist every non-trivial delivery artifact under `.ai/plans/` before Build. Name every new artifact
-`YYYY-MM-DD-NN-<slug>.md`, using its UTC creation date and the next zero-padded daily sequence.
-To allocate `NN`, inspect filenames only; do not read unauthorized plan contents. This makes lexicographic directory
-order chronological. Planless trivial, investigation, review, and documentation workers use the bounded handoff
-envelope and do not create an artifact merely for isolation. An investigation may create one normal pending-approval
-delivery plan only when its original request explicitly asks to save a plan; this is not an investigation artifact or
-implementation approval.
-
-Plans open with a brief statement of intent, followed by short descriptions of the changes and the main checks and
-limits. A quick scan should reveal what is proposed and why it matters. Split independent requirements and group related
-points when helpful; no particular bolding, nesting, or section layout is required.
-
-Describe behavior before mechanisms. Keep technical details that explain a decision, risk, or scope boundary; keep
-routine execution inventories in handoffs or progress evidence. Avoid repeating the scope as both delivery steps and
-tests. Preserve required behavior, permissions, exceptions, and material risks. Readability means understanding the
-proposal easily, not meeting a word or bullet count.
-See the [writing examples](writing-examples.md) and the worked template in
-[standard planning guidance](../src/managed/.ai/workflows/sia/delivery/standard.md).
-
-New plans keep only the information a reader needs in their header and visible body:
-
-```markdown
----
-operation: implement
-workflow: delivery
-skills: [repository-discovery, testing]
----
-
-# Outcome
-
-<!-- sia:approval:start -->
-## Scope and acceptance
-...
-<!-- sia:approval:end -->
-
-<!-- sia:status pending-approval -->
-<!-- sia:base 4d3f... -->
-```
-
-The filename is the identity; for example, `.ai/plans/2026-07-14-06-short-outcome.md`. Frontmatter has no ID,
-revision, route, status, digest, baseline, permissions, or empty lists. Only `status` is required after the approval
-block. Optional one-line comments appear only when relevant:
-`approved`, `base`, `dirty`, `mode`, `route`, `ceiling`, `external`, `progress`, and `blocker`.
-
-The canonical digest convention lives in `.ai/sia.md`: hash UTF-8 content between the unique approval markers,
-excluding markers, after converting CRLF and CR to LF; preserve all other whitespace. Use lowercase SHA-256.
-An approved standard plan adds `<!-- sia:approved <sha256> -->`; changing approved bytes removes that comment
-and restores
-`<!-- sia:status pending-approval -->`. Progress comments never repair an invalid digest.
-
-The status comment determines resume: `pending-approval`, `build`, `review-validate`, `fix`, `ship`, `blocked`,
-`complete`, or `cancelled`. A blocked unattended plan adds one concise blocker comment with an observable resume
-condition. A valid `pending-approval` draft resumes to Approve and waits; it does not authorize Build.
-Resume treats the exact named artifact as content-read-authorized, reads only it, rejects
-contradictory/complete/cancelled state, and preserves legacy artifacts without migration. Base and dirty comments
-protect attribution when present; unattended ceiling and external comments are immutable. Handoff-only details stay
-in the handoff envelope, not the plan.
-
-Avoid a report directory. Persist only the visible authorization and the few comments needed to resume safely.
-
-## Delivery workflow
-
-```text
-Plan → Approve → Build → Review + Validate → Fix ─┐
-                              ↑                   │
-                              └───────────────────┘
-                                      ↓
-                                     Ship
-```
-
-### Plan
-
-Load the smallest relevant docs and skills, perform focused read-only discovery, inspect analogous code and tests, and
-produce an executable plan. Establish current behavior, where the change belongs, and why the chosen approach fits
-the repository. New capabilities and mechanisms need an explicit requirement or demonstrated necessity; explain why
-a simpler existing approach is insufficient when the choice matters. Keep the plan concise without omitting the
-evidence behind consequential decisions. Do not edit product/source code.
-
-### Approve
-
-Eligible lightweight work shows its inline receipt under direct activating-request authorization. Standard work stops
-once for a plain-language intent-envelope approval. In-envelope implementation details become evidence; scope, risk,
-permission, or external-action expansion requires a revised plan. Unattended mode auto-authorizes only inside its
-original outcome. Authorization never expands host permissions or unrelated external actions.
-
-For interactive standard delivery, an instruction to implement starts discovery and planning; it does not approve an
-unseen plan. Present the saved plan and wait for a clear approval reply before source edits, even for reversible work.
-General autonomy guidance does not remove this sequence. Once the plan is approved, continue in scope without asking
-again. Never write an approval record after an early edit to make the sequence appear valid.
-
-This sequence expresses the user's workflow preference. It does not override higher-priority host instructions or
-enforce writes mechanically. Report any conflict that prevents honoring it, rather than silently skipping the gate.
-
-### Build
-
-Prefer an isolated worker using the approved handoff. After exact definitions resolve, do not reread catalogs, broad
-docs, unauthorized plans, or prior evidence. Implement only approved scope, add or update tests, preserve pre-existing
-changes, and stop for replanning when material assumptions fail.
-
-Prefer existing patterns, clear names, and direct control flow. New abstractions, dependencies, options, and fallbacks
-need a current requirement; hypothetical future needs do not justify them. Readability matters more than line count.
-Preserve required error handling, validation, security, and compatibility. Verified internal contracts can rule out
-unnecessary defensive branches; assumptions alone cannot.
-
-### Review and validate
-
-Use a separate review phase and prefer an isolated worker that did not build the change. Compare the complete
-diff—including documentation—with the approved plan and baseline. Lightweight instead uses a focused coordinator
-diff/scope check and testing; a material finding promotes it to standard. Inspect correctness, scope, regressions,
-risks, and command evidence. Report the actual isolation mechanism and never claim an uninspected command passed.
-
-### Fix
-
-A build/fix worker addresses findings within approved scope and updates tests or docs. Then the separate review and
-validation phase reruns, isolated when the host supports it. Material remediation returns to Plan and Approve.
-Allow at most three unattended Fix cycles per plan revision; then return a blocker rather than weakening acceptance.
-
-### Ship
-
-Ship writes only plan completion status and evidence by default, then retains the completed artifact without prompting.
-Deletion requires a separate explicit request and is never inferred from completion or cleanup language. Product,
-source, and external delivery state remain read-only. Confirm the final reviewed artifact and report behavior, files,
-verification, deviations, and risks where they help assess the change. Lead with results, meaningful checks, and
-unresolved issues. Keep required route, model/usage, and detailed command evidence in the existing plan or handoff;
-show these details when requested or material. Do not create an artifact just for routine reporting. Evidence and
-approval requirements remain unchanged. Commit, push, pull request, release, publish, and deploy need explicit intent.
-
-In unattended mode, continue through in-scope Fix and Review/Validate cycles without asking questions. Use conservative,
-reversible assumptions or return a blocked result when no safe in-scope path remains.
-
-## Lightweight workflows
-
-### Investigation
-
-Product, source, existing plans, and external state remain read-only. Timebox the question, inspect the smallest useful
-evidence set, separate observations from inference, report confidence and unknowns, and recommend a next operation.
-
-When the original request explicitly asks to save an implementation plan, the coordinating session may create exactly
-one new compact delivery plan under `.ai/plans/` after synthesis. Resolve one unambiguous effective delivery operation;
-use its exact workflow and skills, normal UTC filename allocation, approval markers, `pending-approval` status, and
-base/dirty evidence. Add only that new path to plan authorization. Never read or edit another plan, approve or execute
-the draft, add unattended authority, or let a scout write it. Report `Sia resume <path>`; normal delivery approval still
-applies. An investigation report never approves implementation and has no resumable artifact of its own.
-
-### Review
-
-Read-only unless the user separately invokes a fixing operation. Establish the requested scope and baseline, report
-prioritized findings with file evidence, run or assess relevant validation, and distinguish pre-existing changes.
-
-### Documentation
-
-Writes only the requested `.ai/docs/**` scope and its nearest indexes. It verifies claims against current evidence and
-does not require delivery ceremony unless product/source changes become necessary.
-
-### Definition
-
-Creates or updates project skills, operations, workflows, and CUSTOM entries. It validates naming, schema, references,
-override behavior, and catalog consistency without touching shipped definitions.
-
-## Parallel work
-
-Investigation and review workflows may partition independent areas among bounded workers. Partitions must not overlap,
-must be useful independently, and must return the same handoff/result shape. The coordinating Sia session synthesizes
-results and owns user-visible gates and completion. Scouts normally request `fast`; synthesis and final review request
-`reasoning`, subject to host availability.
+Investigation and standalone review are read-only. Investigation may save one pending plan only on explicit request.
+Documentation writes the requested docs and nearest indexes. Creator operations use one definition workflow for shared
+validation while defining their own schema. CUSTOM workflows keep their own rules; shipped support is not appended.

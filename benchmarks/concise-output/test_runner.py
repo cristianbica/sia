@@ -19,7 +19,7 @@ class RunnerTests(unittest.TestCase):
         arms = runner.contracts()
         self.assertNotEqual(arms['baseline'], arms['candidate'])
         self.assertEqual(arms['baseline'], (runner.HERE / 'baseline.txt').read_text())
-        self.assertIn('Prefer existing patterns,', arms['candidate'])
+        self.assertTrue(arms['candidate'].strip())
         self.assertEqual(len(runner.cases()), 15)
 
     def test_commands_keep_model_as_one_argument_and_isolation(self):

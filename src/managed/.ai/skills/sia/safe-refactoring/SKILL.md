@@ -9,28 +9,10 @@ use_when:
 
 # Safe refactoring
 
-Make structural intent and preserved behavior explicit. Refactoring does not justify unrelated cleanup or weaker
-validation.
+State the intended structural change and behavior that must remain unchanged. Inspect affected callers, contracts,
+and existing tests. Choose the smallest structural change that solves the current problem and fits local patterns.
 
-## Required context
-
-- Approved scope, non-goals, and the behavior that must remain unchanged.
-- Current callers, boundaries, tests, public interfaces, data formats, and operational constraints.
-- Pre-existing dirty paths and verified repository commands.
-
-## Procedure
-
-1. Characterize observable behavior and identify gaps where tests or other evidence are too weak to detect regressions.
-2. Find the smallest structural change that achieves the approved objective and preserves repository conventions.
-3. Separate behavior changes from movement or cleanup; return to planning if separation is not possible.
-4. Prefer incremental, reviewable steps with focused validation after each meaningful boundary change.
-5. Recheck callers, lifecycle and error paths, compatibility surfaces, generated artifacts, and documentation impact.
-6. Review the final diff for accidental behavior, expanded scope, stale names, dead compatibility paths, and weak tests.
-
-Do not preserve a bug merely by calling it behavior when the approved plan explicitly changes it. Conversely, do not
-smuggle behavior changes into a refactor. Apply edits only in a workflow phase that permits them.
-
-## Output
-
-Report the structural change, behavior-preservation evidence, tests or commands run, any deliberate behavior changes,
-scope deviations, and residual risk.
+Separate movement/cleanup from behavior changes where practical. Use reviewable steps and focused checks after
+meaningful boundaries. Recheck affected lifecycle/error paths, interfaces, and documentation, without expanding into
+unrelated cleanup. Report deliberate behavior changes and missing coverage. Refactoring never authorizes extra features
+or weaker validation; a necessary scope change must be made explicit before proceeding.

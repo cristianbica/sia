@@ -21,18 +21,18 @@ STANDARD_CASES = ('standard', 'continuation', 'passing-checks', 'pending-resume'
 UNRELATED_PLAN = '.ai/plans/1999-01-01-01-unrelated.md'
 TASK = 'Change app.py greeting from Hello to Welcome; preserve its function and argument. Check with python3 -B -c "from app import greet; assert greet(\'Ada\') == \'Welcome Ada\'".'
 PROMPTS = {
-    'standard': 'Sia implement ' + TASK + ' Treat greet as a public API: update its documented greeting contract in app.py.',
+    'standard': 'Sia implement Plan this change and save the plan for approval before editing. ' + TASK + ' Treat greet as a public API: update its documented greeting contract in app.py.',
     'trivial': 'Sia implement Correct only the typo Welcomme to Welcome in README.md.',
     'lightweight': 'Sia implement ' + TASK + ' This is an internal helper with no other consumers or public API.',
     'forge-direct': 'Sia do: ' + TASK,
     'forge-plan': 'Sia plan: ' + TASK,
-    'unattended': 'Sia unattended implement full ' + TASK + ' Authorization is limited to local fixture code, tests, and plan; no external actions.',
+    'unattended': 'Sia unattended implement ' + TASK + ' Authorization is limited to local fixture code, tests, and plan; no external actions.',
 }
-PROMPTS['continuation'] = ('Sia implement full Update the public greet function in app.py to return Welcome plus the name, '
+PROMPTS['continuation'] = ('Sia implement Plan and save this change for approval before editing. Update the public greet function in app.py to return Welcome plus the name, '
     'and add farewell(name) returning Goodbye plus the name. Use the existing tests. After implementing greet, '
     'give a brief progress update, then continue the remaining approved work without waiting for another message. '
     'Finish by running python3 -B -m unittest -v. Preserve unrelated files and existing tests.')
-PROMPTS['passing-checks'] = ('Sia implement full Update the public greet function in app.py to return Welcome plus the name, '
+PROMPTS['passing-checks'] = ('Sia implement Plan and save this change for approval before editing. Update the public greet function in app.py to return Welcome plus the name, '
     'and add farewell(name) returning Goodbye plus the name. Preserve the existing tests and run python3 -B -m unittest -v. '
     'Once those checks pass, finish; repeat them only if a later source change, failure, or new concern justifies it.')
 PROMPTS['pending-resume'] = PROMPTS['standard']
@@ -89,7 +89,6 @@ def pending_plan(repo, response):
 
 def trace_check(events, waiting, authorized_plans=()):
     """Recognize common mutations, and reject opaque tools/commands while waiting."""
-    announced = False
     for event in events:
         item = event.get('item', {})
         kind = item.get('type')
@@ -104,14 +103,9 @@ def trace_check(events, waiting, authorized_plans=()):
                 if not paths or any('*' in p or '?' in p or '..' in Path(p).parts for p in paths):
                     raise Unavailable('broad plan command needs manual read-scope review')
                 assert all(p in authorized_plans for p in paths), 'unauthorized plan read attempt in trace'
-        if kind == 'agent_message':
-            words = item.get('text', '').lower()
-            announced |= bool(re.search(r'standard|trivial|lightweight|forge|unattended', words)
-                              and re.search(r'authoriz|approv|request', words))
         if event.get('type') not in ('item.started', 'item.completed', 'item.updated'):
             continue
         if kind == 'file_change':
-            assert announced, 'write before route/authorization announcement'
             paths = [c.get('path', '') for c in item.get('changes', [])]
             assert paths, 'file change has no inspectable paths'
             if waiting:
@@ -124,17 +118,14 @@ def trace_check(events, waiting, authorized_plans=()):
             if re.search(r'--(?:pre|hostname-bin|output|ext-diff|textconv|exec|delete)(?:[=\s]|$)|\b(apply_patch|sed\s+-i|touch|rm|mv|cp|tee|truncate)\b|[>]|`|\$\(', command):
                 if waiting:
                     raise AssertionError('possible premature shell write attempt in trace')
-                assert announced, 'command before route/authorization announcement'
                 continue
             if not re.fullmatch(r'(?:/bin/(?:ba)?sh -[lc]+ [\'"])?(?:cat|head|tail|rg|ls|pwd|git status|git diff|git log|git rev-parse)(?: [^;&|\n]*)?(?:[\'"])?', command):
                 if waiting:
                     raise Unavailable('unclassified pre-approval shell activity needs manual review')
-                assert announced, 'command before route/authorization announcement'
         elif kind and kind not in ('agent_message', 'reasoning', 'todo_list', 'file_read'):
             if waiting:
                 raise Unavailable('opaque pre-approval tool activity needs manual review')
-            assert announced, 'tool before route/authorization announcement'
-    return announced
+    return None
 
 
 def continuation_check(events):
@@ -347,14 +338,8 @@ def check_result(repo, case, before):
         result = subprocess.run(['python3', '-B', '-c', "from app import greet; assert greet('Ada') == 'Welcome Ada'"],
                                 cwd=repo, capture_output=True, timeout=10)
         assert result.returncode == 0, 'greeting behavior check failed'
-    if case in ('trivial', 'lightweight', 'forge-direct', 'forge-plan'):
+    if case in ('trivial', 'lightweight', 'forge-direct', 'forge-plan', 'unattended'):
         assert not plan_files(repo), 'planless route created plan artifact'
-    elif case == 'unattended':
-        plans = plan_files(repo)
-        assert len(plans) == 1, 'unattended standard plan missing'
-        body = plans[0].read_text()
-        assert '<!-- sia:mode unattended -->' in body and '<!-- sia:ceiling ' in body, 'unattended authorization missing'
-        completed_plan(body)
 
 
 def run_case(case, repo, env, evidence, args):

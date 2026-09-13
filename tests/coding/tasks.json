@@ -1,0 +1,15 @@
+[
+  {
+    "id": "currency",
+    "request": "Add currency to receipts when the order supplies it. Preserve the existing receipt fields and amount formatting. Orders without currency must keep their current behavior. Do not add currency conversion. Implement and check the change."
+  },
+  {
+    "id": "duplicate",
+    "request": "Processing the same event twice reduces inventory twice but sends only one receipt. Fix this. Separate event IDs must still be processed independently. Implement and check the change."
+  },
+  {
+    "id": "sku-plan",
+    "request": "Plan this change before editing: let process callers request the SKU on the receipt using an optional include_sku argument, defaulting to false. Pass the choice to format_receipt, which should support the same optional argument. Include sku only when requested and present on the order. Preserve existing callers and receipt behavior. Explain how you will change the code and check it, then wait for approval.",
+    "approval": "Approved. Implement that plan and run the checks."
+  }
+]

@@ -9,34 +9,13 @@ use_when:
 
 # Testing
 
-Choose validation from the change's behavior, risk, and repository evidence rather than from a fixed universal command.
+Choose checks from the changed behavior and repository conventions. Prefer tests that reproduce the defect or detect
+meaningful regressions over ones that copy the implementation. Cover relevant failure paths; do not add speculative
+cases outside the task's contracts.
 
-## Required context
+Run focused checks first and broader checks when scope or risk warrants them. Stop once required checks pass unless a
+change, failure, or new concern justifies more work. Inspect outcomes; a skipped check or missing dependency is not a
+pass. Preserve existing tests and do not weaken acceptance to obtain green results.
 
-- Changed and affected behavior, including documented acceptance criteria.
-- Verified repository commands and relevant test locations.
-- The base and pre-existing dirty-worktree baseline.
-- Host permissions and environmental limitations.
-
-## Procedure
-
-1. Identify the smallest tests that directly exercise the changed behavior and its important failure modes.
-2. Add or update regression coverage when behavior changes and the repository has an appropriate test layer.
-3. Run focused validation first; add broader checks only when risk, the approved plan, or repository evidence justifies
-   them. Stop after required checks pass unless changes, failures, or new evidence justify more validation.
-   Avoid tests that merely mirror implementation or add no coverage of meaningful behavior or failure modes.
-4. Inspect exit status and useful output; distinguish test failure from unavailable dependencies or environment.
-5. Review the final diff for untested branches, documentation impact, and accidental scope.
-
-Use the repository's own commands and conventions when verified. Do not invent a generic test stack or silently replace
-an unavailable check with a weaker one.
-
-## Reporting
-
-For every claimed check, record the exact command, outcome, and relevant scope in the active plan or handoff when
-one exists. User-facing replies summarize meaningful checks and material limits; include details when requested or
-needed to assess the result. Without an existing evidence location, report the required evidence directly. Keep
-successful bulk output and broad
-diffs in evidence, not later active context; include useful excerpts for failures. Label commands that were not run and
-explain why. Record residual risk and missing evidence. Never imply that skipped, interrupted, or uninspected commands
-passed.
+Report meaningful results and unavailable checks. Retain exact commands and outcomes in existing task evidence when
+needed; do not create an artifact just for routine test reporting. Review the diff for changes the tests do not cover.

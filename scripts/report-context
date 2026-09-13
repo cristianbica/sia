@@ -11,8 +11,6 @@ COMMON = ['src/managed/.ai/sia.md', 'src/seed/.ai/RULES.md',
           'src/managed/.ai/operations/sia/implement.md', 'src/seed/.ai/docs/INDEX.md']
 COMMON += [f'src/managed/catalogs/{name}.md' for name in ('operations', 'workflows', 'skills')]
 COMMON += [f'src/managed/.ai/skills/sia/{name}/SKILL.md' for name in ('repository-discovery', 'testing')]
-ROUTES = ('trivial', 'lightweight', 'standard-plan', 'standard-execute', 'standard-resume',
-          'forge-intake', 'forge-execute')
 
 
 def read(path, ref=None):
@@ -24,8 +22,6 @@ def read(path, ref=None):
 def support_map(body):
     rows = {}
     for name, links in re.findall(r'^\| ([a-z]+(?:-[a-z]+)?) \| (.+) \|$', body, re.M):
-        if name not in ROUTES:
-            raise ValueError(f'unknown delivery route: {name}')
         paths = re.findall(r'\]\(([^)]+)\)', links)
         if name in rows or (not paths and links != 'none'):
             raise ValueError(f'invalid delivery row: {name}')
@@ -33,40 +29,53 @@ def support_map(body):
             if not path.startswith('delivery/') or '..' in PurePosixPath(path).parts:
                 raise ValueError(f'invalid delivery support path: {path}')
         rows[name] = [str(PurePosixPath(WORKFLOW).parent / path) for path in paths]
-    if set(rows) != set(ROUTES):
-        raise ValueError('delivery table must define every route exactly once')
+    if not rows:
+        raise ValueError('missing support table')
     return rows
 
 
-def measure(ref=None, legacy=False):
-    body = read(WORKFLOW, ref)
-    routes = {route: [] for route in ROUTES} if legacy else support_map(body)
-    result = {}
-    for route, support in routes.items():
-        paths = list(dict.fromkeys(COMMON + [WORKFLOW] + support))
+def measure(ref=None):
+    supports = support_map(read(WORKFLOW, ref))
+    def count(paths):
+        paths = list(dict.fromkeys(paths))
         texts = [read(path, ref) for path in paths]
-        result[route] = {'documents': len(paths), 'words': sum(len(s.split()) for s in texts),
-                         'bytes': sum(len(s.encode('utf-8')) for s in texts), 'paths': paths}
+        return dict(documents=len(paths), words=sum(len(s.split()) for s in texts),
+                    bytes=sum(len(s.encode()) for s in texts), paths=paths)
+    common = COMMON + [WORKFLOW]
+    result = {name: count(common + paths) for name, paths in supports.items()}
+    review = ['src/managed/.ai/skills/sia/code-review/SKILL.md']
+    ordinary = supports.get('coding', supports.get('standard-plan', []))
+    later = [] if 'coding' in supports else supports.get('standard-execute', [])
+    result['coding-complete'] = count(common + ordinary + later + review)
+    result['all-delivery-support'] = count(common + [p for ps in supports.values() for p in ps] + review)
+    if ref:
+        shipped = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', ref, '--', 'src'],
+                                          cwd=ROOT, text=True).splitlines()
+        shipped = [p for p in shipped if p.endswith('.md')]
+    else:
+        shipped = [str(p.relative_to(ROOT)) for p in sorted((ROOT / 'src').rglob('*.md'))]
+    result['all-shipped-markdown'] = count(shipped)
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--baseline-ref', help='optional earlier source revision; only explicit definition paths are read')
+    parser.add_argument('--baseline-ref', help='earlier source revision; reads only source definition paths')
     args = parser.parse_args()
     current = measure()
-    baseline = None
-    if args.baseline_ref:
-        body = read(WORKFLOW, args.baseline_ref)
-        baseline = measure(args.baseline_ref, legacy='## Load only the current route and phase' not in body)
-    print('route\tdocuments\twords\tUTF8_bytes' + ('\tbaseline_words\tword_change' if baseline else ''))
-    for route, values in current.items():
-        row = [route, values['documents'], values['words'], values['bytes']]
+    baseline = measure(args.baseline_ref) if args.baseline_ref else None
+    print('use\tdocuments\twords\tUTF8_bytes' + ('\tbaseline_words\tword_change' if baseline else ''))
+    aliases = {'coding': 'standard-plan', 'saved-plan': 'standard-plan', 'forge': 'forge-intake'}
+    for use, values in current.items():
+        row = [use, values['documents'], values['words'], values['bytes']]
         if baseline:
-            row += [baseline[route]['words'], values['words'] - baseline[route]['words']]
+            before = baseline.get(use, baseline.get(aliases.get(use)))
+            row += [before['words'], values['words'] - before['words']] if before else ['n/a', 'n/a']
         print('\t'.join(map(str, row)))
-    print('Static cold-load estimate: common intake definitions plus selected support. Not a model-token or cost claim.')
-    print('Excludes host instructions, project overrides, task docs/code, prior conversation, and later phase accumulation.')
+    print('Static words/bytes, not model tokens, cost, or proof of behavior. Includes common intake definitions.')
+    print('coding-complete includes later execution and review loads; all-delivery-support counts their union once.')
+    print('Old coding baseline is standard-plan; all-shipped-markdown includes every Markdown file under src.')
+    print('Excludes host instructions, project overrides/docs/code and conversation history.')
     return 0
 
 

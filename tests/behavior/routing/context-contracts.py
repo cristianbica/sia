@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the declared route graph without treating text size as model performance."""
+"""Check source loading structure and accounting, not model compliance."""
 import importlib.machinery
 import importlib.util
 from pathlib import Path
@@ -12,46 +12,49 @@ report = importlib.util.module_from_spec(spec)
 loader.exec_module(report)
 
 
-class RouteContext(unittest.TestCase):
-    def setUp(self):
-        self.body = report.read(report.WORKFLOW)
-        self.routes = report.support_map(self.body)
-
-    def test_route_separation_and_required_support(self):
-        suffixes = {route: [Path(p).name for p in paths] for route, paths in self.routes.items()}
-        self.assertEqual(suffixes['trivial'], [])
-        self.assertEqual(suffixes['standard-plan'], ['standard.md'])
-        self.assertEqual(suffixes['standard-resume'], ['standard.md'])
-        self.assertEqual(suffixes['standard-execute'], ['execution.md'])
-        self.assertEqual(suffixes['lightweight'], ['execution.md'])
-        self.assertEqual(suffixes['forge-intake'], ['forge.md'])
-        self.assertEqual(suffixes['forge-execute'], ['forge.md', 'execution.md'])
-        for paths in self.routes.values():
+class Context(unittest.TestCase):
+    def test_optional_support_is_separate(self):
+        uses = report.support_map(report.read(report.WORKFLOW))
+        self.assertEqual(set(uses), {'coding', 'saved-plan', 'forge', 'worker'})
+        self.assertEqual(uses['coding'], [])
+        self.assertEqual([Path(p).name for p in uses['saved-plan']], ['standard.md'])
+        self.assertEqual([Path(p).name for p in uses['worker']], ['handoff.md'])
+        self.assertEqual([Path(p).name for p in uses['forge']], ['forge.md'])
+        for paths in uses.values():
             for path in paths:
-                self.assertTrue((ROOT / path).is_file(), path)
-        self.assertIn('CUSTOM workflow owns its own supporting references', self.body)
-        self.assertIn('definition_paths.support', self.body)
+                self.assertTrue((ROOT / path).is_file())
+        self.assertFalse((ROOT / 'src/managed/.ai/workflows/sia/delivery/execution.md').exists())
 
-    def test_invalid_and_missing_routes_fail_closed(self):
-        for body in [self.body.replace('| trivial | none |', ''),
-                     self.body + '\n| trivial | none |\n',
-                     self.body.replace('delivery/standard.md', '../standard.md'),
-                     self.body.replace('| trivial | none |', '| trivial | maybe |')]:
-            with self.subTest(body=body[-100:]), self.assertRaises(ValueError):
-                report.support_map(body)
+    def test_invalid_support_table(self):
+        body = report.read(report.WORKFLOW)
+        for broken in (body + '\n| coding | none |\n',
+                       body.replace('delivery/standard.md', '../standard.md'),
+                       body.replace('| coding | none |', '| coding | missing |'), ''):
+            with self.subTest(broken=broken), self.assertRaises(ValueError):
+                report.support_map(broken)
 
-    def test_shared_authority_and_complete_execution(self):
-        for values in report.measure().values():
-            self.assertIn('src/managed/.ai/sia.md', values['paths'])
-            self.assertIn('src/seed/.ai/RULES.md', values['paths'])
-            self.assertGreater(values['words'], 0)
-        execution = report.read(self.routes['standard-execute'][0])
-        for phase in ('Build', 'Review/Validate', 'Fix', 'Ship'):
-            self.assertIn('## ' + phase, execution)
-        standard = report.read(self.routes['standard-plan'][0])
-        self.assertIn('## Approve', standard)
-        self.assertIn('before any product/source edit', standard)
-        self.assertIn('Only standard delivery writes', execution)
+    def test_counts_include_later_and_total_files_without_duplicates(self):
+        values = report.measure()
+        self.assertLess(values['coding']['words'], values['coding-complete']['words'])
+        self.assertLess(values['coding-complete']['words'], values['all-delivery-support']['words'])
+        self.assertGreater(values['all-shipped-markdown']['words'], values['all-delivery-support']['words'])
+        for entry in values.values():
+            self.assertEqual(len(entry['paths']), len(set(entry['paths'])))
+            self.assertEqual(entry['words'], sum(len(report.read(p).split()) for p in entry['paths']))
+        for path in values['coding-complete']['paths']:
+            self.assertNotIn('/delivery/standard.md', path)
+            self.assertNotIn('/delivery/handoff.md', path)
+
+    def test_protocol_header_and_skill_schemas(self):
+        protocol = report.read('src/managed/.ai/sia.md')
+        self.assertEqual(protocol.splitlines()[:3], ['---', 'sia_protocol: 1', '---'])
+        for path in (ROOT / 'src/managed/.ai/skills/sia').glob('*/SKILL.md'):
+            head, body = path.read_text().split('---', 2)[1:]
+            self.assertIn('name: ' + path.parent.name, head)
+            self.assertIn('description:', head)
+            self.assertTrue(body.strip())
+        for vendor in ('.codex', '.claude', '.cursor', '.opencode'):
+            self.assertFalse((ROOT / 'src/managed' / vendor).exists())
 
 
 if __name__ == '__main__':

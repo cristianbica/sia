@@ -81,8 +81,9 @@ It never invokes a model and is not evidence of live host-model compliance.
 ## Long-task regression scenarios
 
 [Continuation scenarios](../behavior/routing/fixtures/model-continuation.md) define expected outcomes for compaction,
-already-authorized steps, scope control, and verification stopping. Static contracts check that guidance and scenarios
-remain present. These scenarios are not run by the eight-case live smoke suite and require a separate authorized
+already-authorized steps, scope control, and verification stopping. These are manual evaluation scenarios, not
+assertions about prompt wording. These scenarios are not run by the eight-case live smoke suite and require a separate
+authorized
 multi-turn evaluation to certify model behavior.
 
 ## Writable approval and continuation checks (Codex and Claude)
@@ -100,9 +101,11 @@ Python 3 and a CLI supporting structured tool events and exact-session continuat
 missing sessions, mismatched continuation sessions, host failures, timeouts, output truncation, and missing evidence
 return `UNAVAILABLE`, never a pass.
 
-Nine cases cover standard approval; trivial and lightweight direct work; Forge direct and inline-plan work; unattended
-standard delivery; completing remaining approved work after a progress update; stopping checks after passing; and
-resuming a pending plan in a fresh session before approving it. Forge cases first enable Forge in the same session.
+Legacy CLI case names `standard`, `trivial`, and `lightweight` remain for harness compatibility, not delivery routes.
+Nine cases cover explicitly requested saved approval; direct wording and code changes; Forge direct and inline-plan
+work; planless unattended delivery; completing remaining approved work after a progress update; stopping checks after
+passing; and resuming a pending plan in a fresh session before approving it. Forge cases first enable Forge in the
+same session.
 The last two implementation cases use a real module and existing unittest fixture with two required behaviors.
 The pending-resume case must remain pending without source edits until the subsequent approval.
 All nine cases use at most seventeen model turns per host, sequentially, with a default 90-second timeout and 1 MiB
@@ -111,15 +114,18 @@ no monetary cap. Requested model/effort accept `SIA_CODEX_MODEL`, `SIA_CLAUDE_MO
 `SIA_CODEX_REASONING_EFFORT` / `SIA_CLAUDE_REASONING_EFFORT` environment defaults. Actual model/usage/cost are recorded
 only when the trace reports them; otherwise they remain `unknown`.
 
-Before approval, standard cases require a valid pending plan, no approval marker, a response naming that path with
+Before approval, saved-plan cases require a valid pending plan, no approval marker, a response naming that path with
 approval wording, and unchanged files outside the created plan. Review the response to confirm it actually asks for
 approval; a keyword match is not sufficient. Approval resumes the exact reported session. Completed plans retain the
 presented envelope and its matching SHA-256 digest: normalize CRLF and bare CR to LF, encode UTF-8, and preserve all
-whitespace between the unique ordered markers, excluding the markers themselves. Unattended plans also require mode
-and authorization-ceiling comments. Planless controls must create no plan artifact.
+whitespace between the unique ordered markers, excluding the markers themselves. When a saved unattended plan is
+explicitly requested, its format retains mode and authorization-ceiling comments; the current unattended case checks
+ordinary planless work. Direct coding controls
+must create no plan artifact.
 
-Trace checks inspect observable file-change attempts, including failed or reverted attempts, and require a preceding
-route/authorization announcement. Exact argument-free reads (`pwd`, `ls`, `git status`, `git diff`) are recognized.
+Trace checks inspect observable file-change attempts, including failed or reverted attempts. They enforce the
+requested planning boundary without requiring a route or authorization announcement. Exact argument-free reads (`pwd`,
+`ls`, `git status`, `git diff`) are recognized.
 Before approval, possible shell writes fail and opaque tools/commands return `UNAVAILABLE`. Conservative classification
 can reject legitimate shell-based plan creation. Explicit reads of the unrelated fixture plan fail; broad plan commands
 need manual scope review. This is not a shell interpreter or a security boundary. Unreported tools, arbitrary code,

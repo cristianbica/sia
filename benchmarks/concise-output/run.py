@@ -32,10 +32,10 @@ def cases():
 def contracts():
     protocol = (ROOT / 'src/managed/.ai/sia.md').read_text()
     response = protocol.split('## User-facing responses\n', 1)[1].split('\n## ', 1)[0].strip()
-    delivery = (ROOT / 'src/managed/.ai/workflows/sia/delivery/execution.md').read_text()
-    simplicity = delivery.split('Prefer existing patterns,', 1)[1].split('\n\n', 1)[0]
+    delivery = (ROOT / 'src/managed/.ai/workflows/sia/delivery.md').read_text()
+    simplicity = delivery.split('Add behavior and mechanisms', 1)[1].split('\n\n', 1)[0]
     return {'baseline': (HERE / 'baseline.txt').read_text(),
-            'candidate': response + '\n\nPrefer existing patterns,' + simplicity + '\n'}
+            'candidate': response + '\n\nAdd behavior and mechanisms' + simplicity + '\n'}
 
 
 def command(host, model, effort, prompt, response):
