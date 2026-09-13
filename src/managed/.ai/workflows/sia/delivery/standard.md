@@ -17,12 +17,19 @@ Load for Plan, Approve, or validating a resumed artifact. After approval, follow
 
 Write for the person deciding whether to approve the change:
 
-- Start with the proposed behavior. Explain the key decisions and why they matter, using short, concrete sentences.
-- Give each point one main idea. Explain necessary technical terms instead of stacking names and mechanisms.
-- Keep details that affect understanding or approval. Omit file inventories, repeated safeguards, and speculative steps.
-- State observable acceptance checks and material risks. Do not drop scope or safety requirements for brevity.
-- Reread for meaning: can the reader tell what will change and why without translating jargon? Shorter text and more
-  bullets alone do not pass. Avoid both long prose and cryptic fragments; do not impose a word quota.
+- Open with one or two plain-language sentences: what result is intended, and why does it matter?
+- Make the rest scannable. Describe what will change in short points, with one main idea per point. Split independent
+  requirements instead of joining them with semicolons or packing several sentences into one bullet.
+- Group related points when it helps the reader find an area quickly. Use bullets, short descriptions, or subheadings
+  as needed; bold labels, nesting, and a fixed set of sections are not required. Simple plans can stay small.
+- Explain behavior before mechanisms. Include technical detail only when it clarifies an important decision, risk,
+  or scope boundary. Put routine file, command, and implementation inventories in handoffs or progress evidence.
+- Give the main observable success checks and limits briefly. Do not retell the scope as delivery steps and again as
+  tests. Include a sequence only when order matters to understanding or approval.
+- Preserve required behavior, actors, permissions, exceptions, and material risks. Moving execution notes must not
+  hide a decision or weaken the approval boundary. Explain necessary jargon; terse labels are not descriptions.
+- Reread as an approver: can a quick scan find the intent, changes, success checks, and limits? Can each point be
+  understood on its own without decoding a dense paragraph? Revise for those answers, not word or bullet counts.
 
 Persist a compact artifact before Build and immediately add its exact path to the conversation's
 `authorized_plan_paths`. Standard starts with `<!-- sia:status pending-approval -->`; interactive and standard are
@@ -70,20 +77,19 @@ skills: [repository-discovery, testing]
 # Prevent duplicate webhook processing
 
 <!-- sia:approval:start -->
-Record each webhook's event ID so a repeated delivery does not apply the same update twice.
+Prevent repeated webhook deliveries from applying the same update twice, while allowing failed updates to be retried.
 
 ## Changes
 
-- Save the event ID and its update in one database transaction. If the update fails, a retry can still process it.
-- Enforce unique event IDs in the database so simultaneous deliveries cannot both apply the update.
-- Add an event-ID table. Leave existing webhook authentication and payload validation unchanged.
+- Add a table of processed event IDs, with database uniqueness to prevent simultaneous duplicates.
+- Save the ID and update in one transaction. A failed update must leave the event available for retry.
+- Keep existing webhook authentication and payload validation.
 
 ## Checks and limits
 
-- Test repeated and simultaneous deliveries: one update per event ID.
-- Test a failed update followed by a successful retry: the event must not be lost.
-- Run the webhook tests and apply the migration to an isolated test database.
-- Existing events have no recorded IDs; this only prevents duplicates processed after the change is installed.
+- Verify one update per event ID, including simultaneous deliveries and a retry after failure.
+- Run webhook tests; apply the migration only to an isolated test database.
+- Protection starts after installation; older events have no recorded IDs.
 - No production migration, deployment, or live webhook calls.
 <!-- sia:approval:end -->
 

@@ -229,9 +229,14 @@ envelope and do not create an artifact merely for isolation. An investigation ma
 delivery plan only when its original request explicitly asks to save a plan; this is not an investigation artifact or
 implementation approval.
 
-Plans explain what will change, why the key decisions matter, and how success will be checked. Use short, concrete
-sentences; do not pack several mechanisms into one bullet. Keep details that affect understanding or approval, including
-material risks. Remove file inventories and repeated safeguards. Shorter text or more bullets alone does not pass.
+Plans open with a brief statement of intent, followed by short descriptions of the changes and the main checks and
+limits. A quick scan should reveal what is proposed and why it matters. Split independent requirements and group related
+points when helpful; no particular bolding, nesting, or section layout is required.
+
+Describe behavior before mechanisms. Keep technical details that explain a decision, risk, or scope boundary; keep
+routine execution inventories in handoffs or progress evidence. Avoid repeating the scope as both delivery steps and
+tests. Preserve required behavior, permissions, exceptions, and material risks. Readability means understanding the
+proposal easily, not meeting a word or bullet count.
 See the [writing examples](writing-examples.md) and the worked template in
 [standard planning guidance](../src/managed/.ai/workflows/sia/delivery/standard.md).
 
