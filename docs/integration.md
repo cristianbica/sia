@@ -10,7 +10,7 @@ AGENTS.md
 
 .ai/
   sia.md                     # Sia-owned activation protocol
-  RULES.md                   # refreshed defaults above the marker; project rules below
+  RULES.md                   # created once; the entire file belongs to the project
   docs/INDEX.md              # project-owned after first creation
   skills/{INDEX.md,sia/,<project-skill>/}
   operations/{INDEX.md,sia/,<project-operation>.md}
@@ -44,21 +44,20 @@ repository whose installer was run from Codex; the bridge remains inert unless C
 
 ## Ownership model
 
-Managed refreshes replace reserved paths, marked Sia blocks, or the rules prefix through its boundary marker.
+Managed refreshes replace reserved paths and marked Sia blocks. Existing project rules are never refreshed.
 
 | Target | Replace the complete file or directory | Replace only a marked Sia block |
 | --- | --- | --- |
 | `.ai/` | `.ai/sia.md`; `.ai/{skills,operations,workflows}/sia/` | Each category `INDEX.md` SIA section |
-| `.ai/RULES.md` | None | Defaults through the project-specific marker |
+| `.ai/RULES.md` | None | None; create only when missing |
 | Host instruction files | None | Root `AGENTS.md`; optional `.claude/CLAUDE.md` |
 
 The intentionally empty host-file/full-replacement cell is important: Sia never takes ownership of a user's whole
 instruction file.
 
-`src/seed/.ai/RULES.md` supplies the installed defaults. Every install replaces the prefix through
-`<!-- Add project-specific rules below this line. -->` and preserves all bytes below it. Put custom rules below that
-marker; edits above it are replaced. Existing rules files must contain exactly one boundary marker. Missing or duplicate
-markers stop installation before content writes; restore one boundary and move custom rules below it before retrying.
+`src/seed/.ai/RULES.md` supplies initial defaults only. Existing `.ai/RULES.md` files remain byte-for-byte unchanged,
+including permissions and files with missing, renamed, or repeated comment markers. The whole file is project-owned;
+updating its rules requires an explicitly requested change. Symlinks and non-file targets still fail preflight.
 
 Create-once seeds are outside that replacement matrix. `docs/INDEX.md` and new category indexes are copied only when
 missing, then become project-owned; later installs never refresh them as whole files. Project definitions,

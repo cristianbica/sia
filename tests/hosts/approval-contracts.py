@@ -37,7 +37,9 @@ class ApprovalHarness(unittest.TestCase):
             if fault == 'timeout':
                 command += ['--timeout', '0.1']
             result = subprocess.run(command, env=env, capture_output=True, text=True, timeout=90)
-            self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+            summary_path = artifacts / 'summary.tsv'
+            details = summary_path.read_text() if summary_path.exists() else ''
+            self.assertEqual(result.returncode, expected, result.stdout + result.stderr + details)
             summary = (artifacts / 'summary.tsv').read_text()
             if expected == 0:
                 self.assertEqual(summary.count('\tPASS\t'), len(runner.CASES) if case is None else 1, summary)

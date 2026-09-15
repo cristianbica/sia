@@ -25,7 +25,7 @@ The source tree is canonical. The installed `.ai/` tree is a runtime projection 
 | `src/managed/.ai/operations/sia/` | `.ai/operations/sia/` | Sia installer; replaced on refresh |
 | `src/managed/.ai/workflows/sia/` | `.ai/workflows/sia/` | Sia installer; replaced on refresh |
 | `src/managed/catalogs/` | SIA blocks in category `INDEX.md` files | Sia installer; marked block only |
-| `src/seed/.ai/RULES.md` | `.ai/RULES.md` | Sia refreshes defaults; project owns content below the marker |
+| `src/seed/.ai/RULES.md` | `.ai/RULES.md` | Created only when missing; project owns the entire file |
 | `src/seed/.ai/docs/INDEX.md` | `.ai/docs/INDEX.md` | Project; copied only if absent |
 | `src/seed/.ai/*/INDEX.md` | Category indexes and CUSTOM sections | Project outside SIA block |
 | `src/bridges/` | Marked blocks in `AGENTS.md` and `.claude/CLAUDE.md` | Sia block; surrounding file is project-owned |
@@ -40,7 +40,7 @@ Installed project-owned paths have their own responsibilities:
   project change |
 | `.ai/workflows/<name>.md` | Custom phases, gates, and transitions | `create-workflow` or an explicit project change |
 | `.ai/plans/**` | Delivery artifacts and approval evidence | Delivery workflow or investigation's explicit new-draft exception |
-| `.ai/RULES.md` | Default and project-specific Sia constraints | Installer above the marker; project below |
+| `.ai/RULES.md` | Default and project-specific Sia constraints | Project owns the entire file |
 
 The reserved `.ai/*/sia/` directories and `.ai/sia.md` are not project extension points. When developing Sia, edit the
 left-hand canonical source paths, then rerun `./install.sh`; do not manually edit the installed Sia projection. Custom
@@ -62,9 +62,9 @@ the current protocol without restarting the host.
 
 ## Ownership boundary
 
-`AGENTS.md` and `.claude/CLAUDE.md` remain mixed-ownership files: only Sia's marked blocks are managed. Rules below the
-project-specific marker, documentation, plans, custom definitions, CUSTOM catalog sections, and text outside catalog blocks are
-project-owned. The installer does not infer ownership of unknown historical content.
+`AGENTS.md` and `.claude/CLAUDE.md` remain mixed-ownership files: only Sia's marked blocks are managed. The
+entire project rules file, documentation, plans, custom definitions, CUSTOM catalog sections, and text outside catalog
+blocks are project-owned. The installer does not infer ownership of unknown historical content.
 
 For this dogfood repository, “change Sia” means changing `src/`, `install.sh`, `scripts/`, `tests/`, `docs/`, or the
 root README. “Configure the installed Sia runtime” means changing project-owned `.ai/**` paths. If a task could mean

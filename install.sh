@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Managed refreshes replace reserved Sia paths, marked blocks, and rule defaults; other seeds are created once.
+# Managed refreshes replace reserved Sia paths and marked blocks; project seeds are created once.
 
 set -eu
 
@@ -9,7 +9,6 @@ REF=${REF:-}
 SOURCE_DIR=${SOURCE_DIR:-}
 DOWNLOAD_ROOT=
 LOCK_DIR=
-RULES_BOUNDARY='<!-- Add project-specific rules below this line. -->'
 
 cleanup() {
   [ -z "$LOCK_DIR" ] || rmdir "$LOCK_DIR" 2>/dev/null || :
@@ -111,29 +110,13 @@ check_block() {
   fi
 }
 
-check_rules() {
-  check_seed "$1"
-  if [ ! -e "$1" ]; then
-    MARKER_STATE=missing
-    return
-  fi
-  rule_markers=$(grep -F -x -c "$RULES_BOUNDARY" "$1" || true)
-  [ "$rule_markers" = 1 ] || fail "$1 must contain exactly one $RULES_BOUNDARY; put custom rules below it"
-  MARKER_STATE=present
-}
-
 replace_block() {
   target=$1
   fragment=$2
   start=$3
   end=$4
   anchor=${5:-}
-  refresh_mode=${6:-block}
-  if [ "$refresh_mode" = rules ]; then
-    check_rules "$target"
-  else
-    marker_state "$target" "$start" "$end"
-  fi
+  marker_state "$target" "$start" "$end"
   if [ "$MARKER_STATE" = missing ]; then
     parent=${target%/*}
     [ "$parent" != "$target" ] || parent=.
@@ -165,14 +148,7 @@ replace_block() {
   cp "$target" "$snapshot" || { rm -f "$snapshot" "$tmp"; fail "cannot snapshot $target"; }
   cp -p "$target" "$tmp" || { rm -f "$snapshot" "$tmp"; fail "cannot prepare $target"; }
   chmod u+w "$tmp" || { rm -f "$snapshot" "$tmp"; fail "cannot prepare $target"; }
-  if [ "$refresh_mode" = rules ]; then
-    check_rules "$snapshot"
-    boundary_line=$(grep -F -x -n "$RULES_BOUNDARY" "$snapshot" | cut -d: -f1)
-    { cat "$fragment" && tail -n "+$((boundary_line + 1))" "$snapshot"; } >"$tmp" || {
-      rm -f "$snapshot" "$tmp"
-      fail "cannot prepare $target"
-    }
-  elif [ "$MARKER_STATE" = present ]; then
+  if [ "$MARKER_STATE" = present ]; then
     awk -v start="$start" -v end="$end" -v fragment="$fragment" '
       BEGIN { while ((getline line < fragment) > 0) block = block line "\n"; close(fragment) }
       $0 == start { printf "%s", block; inside = 1; next }
@@ -296,10 +272,6 @@ check_source() {
     "$bridges/agents.block.md" "$bridges/claude.block.md"; do
     source_file "$path"
   done
-  check_rules "$seeds/RULES.md"
-  [ "$(tail -n 1 "$seeds/RULES.md")" = "$RULES_BOUNDARY" ] || \
-    fail 'Sia source RULES.md must end with the project rules boundary'
-  [ -z "$(tail -c 1 "$seeds/RULES.md")" ] || fail 'Sia source RULES.md must end with a newline'
   check_source_catalog skills "$managed/skills/sia"
   check_source_catalog operations "$managed/operations/sia"
   check_source_catalog workflows "$managed/workflows/sia"
@@ -307,7 +279,7 @@ check_source() {
 
 preflight() {
   check_layout
-  check_rules .ai/RULES.md
+  check_seed .ai/RULES.md
   check_seed .ai/docs/INDEX.md
   for category in skills operations workflows; do
     check_block ".ai/$category/INDEX.md" "<!-- sia:$category:start -->" \
@@ -337,7 +309,7 @@ install_sia() {
     rm -rf ".ai/$category/sia"
     cp -R "$managed/$category/sia" ".ai/$category/"
   done
-  replace_block .ai/RULES.md "$seeds/RULES.md" '' '' '' rules
+  seed "$seeds/RULES.md" .ai/RULES.md
   seed "$seeds/docs/INDEX.md" .ai/docs/INDEX.md
   for category in skills operations workflows; do
     seed "$seeds/$category/INDEX.md" ".ai/$category/INDEX.md"

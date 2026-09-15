@@ -14,8 +14,8 @@ changes the agreed scope or an action requires permission. No route classificati
 
 Add behavior and mechanisms only when the task requires them. Prefer the simpler existing approach; explain a
 consequential departure with repository evidence. Fix the cause of a bug rather than adding speculative retries,
-fallbacks, or unrelated cleanup. Skills declared by the operation load at entry; load additional testing, code-review,
-documentation, or safe-refactoring skills only when useful, respecting the effective catalogs. Reuse already loaded
+fallbacks, or unrelated cleanup. Skills declared by the operation load at entry; load additional
+documentation or safe-refactoring skills only when useful, respecting the effective catalogs. Reuse already loaded
 skills. Stop checking after suitable checks pass unless new evidence justifies more work.
 
 ## Planning
@@ -32,6 +32,9 @@ format and approval state. Existing saved plans keep their approval requirements
 recorded ceiling. An approved plan's implementation still follows this workflow.
 
 ## Review and completion
+
+Before final review, resolve and load the effective `code-review` and `testing` skills through their catalog. Honor
+CUSTOM overrides and reuse already loaded skills. Review is required; a separate worker is optional.
 
 Review the diff against the original request, subsequent user changes, and any approved plan. Challenge unnecessary
 features even if the plan introduced them. Fix in-scope defects; report any boundary change before acting on it.

@@ -107,48 +107,46 @@ test_catalog_blocks_are_replaced_without_touching_custom() {
   assert_fixed_count "$repo/.ai/skills/INDEX.md" '<!-- sia:skills:start -->' 1
 }
 
-test_rule_defaults_refresh_and_custom_bytes_survive() {
-  repo=$(new_repo) || return 1
-  run_install "$repo" || return 1
-  cmp -s "$ROOT/src/seed/.ai/RULES.md" "$repo/.ai/RULES.md" || return 1
-  custom="$TMP_ROOT/custom-rules"
-  printf '\n## Custom rules\n\n- Keep tabs:\tand trailing spaces.  \n- No final newline' >"$custom"
-  {
-    printf '# Old defaults\n\n- OLD-RULE\n\n<!-- Add project-specific rules below this line. -->\n'
-    cat "$custom"
-  } >"$repo/.ai/RULES.md"
-  chmod 640 "$repo/.ai/RULES.md" || return 1
-  cat "$ROOT/src/seed/.ai/RULES.md" "$custom" >"$TMP_ROOT/expected-rules"
-  run_install "$repo" || return 1
-  cmp -s "$TMP_ROOT/expected-rules" "$repo/.ai/RULES.md" || \
-    fail 'rule refresh did not replace defaults and preserve exact custom bytes' || return 1
-  assert_equal '-rw-r-----' "$(file_permissions "$repo/.ai/RULES.md")" 'rule permissions changed' || return 1
-  run_install "$repo" || return 1
-  cmp -s "$TMP_ROOT/expected-rules" "$repo/.ai/RULES.md" || fail 'rule refresh is not idempotent'
+test_existing_rule_bytes_survive() {
+  for layout in legacy missing duplicate renamed; do
+    repo=$(new_repo) || return 1
+    run_install "$repo" || return 1
+    cmp -s "$ROOT/src/seed/.ai/RULES.md" "$repo/.ai/RULES.md" || return 1
+    {
+      printf '# Project rules\n\n- Never deploy without approval.\n'
+      case $layout in
+        legacy) printf '<!-- Add project-specific rules below this line. -->\n' ;;
+        duplicate)
+          printf '<!-- Add project-specific rules below this line. -->\n'
+          printf '<!-- Add project-specific rules below this line. -->\n'
+          ;;
+        renamed) printf '<!-- Custom constraints -->\n' ;;
+      esac
+      printf '\n- Keep tabs:\tand trailing spaces.  \n- No final newline'
+    } >"$repo/.ai/RULES.md"
+    cp "$repo/.ai/RULES.md" "$TMP_ROOT/expected-rules" || return 1
+    chmod 440 "$repo/.ai/RULES.md" || return 1
+    for iteration in 1 2; do
+      run_install "$repo" || return 1
+      cmp -s "$TMP_ROOT/expected-rules" "$repo/.ai/RULES.md" || \
+        { fail "changed project rules: $layout"; return 1; }
+      assert_equal '-r--r-----' "$(file_permissions "$repo/.ai/RULES.md")" 'rule permissions changed' || return 1
+    done
+  done
 }
 
-test_invalid_rule_boundaries_fail_before_writes() {
-  for invalid in missing duplicate symlink; do
-    repo=$(new_repo) || return 1
-    mkdir -p "$repo/.ai" || return 1
-    printf 'protocol sentinel\n' >"$repo/.ai/sia.md"
-    case $invalid in
-      missing) printf 'custom rules without a boundary\n' >"$repo/.ai/RULES.md" ;;
-      duplicate)
-        cat "$ROOT/src/seed/.ai/RULES.md" "$ROOT/src/seed/.ai/RULES.md" >"$repo/.ai/RULES.md"
-        ;;
-      symlink)
-        cp "$ROOT/src/seed/.ai/RULES.md" "$repo/rules-target"
-        ln -s ../rules-target "$repo/.ai/RULES.md" || return 1
-        ;;
-    esac
-    cp "$repo/.ai/RULES.md" "$TMP_ROOT/rules-before" || return 1
-    if run_install "$repo"; then
-      fail "accepted invalid rules: $invalid"; return 1
-    fi
-    cmp -s "$TMP_ROOT/rules-before" "$repo/.ai/RULES.md" || fail 'invalid rules changed' || return 1
-    assert_equal 'protocol sentinel' "$(cat "$repo/.ai/sia.md")" 'preflight failure changed protocol' || return 1
-  done
+test_rule_symlink_fails_before_writes() {
+  repo=$(new_repo) || return 1
+  mkdir -p "$repo/.ai" || return 1
+  printf 'protocol sentinel\n' >"$repo/.ai/sia.md"
+  cp "$ROOT/src/seed/.ai/RULES.md" "$repo/rules-target"
+  ln -s ../rules-target "$repo/.ai/RULES.md" || return 1
+  cp "$repo/rules-target" "$TMP_ROOT/rules-before" || return 1
+  if run_install "$repo"; then
+    fail 'accepted symlinked rules'; return 1
+  fi
+  cmp -s "$TMP_ROOT/rules-before" "$repo/rules-target" || return 1
+  assert_equal 'protocol sentinel' "$(cat "$repo/.ai/sia.md")" 'preflight failure changed protocol'
 }
 
 test_tool_blocks_preserve_surrounding_instructions() {
@@ -325,9 +323,9 @@ run_case 'rerun replaces Sia-owned .ai files and preserves project content' \
   test_owned_ai_files_are_replaced_and_project_content_survives
 run_case 'catalog blocks refresh without changing CUSTOM content' \
   test_catalog_blocks_are_replaced_without_touching_custom
-run_case 'rule defaults refresh while custom bytes and permissions survive repeated installs' \
-  test_rule_defaults_refresh_and_custom_bytes_survive
-run_case 'invalid rule boundaries and symlinks fail before writes' test_invalid_rule_boundaries_fail_before_writes
+run_case 'existing rules and permissions survive regardless of marker layout' \
+  test_existing_rule_bytes_survive
+run_case 'symlinked rules fail before writes' test_rule_symlink_fails_before_writes
 run_case 'tool blocks preserve surrounding project instructions' test_tool_blocks_preserve_surrounding_instructions
 run_case 'an existing Claude import is left alone' test_existing_claude_import_is_left_alone
 run_case 'new repository files honor a restrictive umask' test_new_files_honor_restrictive_umask

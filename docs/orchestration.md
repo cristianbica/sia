@@ -52,6 +52,7 @@ three failed fix cycles and retry a blocker only after observable change. Custom
 ## Review and workers
 
 Review both the original request and any approved plan. Extra features can be wrong even when the plan proposed them.
+Delivery resolves the effective code-review and testing skills before final review, honoring CUSTOM overrides.
 Independent review is useful when it adds confidence, but a worker is optional. Use host delegation only for a bounded
 useful assignment. The [handoff support](../src/managed/.ai/workflows/sia/delivery/handoff.md) carries exact paths,
 permissions, evidence, and approved scope. Existing fuller envelopes remain valid. Model selection and telemetry are

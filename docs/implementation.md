@@ -12,6 +12,12 @@ Operation names, aliases, CUSTOM resolution, exact activation, and saved-plan co
 
 ## Local checks
 
+The contract suite checks selected planning, ownership, read-only, handoff, and skill-loading instructions in source.
+It includes deliberately weakened source variants, so removing the approval boundary or required review skill fails.
+These are textual guardrails: wording changes may require reviewed pattern updates, and matching text cannot prove
+that a model will comply. Offline host shims separately validate trace handling and continuation.
+
+
 `sh scripts/verify` runs package/schema/link checks, activation bridge checks, context-loading checks, installer tests,
 offline host shims, approval/continuation harness tests, and benchmark fixture checks. Executable invariants such as
 preserving files on install, rejecting malformed approval hashes, and continuing an exact session remain covered.

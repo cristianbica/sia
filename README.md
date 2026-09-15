@@ -20,7 +20,7 @@ To install from a local Sia checkout, run `/path/to/sia/install.sh` from the tar
 Local checkout installation uses its current `src/` files and does not download or switch revisions.
 
 Review and commit the intended installed files for your team. Updates preserve project docs, custom definitions,
-CUSTOM entries, and project rules below their marker. Managed Sia files and default rules are refreshed.
+CUSTOM entries, and entire existing project rule files. Only managed Sia files and marked Sia blocks are refreshed.
 Use `Sia reload` in an existing conversation after updating.
 
 ## Use it
@@ -72,7 +72,8 @@ skills.
 Installed content lives under `.ai/`: the protocol, default/project rules, docs, skills, operations, workflows, and
 saved plans. The root `AGENTS.md` bridge handles activation; Claude receives an import bridge when needed.
 
-Add project constraints below the marker in `.ai/RULES.md`. Custom definitions live directly in their category and
+Edit project constraints in `.ai/RULES.md`; installation preserves the entire existing file. Custom definitions live
+directly in their category and
 are registered in the index's CUSTOM section. They override same-named shipped definitions deliberately; upgrades
 preserve them. Use `create-skill`, `create-operation`, `create-workflow`, or `reconcile-catalogs` when useful.
 Custom workflows keep their own chosen behavior. See [extensions](docs/extensions.md).

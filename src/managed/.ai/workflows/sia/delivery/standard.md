@@ -9,10 +9,19 @@ and any additional gates while preserving the protocol's shared approval boundar
 Create `.ai/plans/YYYY-MM-DD-NN-<slug>.md` using the UTC date and next zero-padded daily sequence. Inspect filenames
 only to allocate it. Immediately add the exact new path to `authorized_plan_paths`.
 
-Keep frontmatter to `operation`, `workflow`, and `skills`. Put the proposed outcome, approach, scope, non-goals,
-acceptance checks, and material risks/external actions in one approval block. Use readable prose or bullets, not a
-mandatory set of headings. Keep the plan concise but retain the decisions and checks needed to judge the change.
-Do not repeat protocol rules or narrate investigation. Footer state uses one-line comments; omit empty optional fields.
+Keep frontmatter to `operation`, `workflow`, and `skills`. Put the proposed change and its approval boundary in one
+approval block. Footer state uses one-line comments; omit empty optional fields.
+
+Write for the person deciding whether to approve:
+
+- Open with the intended result. Explain the approach using relevant repository evidence, not a restated goal.
+- Give each point one main idea. Group related changes so a quick scan finds the work, checks, and limits.
+- Keep decisions, required behavior, exceptions, and material risks. Explain necessary jargon; avoid cryptic labels.
+- Omit repeated safeguards and routine file/command inventories. Include order only when it affects the decision.
+- Reread for completeness and readability, not a word quota. Small changes need a small plan; larger changes need
+  enough detail to judge them. Do not compress away requirements or narrate the investigation.
+
+A small change can use a few sentences:
 
 ```markdown
 ---
@@ -31,6 +40,22 @@ Check receipts for two currencies and preserve existing receipt fields. No new c
 <!-- sia:status pending-approval -->
 <!-- sia:base <commit> -->
 ```
+
+For a change with several interacting requirements, use a short structured plan:
+
+> Prevent duplicate webhook updates while allowing failed events to retry.
+>
+> **Changes**
+>
+> - Store processed event IDs with database uniqueness to handle simultaneous deliveries.
+> - Save the event ID and business update in one transaction; failure must leave the event retryable.
+> - Keep existing authentication and payload validation.
+>
+> **Checks and limits**
+>
+> - Check repeated and simultaneous deliveries, plus a failed update followed by a retry.
+> - Run webhook tests and apply the migration only to an isolated test database.
+> - Protection starts after installation. No production migration or deployment is included.
 
 Present the plan and wait for approval before any non-plan change. A clarification answer, resume alone, or an earlier
 generic imperative

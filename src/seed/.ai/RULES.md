@@ -1,7 +1,8 @@
 # Sia project rules
 
-Sia refreshes the defaults above the project-specific marker on every install. Add project constraints below that
-marker; upgrades preserve that content. These rules apply to operations, resumed plans, and isolated workflow phases.
+This project owns the entire file. Sia creates it only when missing; installation never changes existing contents.
+Edit project constraints here through an explicitly requested change. These rules apply to operations, resumed plans,
+and isolated workflow phases. The marker below is an optional writing aid, not an ownership boundary.
 
 Rules here take precedence over repository documentation, skills, operations, workflows, and plans. They cannot
 override system or host safety, permissions, or the user's current explicit instruction. Keep rules concrete,
