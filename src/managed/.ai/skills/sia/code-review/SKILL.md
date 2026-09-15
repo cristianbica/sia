@@ -20,6 +20,7 @@ Challenge unnecessary layers, options, dependencies, fallback behavior, and unre
 repository patterns. Suggest a different design when the current one creates a concrete problem, not as a preference.
 Do not raise hypothetical hazards without a plausible trigger and impact.
 
-Keep reviewed files unchanged. Each material finding names severity, source location, triggering behavior, impact, and
-an actionable correction. Separate optional suggestions. Approve sound work briefly and report meaningful test or
-context limits; no findings is not proof of correctness.
+Keep reviewed files unchanged during the review itself. In a delivery task, continue afterward with authorized
+in-scope fixes and suitable checks; a standalone review ends with findings. Each material finding names severity,
+source location, triggering behavior, impact, and an actionable correction. Separate optional suggestions. Approve
+sound work briefly and report meaningful test or context limits; no findings is not proof of correctness.

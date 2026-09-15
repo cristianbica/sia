@@ -106,8 +106,10 @@ use_when:
 ---
 ```
 
-The body defines required context, procedure, constraints, validation, and output. Supporting examples or references
-live beside `SKILL.md` and load only when needed. Skills cannot activate operations or own lifecycle gates.
+Descriptions identify concrete triggering tasks rather than broad topics. The body provides the relevant expertise,
+constraints, and validation guidance. For multiple workflows, keep shared guidance and routing in `SKILL.md`; place
+substantial conditional procedures in supporting files with when-to-read links. Supporting files load only when
+needed. Skills cannot activate operations or own lifecycle gates.
 
 ## Operation contract
 

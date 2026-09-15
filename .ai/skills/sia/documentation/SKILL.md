@@ -2,9 +2,9 @@
 name: documentation
 description: Create and refresh concise repository knowledge that is routed, evidence-linked, and honest about age.
 use_when:
-  - repository documentation is initialized
+  - initializing or updating repository documentation
   - a feature, area, pattern, or explicit decision needs durable context
-  - existing repository documentation may be stale
+  - checking potentially stale documentation for the area in the current task
 ---
 
 # Documentation

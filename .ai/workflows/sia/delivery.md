@@ -12,8 +12,9 @@ result or an action requires permission. No route classification, receipt, saved
 
 Add behavior and mechanisms only when the task requires them. Prefer the simpler existing approach; explain a
 consequential departure with repository evidence. Fix the cause of a bug rather than adding speculative retries,
-fallbacks, or unrelated cleanup. Load testing, code-review, documentation, or safe-refactoring skills when useful,
-respecting the effective catalogs. Stop checking after suitable checks pass unless new evidence justifies more work.
+fallbacks, or unrelated cleanup. Skills declared by the operation load at entry; load additional testing, code-review,
+documentation, or safe-refactoring skills only when useful, respecting the effective catalogs. Reuse already loaded
+skills. Stop checking after suitable checks pass unless new evidence justifies more work.
 
 ## Requested plans
 
