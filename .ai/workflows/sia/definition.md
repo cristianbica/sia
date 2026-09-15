@@ -8,6 +8,10 @@ description: Safely create or reconcile project definitions and their CUSTOM cat
 Use for creator operations and catalog reconciliation. The operation supplies the target schema and requested change;
 this workflow owns shared validation and writes. Shipped `sia/` definitions and SIA blocks are not project edit targets.
 
+Follow the protocol's shared saved-plan and approval boundary before writing definitions or catalog entries. Use
+[shared plan support](delivery/standard.md) with this workflow and the actual operation. Perform the checks below
+read-only to prepare the plan, then apply and validate approved changes.
+
 Before writing, resolve the requested category and check its index and direct project paths:
 
 - Names match `[a-z0-9]+(?:-[a-z0-9]+)*`, agree with path/frontmatter, and have no normalized or case-folded collision.

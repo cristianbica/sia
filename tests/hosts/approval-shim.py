@@ -75,13 +75,23 @@ if fault != 'missing-session':
 plan_path = '.ai/plans/2026-09-07-01-greeting.md'
 block = '\nChange app.py greeting to Welcome. Check greeting. No external actions.\n'
 digest = hashlib.sha256(block.encode()).hexdigest()
-plan = ('---\noperation: implement\nworkflow: delivery\nskills: [repository-discovery, testing]\n---\n\n'
+case = Path.cwd().name
+operation, workflow = {'fix': ('fix', 'delivery'), 'fix-alias': ('fix', 'delivery'),
+    'document': ('document', 'documentation'), 'definition': ('create-operation', 'definition')}.get(case, ('implement', 'delivery'))
+plan = (f'---\noperation: {operation}\nworkflow: {workflow}\nskills: [repository-discovery, testing]\n---\n\n'
         '# Greeting\n\n<!-- sia:approval:start -->' + block + '<!-- sia:approval:end -->\n\n')
 case = Path.cwd().name
-standard = case in ('standard', 'continuation', 'passing-checks', 'pending-resume')
-if prompt == 'Sia forge on':
+standard = case in ('standard', 'trivial', 'lightweight', 'continuation', 'passing-checks', 'pending-resume',
+    'fix', 'fix-alias', 'inferred', 'document', 'definition', 'clarification', 'forge-direct')
+if case == 'read-only':
+    if fault == 'premature-write':
+        write('app.py', 'broken\n')
+    say('greet returns Hello followed by the name.')
+elif case == 'clarification' and prompt.startswith('Sia implement'):
+    say('Which greeting should greet return?')
+elif prompt == 'Sia forge on':
     say('Forge enabled.')
-elif (standard and not prompt.startswith('Sia approved')) or 'Sia plan:' in prompt:
+elif (standard and not prompt.startswith('Sia approved')) or 'Sia inline plan ' in prompt:
     if fault == 'unauthorized-read':
         emit('item.started', item={'type': 'file_read', 'path': '.ai/plans/1999-01-01-01-unrelated.md'})
     if fault == 'bare-reads':
@@ -89,8 +99,12 @@ elif (standard and not prompt.startswith('Sia approved')) or 'Sia plan:' in prom
             emit('item.completed', item={'type': 'command_execution', 'command': command})
     if fault == 'silent-write':
         Path('app.py').write_text('broken\n')
-    if fault == 'premature-write':
+    if fault == 'premature-write' or (fault == 'clarification-edit' and prompt.startswith('Use Welcome')):
         write('app.py', 'broken\n')
+    if fault == 'helper-write':
+        write('language_helper.py', '# premature helper\n')
+    if fault == 'test-write':
+        write('test_language.py', '# premature test\n')
     if fault == 'reverted-attempt':
         emit('item.started', item={'type': 'file_change', 'changes': [{'path': 'app.py', 'kind': 'update'}]})
     if fault == 'shell-attempt':
@@ -109,7 +123,13 @@ elif (standard and not prompt.startswith('Sia approved')) or 'Sia plan:' in prom
         write(plan_path, content)
     say(f'Please approve the plan {plan_path}.' if standard else 'Inline plan: change app.py greeting. Check greeting. No external actions. Please approve.')
 else:
-    if case == 'trivial':
+    if case == 'document':
+        write('.ai/docs/greeting.md', '# Greeting\n\ngreet returns Hello followed by the name.\n')
+        write('.ai/docs/INDEX.md', Path('.ai/docs/INDEX.md').read_text() + '\n- [Greeting](greeting.md)\n')
+    elif case == 'definition':
+        write('.ai/operations/greet-check.md', '---\nname: greet-check\ndescription: Review greetings.\nworkflow: review\nskills: []\n---\n\nReview greeting behavior.\n')
+        write('.ai/operations/INDEX.md', Path('.ai/operations/INDEX.md').read_text() + '\n- `greet-check` — Review greetings.\n')
+    elif case == 'trivial':
         write('README.md', Path('README.md').read_text().replace('Welcomme', 'Welcome'))
     else:
         write('app.py', 'def greet(name):\n    return "Welcome " + name\n')

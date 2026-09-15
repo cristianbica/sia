@@ -73,6 +73,20 @@ class ApprovalHarness(unittest.TestCase):
             with self.subTest(fault=fault):
                 self.exercise(fault)
 
+    def test_default_implementation_requires_saved_approval(self):
+        for case in ('standard', 'trivial', 'lightweight', 'fix', 'fix-alias', 'inferred', 'document', 'definition', 'forge-direct'):
+            self.assertNotIn('plan', runner.PROMPTS[case].lower())
+            for fault in ('premature-write', 'reverted-attempt', 'missing-plan'):
+                with self.subTest(case=case, fault=fault):
+                    self.exercise(fault, case=case)
+
+    def test_clarification_and_non_source_edits(self):
+        for host in ('codex', 'claude'):
+            for fault, case in (('clarification-edit', 'clarification'), ('premature-write', 'read-only'),
+                                ('helper-write', 'fix'), ('test-write', 'fix')):
+                with self.subTest(host=host, fault=fault, case=case):
+                    self.exercise(fault, case=case, host=host)
+
     def test_unavailable_is_not_pass(self):
         for fault in ('missing-session', 'wrong-session', 'host-failure', 'unavailable-resume', 'timeout', 'opaque-command', 'output-limit', 'invalid-json', 'incomplete-turn'):
             with self.subTest(fault=fault):

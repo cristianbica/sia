@@ -1,8 +1,8 @@
 # Saved plans and resume
 
-Load only when saving or resuming a plan, or implementing one already approved. This support preserves existing plan
-contracts; normal coding does not need an artifact. Resolve the artifact's effective operation, workflow, and skills.
-A CUSTOM workflow owns its lifecycle; do not append shipped delivery rules to it.
+Use this shared plan lifecycle for change requests across all workflows. Resolve the actual operation, workflow, and
+skills; do not relabel documentation or definition work as implement. CUSTOM workflows keep their task-specific steps
+and any additional gates while preserving the protocol's shared approval boundary.
 
 ## Save and approve
 
@@ -11,7 +11,8 @@ only to allocate it. Immediately add the exact new path to `authorized_plan_path
 
 Keep frontmatter to `operation`, `workflow`, and `skills`. Put the proposed outcome, approach, scope, non-goals,
 acceptance checks, and material risks/external actions in one approval block. Use readable prose or bullets, not a
-mandatory set of headings. Footer state uses one-line comments; omit empty optional fields.
+mandatory set of headings. Keep the plan concise but retain the decisions and checks needed to judge the change.
+Do not repeat protocol rules or narrate investigation. Footer state uses one-line comments; omit empty optional fields.
 
 ```markdown
 ---
@@ -31,7 +32,8 @@ Check receipts for two currencies and preserve existing receipt fields. No new c
 <!-- sia:base <commit> -->
 ```
 
-Present the plan and wait for approval before any product/source edit. Resume alone or an earlier generic imperative
+Present the plan and wait for approval before any non-plan change. A clarification answer, resume alone, or an earlier
+generic imperative
 is not approval. A clear reply referring to the presented plan is sufficient; do not ask again for routine steps.
 Compute lowercase SHA-256 of UTF-8 content between the unique approval markers, excluding the markers: normalize CRLF
 and CR to LF, preserve all other whitespace. Append `<!-- sia:approved <sha256> -->` only after approval; set status to

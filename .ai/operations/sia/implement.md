@@ -9,6 +9,6 @@ skills:
 
 # Implement
 
-Make the smallest complete change that satisfies the request. Use the delivery workflow for coding, requested planning,
-and checks. Identify the affected code and any assumption that would materially change the approach before editing.
-Do not add features merely because they might be useful later.
+Use the delivery workflow to inspect the relevant code, clarify material requirements, and present a saved plan for
+approval before editing. After approval, make the smallest complete change and run suitable checks. Do not add
+features merely because they might be useful later.

@@ -3,12 +3,12 @@
 ## What is implemented
 
 Sia installs readable source prompts, shared activation bridges, catalog entries, and initial project seeds. The
-installer preserves project content and validates inputs before writing. Ordinary coding now uses one delivery
-workflow; saved plans, Forge session controls, and worker handoffs are optional support.
+installer preserves project content and validates inputs before writing.
 
-The simplification keeps existing operation names, aliases, CUSTOM resolution, exact activation, and saved-plan
-compatibility. It deliberately changes the default for source edits: a clear implementation request starts work
-instead of automatically generating an approval plan. Explicit planning still waits for approval.
+The shared protocol requires saved planning and approval for all change requests, including fixes, documentation,
+definitions, natural-language requests, and Forge. Workflows keep their task-specific checks. Read-only requests and
+session directives need no plan. Explicit user exceptions preserve their scope and existing pending approvals.
+Operation names, aliases, CUSTOM resolution, exact activation, and saved-plan compatibility remain supported.
 
 ## Local checks
 

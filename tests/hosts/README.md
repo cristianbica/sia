@@ -102,13 +102,12 @@ missing sessions, mismatched continuation sessions, host failures, timeouts, out
 return `UNAVAILABLE`, never a pass.
 
 Legacy CLI case names `standard`, `trivial`, and `lightweight` remain for harness compatibility, not delivery routes.
-Nine cases cover explicitly requested saved approval; direct wording and code changes; Forge direct and inline-plan
-work; planless unattended delivery; completing remaining approved work after a progress update; stopping checks after
-passing; and resuming a pending plan in a fresh session before approving it. Forge cases first enable Forge in the
-same session.
-The last two implementation cases use a real module and existing unittest fixture with two required behaviors.
-The pending-resume case must remain pending without source edits until the subsequent approval.
-All nine cases use at most seventeen model turns per host, sequentially, with a default 90-second timeout and 1 MiB
+Seventeen cases cover implement, fix, aliases, inferred requests, documentation, definition creation, small changes,
+Forge saved and explicit inline planning, clarification, pending-plan resume, approved continuation, verification
+stopping, read-only requests, and explicit unattended or skipped planning. Both host shims exercise these cases.
+The continuation and passing-checks cases use a module and existing unittest fixture with two required behaviors.
+
+All cases use at most 35 model turns per host, sequentially, with a default 90-second timeout and 1 MiB
 stdout/stderr limit per turn. Claude additionally defaults to a $1 per-turn CLI budget (`--claude-budget`); Codex has
 no monetary cap. Requested model/effort accept `SIA_CODEX_MODEL`, `SIA_CLAUDE_MODEL`, and the corresponding
 `SIA_CODEX_REASONING_EFFORT` / `SIA_CLAUDE_REASONING_EFFORT` environment defaults. Actual model/usage/cost are recorded
@@ -124,7 +123,7 @@ ordinary planless work. Direct coding controls
 must create no plan artifact.
 
 Trace checks inspect observable file-change attempts, including failed or reverted attempts. They enforce the
-requested planning boundary without requiring a route or authorization announcement. Exact argument-free reads (`pwd`,
+shared planning boundary without requiring a route or authorization announcement. Exact argument-free reads (`pwd`,
 `ls`, `git status`, `git diff`) are recognized.
 Before approval, possible shell writes fail and opaque tools/commands return `UNAVAILABLE`. Conservative classification
 can reject legitimate shell-based plan creation. Explicit reads of the unrelated fixture plan fail; broad plan commands

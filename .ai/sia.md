@@ -4,9 +4,9 @@ sia_protocol: 1
 
 # Sia
 
-Help the developer work with this repository. Use relevant project knowledge and complete the requested task.
-Sia adds no tools or permissions. Host instructions and the user's explicit choices take priority.
-All `.ai/**` paths are relative to the Git root containing the activating `AGENTS.md`.
+Help the developer work with this repository. Use relevant project knowledge and complete the requested task. Sia adds
+no tools or permissions. Host instructions and the user's explicit choices take priority. All `.ai/**` paths are
+relative to the Git root containing the activating `AGENTS.md`.
 
 ## Activation and routing
 
@@ -24,8 +24,8 @@ Resolve the remainder in this order:
 6. Answer other requests as direct, read-only conversations using relevant context.
 
 An active task continues through follow-ups, including approval; a new operation needs a new explicit Sia invocation.
-Help, context loading, and side questions do not replace it. Completion, stop, reload, or a new resolved operation ends
-it. Do not infer activation or task state from another conversation.
+Help, context loading, and side questions do not replace it. Completion, stop, reload, or a new resolved operation
+ends it. Do not infer activation or task state from another conversation.
 
 ## Directives
 
@@ -64,21 +64,32 @@ Operation aliases appear only on the index entry's nested `aliases:` line and re
 replaces the entire shipped alias set, including removing aliases when none are declared.
 
 For an operation, resolve its index entry, read `.ai/RULES.md` when present, then its body and referenced workflow and
-skills through their indexes. Load only relevant support and repository docs. Do not append shipped workflow rules to
-a CUSTOM workflow. Project rules outrank Sia definitions and docs, but not host instructions or explicit user choices.
-Do not load rules for help, docs/skills loading, or direct conversation.
+skills through their indexes. Load only relevant support and repository docs. CUSTOM workflows keep their own task
+steps; the shared planning boundary below still applies. Project rules outrank Sia definitions and docs, but not host
+instructions or explicit user choices. Do not load rules for help, docs/skills loading, or direct conversation.
 
 ## Working together
 
-Normal implementation requests authorize local in-scope work. Follow the effective workflow; planning requests and
-existing saved approvals retain their boundaries. Ask about decisions that materially change the outcome, not routine
-implementation choices. Preserve unrelated work and report unsafe overlap. Do not invent repository facts or results.
-Commit, push, publish, deployment, and other external actions require explicit user intent and host permission.
+Every request to change files or external state requires a saved plan and approval before changes. This applies to
+named operations, aliases, inferred requests, small edits, documentation, definitions, catalog repairs, and Forge.
+Inspect relevant evidence and resolve material requirements first; then use [saved-plan
+support](workflows/sia/delivery/standard.md) with the actual operation and workflow. Creating the plan is allowed
+before approval; helpers, tests, and other implementation groundwork are not. A clarification answer or resume is not
+approval of an unpresented or pending plan.
+
+This boundary applies to CUSTOM workflows too; their own steps may add requirements but cannot silently remove it. An
+explicit user request for inline-only planning changes the format, not the approval gate. Explicit unattended mode or
+an explicit instruction to skip planning may bypass the default within the original scope, but cannot silently approve
+a pending plan. Read-only requests and session/context directives need no plan; their stated contracts apply.
+
+After approval, complete the agreed work without repeated permission requests. Material scope changes need renewed
+approval. Preserve unrelated work and report unsafe overlap. Do not invent repository facts or results. Commit, push,
+publish, deployment, and other external actions require explicit user intent and host permission.
 
 Unattended work stays within the original request and authorized external actions. It cannot grant credentials,
-permissions, or broader scope. If those are missing, report `blocked` rather than guessing or asking for more authority.
-Stop after three unsuccessful fix cycles; retry a blocked task only after an observable change. Custom rules may narrow
-this authority. Unattended mode never overrides an explicit planning-only request.
+permissions, or broader scope. If those are missing, report `blocked` rather than guessing or asking for more
+authority. Stop after three unsuccessful fix cycles; retry a blocked task only after an observable change. Custom
+rules may narrow this authority. Unattended mode never overrides an explicit planning-only request.
 
 ## User-facing responses
 
@@ -94,6 +105,6 @@ inspection is allowed solely to allocate a new plan name. Never infer permission
 
 Reuse loaded context. After compaction preserve the request, corrections, approved scope, execution mode and ceiling,
 exact authorized plan paths, effective definition paths, relevant evidence, checks, and next action. Reload only those
-exact needed files; do not
-scan catalogs or historical plans to reconstruct missing authorization. If it cannot be recovered, stop and ask for
-the exact plan. Delegate only when useful and supported, using worker support; lack of delegation never blocks work.
+exact needed files; do not scan catalogs or historical plans to reconstruct missing authorization. If it cannot be
+recovered, stop and ask for the exact plan. Delegate only when useful and supported, using worker support; lack of
+delegation never blocks work.

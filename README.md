@@ -35,12 +35,10 @@ Sia investigate intermittent webhook failures
 Sia investigate the checkout design and save an implementation plan
 ```
 
-`implement` and `fix` normally inspect the code, make the change, check it, and report the result. They do not require
-route labels, receipts, saved plans, or workers. An explicit planning request stops before implementation for approval.
-A clear approval of the presented plan authorizes its work. Material scope changes and host permissions still matter.
-
-**Changed default:** earlier versions created approval plans for most source changes. Normal coding now proceeds from
-the request. Existing saved plans keep their approval checks; a pending plan is never automatically approved.
+Every change request follows the same sequence: inspect, clarify, save a plan, wait for your approval, then change and
+verify. This includes `implement`, `fix`, aliases, natural-language requests, docs, definitions, and one-line edits.
+Read-only questions and session directives need no plan. Explicit unattended mode or an instruction to skip planning
+can select another behavior; existing pending approvals remain binding.
 
 Repository docs are pointers to relevant architecture, conventions, and verified commands. `load docs` loads only their
 index; `load skills` exposes only the skills catalog. Both augment the host without starting an operation. Source
@@ -48,7 +46,7 @@ remains the authority when documentation is stale. `refresh-docs <subject>` upda
 
 ## Plans and follow-ups
 
-Ask for a plan when you want to review the approach first. Ask to save it when you need to resume later:
+Plans are saved automatically for change requests. Resume one by its exact path:
 
 ```text
 Sia resume .ai/plans/2026-09-13-01-subscription-pausing.md
@@ -57,10 +55,9 @@ Sia resume .ai/plans/2026-09-13-01-subscription-pausing.md
 Only that exact plan is authorized for reading. Resume preserves its status and approval; it does not approve a draft.
 Existing compact and valid legacy formats remain supported. Sia does not search unrelated historical plans.
 
-For a continuous session, `Sia forge on` makes the prefix optional for follow-ups. Forge uses the same coding behavior;
-`do:` asks for implementation, while `plan:` or `inline plan` asks for approval first. Clear follow-ups such as “next
-one” reuse the conversation. Forge keeps no saved task state and cannot resume in a new conversation.
-`Sia forge off` ends it. Reserved directives and explicit `unattended` retain their meaning.
+For a continuous session, `Sia forge on` makes the prefix optional for follow-ups. Change requests, including `do:`,
+still require saved planning and approval. `inline plan` explicitly selects an unsaved plan, also requiring approval.
+Saved plans can resume across sessions; inline-only tasks cannot. `Sia forge off` ends the continuous session.
 
 `Sia unattended implement <request>` works within the original request without asking for additional authority.
 It blocks if necessary scope, credentials, or permissions are missing. It does not create a plan by default or bypass
@@ -73,7 +70,7 @@ skills.
 ## Project customization
 
 Installed content lives under `.ai/`: the protocol, default/project rules, docs, skills, operations, workflows, and
-optional plans. The root `AGENTS.md` bridge handles activation; Claude receives an import bridge when needed.
+saved plans. The root `AGENTS.md` bridge handles activation; Claude receives an import bridge when needed.
 
 Add project constraints below the marker in `.ai/RULES.md`. Custom definitions live directly in their category and
 are registered in the index's CUSTOM section. They override same-named shipped definitions deliberately; upgrades

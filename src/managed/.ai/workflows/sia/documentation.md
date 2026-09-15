@@ -1,12 +1,14 @@
 ---
 name: documentation
-description: Create or update scoped repository knowledge from verified evidence without delivery ceremony.
+description: Create or update scoped repository knowledge from verified evidence with planning and approval.
 ---
 
 # Repository documentation
 
 Use the operation's requested scope: initial repository knowledge, a specific subject, or refresh. Read the docs index
-and relevant routes, discover current evidence, and apply the documentation skill. Write only the requested `.ai/docs/`
+and relevant routes, discover current evidence, and apply the documentation skill. Before documentation writes,
+follow the protocol's shared saved-plan and approval boundary using [shared plan support](delivery/standard.md)
+with this workflow and the actual operation. After approval, write only the requested `.ai/docs/`
 content and nearest indexes. Create directories only when the first useful document needs them.
 
 Review the resulting claims, links, and diff. Report changed docs, relevant uncertainty, and any partial state.

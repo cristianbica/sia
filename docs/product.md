@@ -9,12 +9,12 @@ reads files, edits code, runs tools, and controls permissions.
 - Concise, evidence-linked repository documentation, loaded only when relevant.
 - Project-specific constraints and useful reusable skills.
 - Direct implementation, diagnosis, review, and documentation requests.
-- Optional plans and saved context when the developer needs them.
+- Readable saved plans and approval before changes.
 - Portable, explicit activation and safe updates that preserve project-owned content.
 
-Normal coding should not require managing Sia's internal state. An implementation request authorizes its local scope;
-asking for a plan pauses before implementation. Existing saved plans retain their approval contracts. Custom workflows
-can deliberately choose another process without changing ordinary shipped behavior.
+Every normal change request creates a saved plan and pauses for approval, regardless of operation or wording.
+Read-only requests need no plan. CUSTOM workflows preserve this shared boundary; only an explicit user choice can
+select an exception. Existing saved plans retain their approval contracts.
 
 ## What does not belong
 

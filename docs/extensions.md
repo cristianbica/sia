@@ -155,3 +155,9 @@ repairs. It preserves valid custom descriptions and never rewrites SIA blocks.
 - Workflows: `delivery`, `review`, `investigation`, `documentation`, and `definition`.
 - Initial skills: `repository-discovery`, `testing`, `bug-triage`, `code-review`, `documentation`, and
   `safe-refactoring`.
+
+## Shared planning boundary
+
+CUSTOM operations and workflows preserve the protocol's saved-plan and approval requirement for change requests.
+Use the actual operation and workflow in the plan. Custom steps may add gates but cannot silently bypass the shared
+boundary; only an explicit user choice selects an exception. Read-only operations remain read-only.

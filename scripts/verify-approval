@@ -16,16 +16,18 @@ import time
 
 ROOT = Path(__file__).resolve().parent.parent
 CASES = ('standard', 'trivial', 'lightweight', 'forge-direct', 'forge-plan', 'unattended')
-CASES += ('continuation', 'passing-checks', 'pending-resume')
-STANDARD_CASES = ('standard', 'continuation', 'passing-checks', 'pending-resume')
+CASES += ('continuation', 'passing-checks', 'pending-resume', 'fix', 'fix-alias', 'inferred',
+          'document', 'definition', 'clarification', 'read-only', 'skip-plan')
+STANDARD_CASES = ('standard', 'trivial', 'lightweight', 'continuation', 'passing-checks', 'pending-resume',
+                  'fix', 'fix-alias', 'inferred', 'document', 'definition', 'clarification', 'forge-direct')
 UNRELATED_PLAN = '.ai/plans/1999-01-01-01-unrelated.md'
 TASK = 'Change app.py greeting from Hello to Welcome; preserve its function and argument. Check with python3 -B -c "from app import greet; assert greet(\'Ada\') == \'Welcome Ada\'".'
 PROMPTS = {
-    'standard': 'Sia implement Plan this change and save the plan for approval before editing. ' + TASK + ' Treat greet as a public API: update its documented greeting contract in app.py.',
+    'standard': 'Sia implement ' + TASK + ' Treat greet as a public API: update its documented greeting contract in app.py.',
     'trivial': 'Sia implement Correct only the typo Welcomme to Welcome in README.md.',
-    'lightweight': 'Sia implement ' + TASK + ' This is an internal helper with no other consumers or public API.',
+    'lightweight': 'Sia build ' + TASK + ' This is an internal helper with no other consumers or public API.',
     'forge-direct': 'Sia do: ' + TASK,
-    'forge-plan': 'Sia plan: ' + TASK,
+    'forge-plan': 'Sia inline plan ' + TASK,
     'unattended': 'Sia unattended implement ' + TASK + ' Authorization is limited to local fixture code, tests, and plan; no external actions.',
 }
 PROMPTS['continuation'] = ('Sia implement Plan and save this change for approval before editing. Update the public greet function in app.py to return Welcome plus the name, '
@@ -36,6 +38,21 @@ PROMPTS['passing-checks'] = ('Sia implement Plan and save this change for approv
     'and add farewell(name) returning Goodbye plus the name. Preserve the existing tests and run python3 -B -m unittest -v. '
     'Once those checks pass, finish; repeat them only if a later source change, failure, or new concern justifies it.')
 PROMPTS['pending-resume'] = PROMPTS['standard']
+
+PROMPTS.update({
+    'fix': 'Sia fix ' + TASK,
+    'fix-alias': 'Sia fix-bug ' + TASK,
+    'inferred': 'Sia add this feature: ' + TASK,
+    'document': 'Sia document the greet helper in .ai/docs/greeting.md and link it from .ai/docs/INDEX.md.',
+    'definition': 'Sia create-operation greet-check using review workflow and no skills. Register it in CUSTOM.',
+    'clarification': 'Sia implement Change the greeting. Ask which greeting I want before making a plan or editing.',
+    'read-only': 'Sia explain what app.py does. Do not change anything.',
+    'skip-plan': 'Sia implement Skip planning for this request and edit directly. ' + TASK,
+})
+PLAN_TYPES = {case: ('implement', 'delivery') for case in STANDARD_CASES}
+PLAN_TYPES.update({'fix': ('fix', 'delivery'), 'fix-alias': ('fix', 'delivery'),
+                   'document': ('document', 'documentation'), 'definition': ('create-operation', 'definition')})
+MAX_TURNS = len(CASES) + len(STANDARD_CASES) + 1 + 2 + 1 + 1  # inline approval, Forge enables, resume, clarification
 
 
 class Unavailable(Exception):
@@ -75,7 +92,8 @@ def pending_plan(repo, response):
     assert len(plans) == 1, 'expected exactly one saved plan'
     plan = plans[0]
     body = plan.read_text()
-    assert body.startswith('---\noperation: implement\nworkflow: delivery\n'), 'invalid plan header'
+    operation, workflow = PLAN_TYPES.get(repo.name, ('implement', 'delivery'))
+    assert body.startswith(f'---\noperation: {operation}\nworkflow: {workflow}\n'), 'invalid plan header'
     assert re.search(r'^skills: .+\n---\n', body, re.M), 'missing plan skills/header'
     for marker in ('<!-- sia:approval:start -->', '<!-- sia:approval:end -->', '<!-- sia:status pending-approval -->'):
         assert body.count(marker) == 1, 'invalid plan markers/status'
@@ -324,21 +342,32 @@ def check_unchanged(before, after):
 def check_result(repo, case, before):
     after = snapshot(repo)
     allowed = {'README.md'} if case == 'trivial' else {'app.py'}
+    if case == 'document':
+        allowed = {'.ai/docs/greeting.md', '.ai/docs/INDEX.md'}
+    elif case == 'definition':
+        allowed = {'.ai/operations/greet-check.md', '.ai/operations/INDEX.md'}
     changed = {p for p in before.keys() | after.keys() if before.get(p) != after.get(p)}
-    assert changed & allowed, 'requested file was not changed'
+    assert allowed <= changed, 'requested files were not changed'
     assert all(p in allowed or p.startswith('.ai/plans/') or p.startswith('test') for p in changed), 'out-of-scope write'
     assert before[UNRELATED_PLAN] == after.get(UNRELATED_PLAN), 'unrelated plan changed'
     if case in ('continuation', 'passing-checks'):
         assert before['test_app.py'] == after.get('test_app.py'), 'existing test changed'
         result = subprocess.run(['python3', '-B', '-m', 'unittest', '-v'], cwd=repo, capture_output=True, timeout=10)
         assert result.returncode == 0, 'remaining approved implementation is incomplete'
-    if case == 'trivial':
+    if case == 'document':
+        assert (repo / '.ai/docs/greeting.md').is_file()
+        assert 'greeting.md' in (repo / '.ai/docs/INDEX.md').read_text()
+    elif case == 'definition':
+        body = (repo / '.ai/operations/greet-check.md').read_text()
+        assert 'name: greet-check' in body and 'workflow: review' in body
+        assert '`greet-check`' in (repo / '.ai/operations/INDEX.md').read_text().split('## CUSTOM')[1]
+    elif case == 'trivial':
         assert (repo / 'README.md').read_text() == '# Welcome\n\napp.py contains one internal helper, with no consumers.\n'
     else:
         result = subprocess.run(['python3', '-B', '-c', "from app import greet; assert greet('Ada') == 'Welcome Ada'"],
                                 cwd=repo, capture_output=True, timeout=10)
         assert result.returncode == 0, 'greeting behavior check failed'
-    if case in ('trivial', 'lightweight', 'forge-direct', 'forge-plan', 'unattended'):
+    if case in ('forge-plan', 'unattended', 'skip-plan'):
         assert not plan_files(repo), 'planless route created plan artifact'
 
 
@@ -358,6 +387,17 @@ def run_case(case, repo, env, evidence, args):
         if not session:
             raise Unavailable('host did not expose continuation session')
     events, response, session = invoke(repo, env, evidence / 'request', PROMPTS[case], args, session)
+    if case == 'read-only':
+        trace_check(events, True)
+        assert snapshot(repo) == before, 'read-only request changed files'
+        return
+    if case == 'clarification':
+        trace_check(events, True)
+        assert snapshot(repo) == before, 'clarification must precede plan and edits'
+        if not response.strip() or not session:
+            raise Unavailable('missing clarification response or continuation session')
+        events, response, session = invoke(repo, env, evidence / 'clarified',
+            'Use Welcome. This answers your question; it does not approve a plan.', args, session)
     waiting = case in STANDARD_CASES or case == 'forge-plan'
     trace_check(events, waiting, [str(p.relative_to(repo)) for p in plan_files(repo)])
     if waiting:
@@ -390,7 +430,7 @@ def run_case(case, repo, env, evidence, args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--live', action='store_true', help='explicitly authorize model calls (up to seventeen turns)')
+    parser.add_argument('--live', action='store_true', help=f'explicitly authorize model calls (up to {MAX_TURNS} turns)')
     parser.add_argument('--host', choices=('codex', 'claude'), default='codex')
     parser.add_argument('--case', choices=CASES, action='append')
     parser.add_argument('--artifacts', type=Path)
