@@ -13,7 +13,6 @@ run_static() {
     PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/tests/coding/test_fixtures.py" &&
     sh "$ROOT/tests/hosts/static-contracts.sh" &&
     PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/tests/hosts/approval-contracts.py" &&
-    PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/benchmarks/concise-output/test_runner.py" &&
     PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/.ai/skills/benchmark/scripts/test_accounting.py"
 }
 

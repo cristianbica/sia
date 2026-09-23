@@ -32,170 +32,67 @@ with stubbed responses. Live TWRP behavior has not been tested.”
 Check: the report says what changed, what was checked, and what remains unverified. Use these claims only when
 supported.
 
-## Plan: built-in TWRP publishing
+## Plans
 
-The supplied plan combined concrete requirements with dense implementation language. For example:
+The following tasks and repository facts are fictional. These are illustrations of writing judgment, not templates
+or measured model results. Notice why each explanation takes its particular shape.
 
-> Provision after database commit through jobs/services, covering registration's initial workspace and later workspace
-> creation. Serialize provisioning for an organization, persist progress, and reconcile existing remote accounts by
-> stable login email before retrying uncertain account creation.
+### A small display fix
 
-Splitting this into “Post-commit provisioning; serialized reconciliation; persisted progress” would still fail.
-The reader needs to understand when setup runs, what happens on failure, and how retries avoid duplicates.
+> The receipt formatter drops the currency already stored on the order. Append it to the formatted amount, so
+> `12.50` becomes `12.50 EUR`. Keep the existing rounding. Check two currencies and an amount that needs rounding.
 
-The rewrite below preserves the supplied proposal's requirements. It is a writing example, not a verified design or
-authorization to call TWRP.
+The example makes the change concrete. Separate behavior and implementation sections would repeat the same idea.
 
-### Example approval plan
+### A feature with several parts
 
-Set up TWRP publishing automatically so each new workspace is ready to publish. Signup must still succeed when TWRP
-is unavailable.
+Assume a fictional application already has a book catalog, a book picker, and server-side ownership checks.
 
-#### What changes
+> Let readers organize catalog books into private lists. Store membership separately from books so removing a list
+> entry never removes a book from the catalog.
+>
+> Readers can create and rename lists, then add or remove books. Each list belongs to its creator. Other readers
+> cannot view or edit it, even through a direct request.
+>
+> The implementation has three parts:
+>
+> - Add list and membership storage. Make each list/book pair unique so repeated or simultaneous adds leave one entry.
+> - Add the list actions using the existing ownership checks. Check reads as well as edits.
+> - Build the list screen with the existing book picker, and document the new actions.
+>
+> Verify creation, renaming, removal, duplicate adds, and access by another reader. Check that removing an entry leaves
+> the catalog book intact. Run the storage changes in a disposable local database; production migration is separate.
 
-- Give each new organization one TWRP account and one managed MCP connection.
-- Give each workspace its own remote workspace and enabled connection grant, including the initial signup workspace.
-- Start setup in the background after the database commit.
-- Show pending or failed setup with a retry action. Mark a connection active only when setup is complete.
-- Translate setup status and errors, and document setup and publishing for users and developers.
+Here the user needs to understand the feature before assessing the work. The storage decision includes its reason.
+A full schema or mockup would add little to this particular decision; a task with a disputed schema could need one.
 
-#### Reliable setup
+### A change where order matters
 
-- Run one setup job per organization at a time and save progress for retries.
-- After a timeout or uncertain response, check whether the remote account or workspace exists before trying again.
-- TWRP cannot deduplicate account creation; use a stable service email to find an existing account.
-- Attribute managed records to the organization owner or workspace creator. Retry if ownership is unavailable.
-- Use platform credentials and a generated password unrelated to user passwords. Keep secrets encrypted and out of
-  logs, screens, and agent results.
+Assume a fictional exporter currently loads every row into memory. Its file format must stay compatible.
 
-#### Access
+> Write export rows in batches to reduce memory use. Reuse the current row formatter so existing consumers receive
+> the same columns and escaping.
+>
+> 1. Capture the current output for representative data, including quotes, empty values, and non-ASCII text.
+> 2. Replace the full-table load with batched reads in a stable order. Write each batch to a temporary file.
+> 3. Publish the file only after all batches succeed. On failure, remove the temporary file and report the failure.
+>
+> Compare the resulting files with the captured output. Exercise a failure midway through an export and confirm no
+> partial file is published. Measure peak memory on the same large fixture before and after the change.
+>
+> One question needs resolving before implementation: can records change during an export? If so, we must agree on
+> whether the file represents a snapshot before choosing the batching query.
 
-- Protect managed endpoints, credentials, and workspace mappings from ordinary edits.
-- Keep authorized enable/disable controls and existing publishing/deletion approvals.
-- Resolve the workspace on the server and check site ownership before any site, page, inbox, or submission call.
-- Filter lists to the workspace. TWRP tokens span workspaces, so local checks must prevent cross-workspace access.
-- Exclude account-wide workspace management from agent tools.
-- Classify only known read tools as reads; reject unclassified tools.
+Order helps explain the compatibility check and failure handling. The unresolved question remains visible because
+it can change the implementation. Adding generic rollback and risk sections would not resolve it.
 
-#### Checks and limits
+### Review the meaning
 
-- Verify setup during signup and later workspace creation, with one account per organization and one remote workspace
-  per local workspace.
-- Exercise duplicate jobs, interrupted setup, and retries without creating duplicates or showing false success.
-- Verify workspace isolation, protected settings, and existing MCP behavior.
-- Run focused automated checks with external requests stubbed. Apply migrations only to an isolated test database.
-- Preserve existing application and test edits; stop if overlapping work cannot be preserved safely.
-- No existing-tenant backfill, automatic remote deletion, deployment, commits, pushes, or live account/content creation.
-- Live setup needs the platform token in deployment secrets, never source control.
+- Can the reader explain the proposed approach without reconstructing the investigation?
+- Do the details explain decisions, behavior, or necessary work?
+- Are important assumptions and unresolved questions visible?
+- Does each check establish an outcome that matters?
+- Would removing a sentence lose meaning, or only remove repetition?
 
-### Execution notes for the handoff
-
-These retain supplied implementation requirements without making the approval plan a file-and-command inventory.
-They do not change its scope or authorize live setup.
-
-- Default endpoint: `https://twrp.cb.b1z.eu/`.
-- Reuse encrypted provider credentials and the existing MCP transport/resolver.
-- Store the remote account ID in provider config; use a stable service email per organization.
-- Store `twrp_workspace_id` in WorkspaceConnection JSONB configuration with Rails store accessors.
-  Keep `connection_id` pointing to the local Connection.
-- Document service-email setup, account confirmation, and agent use of sites, pages, forms, and responses.
-  Update MCP/development docs and the feature index.
-- Test concurrency, timeouts, validation/transport/tool errors, missing credentials, and missing ownership.
-- Test tool resolution alongside the access and MCP regressions.
-- Run focused Minitest tests, MCP/connection suites, `test/i18n_test.rb`, relevant access/registration tests,
-  targeted RuboCop, Rails autoload checks, and scoped diff checks.
-- Generate schema changes through Rails tasks. Inspect existing Workspace, locale, schema, and documentation edits.
-
-Review: the plan makes the result, failure recovery, access restrictions, and delivery boundaries easy to find.
-The handoff retains the exact configuration and validation details. Compare both against the source requirements;
-shortening the plan must not remove work or move an approval decision out of sight.
-
-## Plan: workspace pages and dashboard
-
-The supplied proposal puts many requirements into each bullet. For example:
-
-> **Dates:** offer common ranges and custom dates, defaulting to All time. Each widget explicitly selects its date field
-> or opts out. Combine dates with saved filters, preserve runtime choices in the URL, and use a displayed, consistent
-> time zone. Refresh on load, filter changes, or request; ignore obsolete responses.
-
-Each requirement is useful, but the reader has to unpack the paragraph. The following example uses short groups and
-points so the behavior is visible on a scan. Grouping is a tool, not a mandatory template. This is an authored rewrite
-of the supplied proposal, not authorization to build the feature or evidence that its design has been verified.
-
-### Example approval plan
-
-Let workspaces build shared pages from configurable blocks. A Positions page could combine a records table with
-recruitment statistics and charts.
-
-#### Pages
-
-- Offer Records, Dashboard, and Blank templates.
-- Owners/operators can create, rename, duplicate, reorder, and delete shared pages. Other members can view them.
-- Preserve existing data and action permissions.
-
-#### Main dashboard
-
-- Create exactly one for every existing and new workspace, pinned beside assistant Home.
-- Allow title and block customization, with a reset to defaults.
-- Start with activity, attention/running counts, and shortcuts.
-- Prevent deletion, hiding, reassignment, or conversion. Deleting the workspace can remove it.
-
-#### Editor and blocks
-
-- Add, configure, and preview blocks in a responsive grid with adjustable widths and order.
-- Support keyboard and click controls, explicit Save/Cancel, and protection against concurrent edits.
-- Include records tables, recent-record feeds, permission-aware activity, sanitized text, and internal links.
-- Offer metric cards for count, sum, average, minimum, and maximum, with optional prior-period comparisons.
-- Offer line/area, bar, and donut charts with accessible chart data.
-
-#### Records and dates
-
-- Reuse existing search, filters, sorting, pagination, detail panels, and authorized actions.
-- Give each table independent controls and page-specific columns.
-- Offer common date ranges and custom dates; default to All time.
-- Each widget selects its date field or opts out of date filtering.
-- Combine dates with saved filters. Keep runtime choices in the URL.
-- Display and consistently use one time zone.
-- Refresh on load, filter changes, or request; ignore obsolete responses.
-
-#### Correct results
-
-- Aggregate all matching records, including those beyond the current table page.
-- Make period comparisons meaningful, including zero and missing values.
-- Show empty, invalid-source, and per-widget failure states clearly. Invalid filters must never broaden results.
-- Bound aggregation cost and make chart truncation visible.
-- Current-state charts do not imply historical conversion.
-
-#### Checks and delivery limits
-
-- Save and reload a Positions page and mixed dashboard; check editing, mobile layout, table independence, and refresh.
-- Verify one protected dashboard through creation, backfill, concurrent requests, and deletion attempts.
-- Confirm ordinary page deletion and workspace deletion still work.
-- Check workspace isolation, viewer restrictions, private activity, stale edits, and removed datasets or fields.
-- Check totals, date/time boundaries, empty values, period comparisons, and visible truncation.
-- Translate all copy, update feature documentation, and run focused tests and regressions.
-- Local implementation and isolated validation only, including Rails-generated schema changes and repository docs.
-- No production migration, deployment, commits, pushes, or outbound messages. Tests have not yet run.
-
-#### Deferred
-
-- Other views and analysis: Kanban, calendars, historical conversion funnels, goals, pivots/joins.
-- More customization: additional shared filters, personal layouts, AI-authored pages.
-- Sharing and automation: public publishing, external-service widgets, scheduled refresh/reports.
-- No arbitrary code, SQL, or embeds; no new record or form engine.
-
-### Execution notes for the handoff
-
-- Add workspace-owned pages/blocks with validated configuration and policies.
-- Protect the main-dashboard invariant in the database and safely backfill existing workspaces.
-- Build navigation, templates, editor, and records blocks using existing dataset components.
-- Use bounded, authorized database aggregation and Chartkick charts; share date filtering across widgets.
-- Bound blocks, rows, filters, categories, time buckets, and query time.
-- Run focused model, policy, migration, query, integration, and Cuprite tests.
-- Cover dataset/Activity/Home regressions; check translations, RuboCop, Rails loading, and whitespace.
-
-Review: locate who can edit pages, what makes the main dashboard special, how dates affect widgets, and what proves the
-results correct. Compare each original scope, delivery, acceptance/risk, and limit item against the plan and handoff.
-For example, changing “owners/operators” to “users” would expand permissions, even if it made the sentence shorter.
-A complete complex scope will take more space than a small change; make that space easy to scan rather than compressing
-it into dense prose or dropping requirements.
+Do not score plans by heading names, bullet counts, or length. A plan can follow every formatting convention and
+still leave the reader unable to understand the work.

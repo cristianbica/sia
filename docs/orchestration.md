@@ -11,9 +11,14 @@ Read-only requests and session directives need no plan. Preserve unrelated chang
 
 ## Planning
 
-A useful plan explains the existing behavior, where the change belongs, the proposed approach, important choices, and
-how to check it. It need not list every file or follow fixed headings. Do enough repository discovery to ground the
-approach, including relevant callers and existing patterns. Do not replace engineering decisions with a restated goal.
+A plan explains the approach, the concrete work, and how success will be checked. Choose the organization to suit the
+task and the user's preferences. A short fix may need one explanation; a migration may need ordered stages. There
+are no prescribed section names. The shared saved-plan support owns the writing guidance.
+
+Use short sentences and focused bullets. Connect decisions to their reasons and include examples when they clarify
+the design. Preserve important requirements without repeating them. See [writing examples](writing-examples.md) for
+different ways to explain different tasks. Reusable examples must be fictional; information from another project
+shared in conversation is not permission to publish it.
 
 Present a required or requested plan and wait for approval. Once approved, continue within its boundary without
 repeated prompts. Routine implementation-detail changes do not invalidate that approval; expanded scope, risk,

@@ -21,11 +21,9 @@ skills. Stop checking after suitable checks pass unless new evidence justifies m
 ## Planning
 
 Planning is read-only except for the plan file. Understand the affected code before proposing how to change it.
-Explain the approach, important decisions, and how success will be checked; name material unknowns instead of
-concealing them in a broad goal. Keep plans concise: state the outcome, approach, key checks, and material limits.
-Avoid repeating protocol rules or writing an implementation diary. Simple changes need only a short explanation. Do
-not require a fixed template or invent alternatives for obvious edits. Present the plan and wait for approval before
-implementation. A clear approval of that presented plan authorizes its work; ask again only if its boundary changes.
+Ground the approach in repository evidence and resolve or name material unknowns. Use the shared saved-plan support
+for writing guidance. Present the plan and wait for approval before implementation. A clear approval authorizes its
+work; ask again only if its boundary changes.
 
 Save a plan for every change request unless the user explicitly selects an exception. Load saved-plan support for its
 format and approval state. Existing saved plans keep their approval requirements. Unattended saved plans use their

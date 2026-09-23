@@ -12,50 +12,60 @@ only to allocate it. Immediately add the exact new path to `authorized_plan_path
 Keep frontmatter to `operation`, `workflow`, and `skills`. Put the proposed change and its approval boundary in one
 approval block. Footer state uses one-line comments; omit empty optional fields.
 
-Write for the person deciding whether to approve:
+## Writing the plan
 
-- Open with the intended result. Explain the approach using relevant repository evidence, not a restated goal.
-- Give each point one main idea. Group related changes so a quick scan finds the work, checks, and limits.
-- Keep decisions, required behavior, exceptions, and material risks. Explain necessary jargon; avoid cryptic labels.
-- Omit repeated safeguards and routine file/command inventories. Include order only when it affects the decision.
-- Reread for completeness and readability, not a word quota. Small changes need a small plan; larger changes need
-  enough detail to judge them. Do not compress away requirements or narrate the investigation.
+Help the reader understand the proposed work well enough to judge it. Start by explaining the approach and why it
+fits the problem, using what you found in the repository. Then develop the parts that need explanation.
 
-A small change can use a few sentences:
+Choose the organization for this task. A bug fix may follow cause, correction, and regression check. A new feature
+may need its behavior explained before the implementation. A migration may need ordered stages and recovery points.
+These are possibilities, not templates. Follow the user's requested presentation when they specify one.
 
-```markdown
----
-operation: implement
-workflow: delivery
-skills: [repository-discovery, testing]
----
+Use short, complete sentences and focused bullets. Group related points; add headings when they help the reader find
+something. Separate the resulting behavior from the work needed to build it when mixing them would be confusing.
+Do not split a simple explanation into several sections just to satisfy a format.
 
-# Show currency on receipts
+Select detail by asking what it explains:
 
-<!-- sia:approval:start -->
-Add the order's currency to the existing receipt formatter and its caller. Keep the current amount formatting.
-Check receipts for two currencies and preserve existing receipt fields. No new currency conversion or external calls.
-<!-- sia:approval:end -->
+- State the concrete changes and connect important choices to their reasons. "Add retry handling" is too vague if
+  the central problem is that retries can repeat a successful write.
+- Name relevant files and existing code to reuse alongside the change they support. Avoid an unexplained inventory.
+- Use examples to resolve ambiguity. A small before/after result or configuration may explain more than a paragraph.
+  Do not add code samples merely to decorate the plan.
+- Keep requirements, dependencies, uncertainties, and risks that affect the approach or approval. Explain what they
+  mean for this work. Routine execution notes can wait until implementation; unresolved design decisions cannot.
+- State how success will be checked and which actions are authorized. Do not retell the whole proposal as a test list.
 
-<!-- sia:status pending-approval -->
-<!-- sia:base <commit> -->
-```
+A bullet should carry a point the reader can follow, not a compressed paragraph or a chain of technical labels.
+When a plan grows, look for repeated ideas and incidental detail before shortening sentences. Do not remove necessary
+explanation just to make the document smaller. Do not invent work to make it look comprehensive.
 
-For a change with several interacting requirements, use a short structured plan:
+Reread as someone who has not followed the investigation: can they tell what will change, why this approach fits,
+what work it requires, and how they will know it worked? Revise whatever makes those answers difficult to find.
+The chat presentation should preserve that understanding; link the saved plan for detail without hiding consequential
+choices in it. Keep approval hashes and state comments out of the human explanation.
 
-> Prevent duplicate webhook updates while allowing failed events to retry.
+A supplied example demonstrates what helped its reader; do not assume its headings suit every task. Reusable examples
+must be fictional. Another project's information shared in conversation is not permission to publish it here.
+
+### Examples of choosing detail
+
+These fictional fragments illustrate writing choices, not required plan layouts.
+
+For a small display fix, the behavior and implementation fit together:
+
+> The receipt formatter drops the currency already stored on the order. Append it to the formatted amount, so
+> `12.50` becomes `12.50 EUR`. Keep the existing rounding. Check two currencies and an amount that needs rounding.
+
+For a retry bug, the reason is essential:
+
+> A retried job can add the same book to a list twice. Enforce uniqueness on the list/book pair in the database,
+> and make the add action return the existing membership when that pair is already present.
 >
-> **Changes**
->
-> - Store processed event IDs with database uniqueness to handle simultaneous deliveries.
-> - Save the event ID and business update in one transaction; failure must leave the event retryable.
-> - Keep existing authentication and payload validation.
->
-> **Checks and limits**
->
-> - Check repeated and simultaneous deliveries, plus a failed update followed by a retry.
-> - Run webhook tests and apply the migration only to an isolated test database.
-> - Protection starts after installation. No production migration or deployment is included.
+> - Check both a repeated request and two simultaneous requests; each must leave one membership.
+> - Removing a membership must still leave the catalog book intact.
+
+## Approval and saved state
 
 Present the plan and wait for approval before any non-plan change. A clarification answer, resume alone, or an earlier
 generic imperative

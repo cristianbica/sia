@@ -38,6 +38,6 @@ same host alone. Hold task, base, model, effort, permissions, and checks constan
 corrective user messages. Inspect the whole result, including unnecessary features, abstractions, and shallow plans.
 A hidden oracle must not be copied into the candidate workspace. Do not rank solutions by similarity to one patch.
 
-This does not replace the local custom benchmark framework. The concise-output benchmark evaluates excerpts only;
-it cannot validate delivery behavior. No live coding comparison is part of the normal verifier or authorized merely
-by installing this change. Practical benefit remains unverified until real outputs have been reviewed.
+This does not replace the local custom benchmark framework. No live coding comparison is part of the normal
+verifier or authorized merely by installing this change. Practical benefit remains unverified until real outputs
+have been reviewed.

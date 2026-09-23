@@ -87,8 +87,8 @@ issue: API clients must request and render the appropriate progress blocks. Sia 
 See [prompt caching](prompt-caching.md) for history and preserved-thinking compatibility; host-owned conversation edits
 and API settings require integration checks, not extra Sia instructions.
 
-Use the opt-in approval runner for repository changes and continuation, and the concise-output benchmark for paired
-language-contract comparisons. Review correctness and scope before readability or token counts. A host that cannot
+Use the opt-in approval runner for repository changes and continuation. Review correctness and scope before
+readability or token counts. A host that cannot
 expose the needed session, permissions, or trace evidence is unavailable for that assertion; do not report it as
 passing.
 Live comparisons require a separately approved model/access/cost budget and must remain outside ordinary verification.
