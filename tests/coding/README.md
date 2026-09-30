@@ -27,7 +27,11 @@ Keep exact prompts/settings, source revision and dirty patch, outputs, diffs, te
 Record whether requested behavior works, whether unrelated behavior changed, and whether new files, abstractions,
 options, or features were necessary. Each task is solvable by editing existing functions; additional machinery needs
 a task-specific reason. Count corrections and manual edits rather than awarding points for Sia terminology or brevity.
-Inspect both results, including ties and regressions. These small tasks can reveal problems, not certify all coding.
+Inspect both results, including ties and regressions. Repeat separately for each authorized model/effort pair rather
+than assuming matching effort names are equivalent. Record premature progress-only stopping, skipped or unavailable
+checks, unnecessary repeated verification, and extra work alongside correctness. Mid-task steering and background-result
+scenarios need the separately authorized [continuation evaluation](../behavior/routing/fixtures/model-continuation.md);
+these three coding fixtures alone do not certify them. These small tasks can reveal problems, not certify all coding.
 
 ## Offline readiness
 

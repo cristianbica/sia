@@ -92,3 +92,21 @@ readability or token counts. A host that cannot
 expose the needed session, permissions, or trace evidence is unavailable for that assertion; do not report it as
 passing.
 Live comparisons require a separately approved model/access/cost budget and must remain outside ordinary verification.
+
+Evaluate GPT-6 Astra and GPT-6.1 Sol separately: OpenAI presents Astra prompting advice as a starting point for the
+family, not a guarantee of equivalent behavior. Audit loaded instructions and skill triggers before adding guidance.
+[OpenAI skill guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra) favors narrow
+triggers and task-relevant progressive disclosure. The shipped skill triggers already follow that pattern.
+
+Include Claude Opus 5.5 and Sonnet 5.5 as distinct evaluation targets. Start an Opus sweep at `medium`; for Sonnet
+agentic coding compare `medium` on well-specified tasks with `high` on harder tasks, including `low` when relevant to
+the host's workload. These are advisory evaluation starting points, not changed host defaults. See the official
+[Opus](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5) and
+[Sonnet](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5) guides.
+
+For each model/effort pair, judge premature progress-only stopping, meaningful verification, unnecessary repeated
+checks, scope expansion, and mid-task corrections alongside approval preservation. Retain tool traces, passing and
+unavailable checks, open work, corrective user turns, latency, and available token/cost metrics. Distinguish a missing
+progress block in the UI from actual stopped work. Use the existing
+[continuation scenarios](../tests/behavior/routing/fixtures/model-continuation.md); they are manual specifications and
+are not automatically covered by the smoke or approval runner. None of these models is newly certified by this update.

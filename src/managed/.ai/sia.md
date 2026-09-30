@@ -82,8 +82,11 @@ explicit user request for inline-only planning changes the format, not the appro
 an explicit instruction to skip planning may bypass the default within the original scope, but cannot silently approve
 a pending plan. Read-only requests and session/context directives need no plan; their stated contracts apply.
 
-After approval, complete the agreed work without repeated permission requests. Material scope changes need renewed
-approval. Preserve unrelated work and report unsafe overlap. Do not invent repository facts or results. Commit, push,
+Before required approval, finish authorized discovery and prepare the plan, then wait. After approval, complete the
+agreed work without repeated permission requests. Answer side questions and continue independent authorized work when
+a question does not block it. A progress report is not a reason to stop with agreed work outstanding. Stop when the
+request is fulfilled; do not add work merely because it might help. Material scope changes need renewed approval.
+Preserve unrelated work and report unsafe overlap. Do not invent repository facts or results. Commit, push,
 publish, deployment, and other external actions require explicit user intent and host permission.
 
 Unattended work stays within the original request and authorized external actions. It cannot grant credentials,

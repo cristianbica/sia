@@ -64,12 +64,19 @@ when the host reports them. [Cache diagnostics](https://platform.claude.com/docs
 is a Claude-API beta capability that can identify the first divergent request component; treat it as optional host
 troubleshooting, not a Sia dependency.
 
-For Fable 5.1, preserve returned assistant turns unchanged, including thinking blocks. Editing an earlier prefix can
+For Fable 5.1, Opus 5.5, and Sonnet 5.5, preserve returned assistant turns unchanged, including thinking blocks.
+Editing an earlier prefix can
 invalidate subsequent thinking blocks; enforcement depends on account and API behavior. Use supported appended updates
 or server-side compaction/context editing. If compacting on the client, start a fresh history from a summary and the new
 turn without replaying old thinking blocks. Earlier models generally cannot consume Fable 5.1 thinking blocks; check
 compatibility before switching. Lower cache-read pricing makes the optimal compaction point workload-dependent: compare
 quality and total task cost instead of compacting early solely to reduce token counts.
+Opus/Sonnet 5.5 support beta per-message effort changes with adaptive thinking; changing top-level effort invalidates
+the cache. Sonnet's `between_tools` mode cannot vary effort mid-conversation. Feature-detect host support rather than
+rewriting history or treating portable profiles as API settings. See the
+[Opus 5.5 guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
+and the
+[Sonnet guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5).
 See [Claude migration guidance](https://platform.claude.com/docs/en/models/fable-5-1/migration-guide).
 
 ### Gemini

@@ -22,7 +22,9 @@ shared in conversation is not permission to publish it.
 
 Present a required or requested plan and wait for approval. Once approved, continue within its boundary without
 repeated prompts. Routine implementation-detail changes do not invalidate that approval; expanded scope, risk,
-permissions, or external actions must be made explicit before proceeding.
+permissions, or external actions must be made explicit before proceeding. Side questions and nonblocking decisions
+do not end approved work; continue the authorized steps that do not depend on their answers. Stop when the request
+is fulfilled, without adding unrequested work.
 
 ## Saved plans
 
@@ -37,6 +39,9 @@ similar task as inferred authority.
 Saved work keeps its original approval while definitions are updated. Resolve the current effective definitions at
 phase boundaries, report changes, and return to approval for material conflicts. New defaults cannot retroactively
 authorize edits. Saved-plan Ship requires passing review and writes only completion metadata; retain the plan.
+Progress reports and
+text-only turn endings do not establish completion. Collect relevant background results and finish required checks.
+An unavailable required check leaves a blocked requirement; report it rather than marking the plan complete.
 
 ## Forge mode
 

@@ -31,6 +31,28 @@ CONTRACTS = {
         r'honor custom overrides.*reuse already loaded',
         r'review is required',
     ]),
+    'approved persistence': ('sia.md', [
+        r'before required approval.*prepare the plan, then wait',
+        r'after approval.*complete the agreed work without repeated permission requests',
+        r'continue independent authorized work.*question does not block',
+        r'stop when the request is fulfilled',
+    ]),
+    'completion evidence': ('workflows/sia/delivery.md', [
+        r'completion requires.*required checks.*review to finish',
+        r'progress.only response.*does not establish completion',
+        r'collect results from relevant background commands or workers',
+        r'if a required check cannot run.*report the blocked requirement',
+    ]),
+    'meaningful verification': ('skills/sia/testing/SKILL.md', [
+        r'run a check that exercises the changed behavior',
+        r'stop once required checks pass unless.*change, failure, or new concern',
+        r'syntax.only check cannot establish runtime behavior',
+        r'failed.to.start command.*not a pass',
+    ]),
+    'saved completion': ('workflows/sia/delivery/standard.md', [
+        r'set complete only after required implementation and checks finish successfully',
+        r'an unavailable required check.*instead of.*setting complete',
+    ]),
     'standalone review': ('workflows/sia/review.md', [
         r'keep source, docs, plans, and external state read.only',
         r'recommend.*without implementing',

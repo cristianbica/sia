@@ -107,11 +107,13 @@ before installing rather than asking the installer to guess.
 
 ## Frontier model compatibility
 
-Guidance checked against official documentation for GPT-6 Astra and Claude Fable/Mythos 5.1 in September 2026.
+Guidance checked against official documentation for GPT-6 Astra, GPT-6.1 Sol, Claude Opus/Sonnet 5.5,
+and Claude Fable/Mythos 5.1 on 2026-09-30.
 These are host responsibilities; Sia's portable `fast` and `reasoning` profiles neither select an API effort nor
 promise cost or latency. Keep existing model roles and evaluate effort on representative tasks before changing defaults.
 
-- GPT-6 Astra: tool use requires the Responses API. Migrate `none`/`minimal` effort to `low`; remove unsupported
+- GPT-6 Astra and GPT-6.1 Sol: tool use requires the Responses API. Migrate `none`/`minimal` effort to `low`; remove
+  unsupported
   sampling and log-probability parameters. See the
   [OpenAI model guide](https://developers.openai.com/api/docs/guides/latest-model).
 - Claude Fable 5.1: forced `tool_choice` values `any` and `tool` return errors. Use supported selection with explicit
@@ -127,3 +129,27 @@ Use meaningful progress, complete authorized work, batch independent reads, make
 and stop verification when required checks pass. Preserve actual approval gates and scope boundaries.
 
 [claude-guide]: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1
+
+### Claude 5.5 host behavior
+
+[Opus 5.5 guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
+recommends starting effort evaluation at `medium`. Thinking is always on; remove legacy requests to reproduce internal
+reasoning in visible output. Request explanations of decisions and evidence instead. A text-only `end_turn` can be a
+progress report with work still open. In a fully unattended integration, a host may inspect outstanding requirements
+and continue with a short message naming them, bounded to two or three automatic continuations on the same task.
+Relevant background results must return before completion. This optional host behavior cannot bypass a pending plan,
+expand authorization, or replace Sia's three-failed-fix-cycle limit. Do not apply unattended prompting to interactive
+approval sessions. Sia does not implement a continuation loop or require a new checklist artifact.
+
+[Sonnet 5.5 guidance][sonnet-55]
+suggests `medium` for well-specified agentic coding and `high` for harder work, followed by workload evaluation. Lower
+effort can stop early or skip meaningful checks; higher effort can add unrequested work. Keep Sia's shared scope,
+approval, and verification rules at every effort. API clients must render progress-update blocks when exposed;
+`thinking.display: "updates"` requests their summaries. Inspect content by block type rather than assuming text comes
+first. Markdown instructions cannot fix a client that drops progress blocks.
+
+Deliver genuine mid-task input as user text, outside `tool_result` blocks. Keep harness notices separate from the
+user's words; Sonnet 5.5 can otherwise misread steering as injected tool content. Preserve the correction and original
+objective unless the user cancels or replaces it. This is a host message-routing responsibility.
+
+[sonnet-55]: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5

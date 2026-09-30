@@ -16,7 +16,7 @@ Add behavior and mechanisms only when the task requires them. Prefer the simpler
 consequential departure with repository evidence. Fix the cause of a bug rather than adding speculative retries,
 fallbacks, or unrelated cleanup. Skills declared by the operation load at entry; load additional
 documentation or safe-refactoring skills only when useful, respecting the effective catalogs. Reuse already loaded
-skills. Stop checking after suitable checks pass unless new evidence justifies more work.
+skills. Use the testing skill to select checks and decide when verification is sufficient.
 
 ## Planning
 
@@ -38,6 +38,12 @@ Review the diff against the original request, subsequent user changes, and any a
 features even if the plan introduced them. Fix in-scope defects; report any boundary change before acting on it.
 Prefer independent review when useful, but do not require a worker. Report the result, meaningful checks, and
 remaining issues. Update affected documentation as part of the change. Saved-plan completion follows its support file.
+
+Completion requires the agreed work, required checks, and review to finish. A progress-only response or end of turn
+does not establish completion. Collect results from relevant background commands or workers before finishing; their
+unfinished work cannot be reported as passed. If a required check cannot run, disclose the missing check and reason,
+and report the blocked requirement rather than declaring verified completion. Continue other authorized work that
+does not depend on the blocker. Stop once the requested work is done and checked.
 
 ## Optional support
 

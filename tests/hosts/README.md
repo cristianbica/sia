@@ -84,7 +84,10 @@ It never invokes a model and is not evidence of live host-model compliance.
 already-authorized steps, scope control, and verification stopping. These are manual evaluation scenarios, not
 assertions about prompt wording. These scenarios are not run by the eight-case live smoke suite and require a separate
 authorized
-multi-turn evaluation to certify model behavior.
+multi-turn evaluation to certify model behavior. Include progress-only endings with work outstanding, pending
+background results, unavailable or superficial checks, and mid-task corrections. Record exact model and effort; keep
+interactive approval sessions separate from fully unattended continuation tests. See
+[model-specific evaluation](../../docs/host-matrix.md#model-specific-evaluation) for the comparison criteria.
 
 ## Writable approval and continuation checks (Codex and Claude)
 

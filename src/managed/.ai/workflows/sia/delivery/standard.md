@@ -101,7 +101,10 @@ paths at phase boundaries and report changes. Definition rewrites do not retroac
 
 Build within approval, then set `review-validate` and review/check the result. Record concise evidence in progress;
 use `fix` for in-scope corrections and recheck them. `ship` requires passing review and writes only completion metadata.
-Set `complete` only after required implementation and checks finish. Keep the plan; delete it only on a separate
+Set `complete` only after required implementation and checks finish successfully and relevant background results are
+collected. A progress report does not finish the plan. An unavailable required check leaves a blocked requirement;
+record the missing check and reason instead of marking it passed or setting `complete`.
+Keep the plan; delete it only on a separate
 explicit
 request. A blocker records what must change before retry. Unattended work stops after three unsuccessful fix cycles.
 Preserve exact authorized plan/definition paths and approval state across handoffs or compaction.
