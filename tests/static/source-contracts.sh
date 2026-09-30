@@ -292,8 +292,7 @@ check_source_boundaries() {
   assert_file "$ROOT/src/managed/.ai/sia.md" || return 1
   assert_file "$ROOT/src/seed/.ai/RULES.md" || return 1
   assert_file "$ROOT/src/seed/.ai/docs/INDEX.md" || return 1
-  assert_file "$ROOT/src/bridges/agents.block.md" || return 1
-  assert_file "$ROOT/src/bridges/claude.block.md" || return 1
+  assert_file "$ROOT/src/bridges/global.block.md" || return 1
 
   for forbidden in \
     "$ROOT/src/managed/.codex" \

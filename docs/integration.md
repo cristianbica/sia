@@ -2,12 +2,9 @@
 
 ## Installed layout
 
+Default repository layout:
+
 ```text
-AGENTS.md
-
-.claude/
-  CLAUDE.md                  # only when no existing Claude file imports AGENTS.md
-
 .ai/
   sia.md                     # Sia-owned activation protocol
   RULES.md                   # created once; the entire file belongs to the project
@@ -15,32 +12,44 @@ AGENTS.md
   skills/{INDEX.md,sia/,<project-skill>/}
   operations/{INDEX.md,sia/,<project-operation>.md}
   workflows/{INDEX.md,sia/,<project-workflow>.md}
-  plans/                      # created lazily when a delivery plan is persisted
+  plans/                     # created lazily when a delivery plan is persisted
 ```
 
 Documenting and creation operations add project content lazily. The installer does not inspect application source or
-generate repository documentation, plans, or project definitions.
+modify repository instruction files in its default global mode. Ignore `.ai/` in `.gitignore`, or use
+`.git/info/exclude` to avoid changing tracked ignore rules. The installer does not edit either file.
 
-## Entrypoint purpose
+## Global entrypoint and consent
 
-The root `AGENTS.md` Sia block makes a supported host aware that Sia exists and tells it to read `.ai/sia.md` only when
-the user explicitly invokes `Sia`. It does not activate Sia, load the docs index, or start a workflow during ordinary
-work.
+The default `SIA_INTEGRATION=global` installs the shared opt-in block at `~/.config/sia/AGENTS.md`. It resolves `.ai/`
+relative to the current Git repository root, including sessions started in a subdirectory. It does not resolve project
+paths relative to the home directory. The block keeps Sia inactive until an explicit `Sia` invocation and checks the
+project protocol before using it. In repositories without Sia, an invocation reports an installation-integrity error.
 
-Claude Code uses Claude instruction files rather than `AGENTS.md` directly. If neither root `CLAUDE.md` nor
-`.claude/CLAUDE.md` already imports root `AGENTS.md`, Sia adds a marked `@../AGENTS.md` block to
-`.claude/CLAUDE.md`. Existing imports and surrounding user instructions are left alone.
+On every install or update, missing references prompt separately for permission to create or append to these files:
 
-Installation does not detect or install host CLIs. It writes the portable repository entrypoints for all supported
-hosts regardless of what is installed on the current machine. This is why `.claude/CLAUDE.md` may be created in a
-repository whose installer was run from Codex; the bridge remains inert unless Claude Code reads it.
-
-| Host surface | Entrypoint |
+| User instruction file | Reference |
 | --- | --- |
-| Codex CLI | Marked block in root `AGENTS.md` |
-| OpenCode CLI/TUI | Marked block in root `AGENTS.md` |
-| Cursor Agent/CLI | Marked block in root `AGENTS.md` |
-| Claude Code CLI | Existing import, or marked `.claude/CLAUDE.md` block |
+| `~/.codex/AGENTS.md` | Instruction to read `~/.config/sia/AGENTS.md` |
+| `~/.claude/CLAUDE.md` | `@~/.config/sia/AGENTS.md` import |
+| `~/.copilot/copilot-instructions.md` | Instruction to read `~/.config/sia/AGENTS.md` |
+
+Answers come from `/dev/tty`, so the curl-to-shell command can still prompt. Only an affirmative answer adds a missing
+reference. Without an interactive terminal, the installer skips new references. It always presents manual loading of
+`.ai/sia.md` as an alternative. Existing managed references refresh without prompting; existing unmarked references
+remain user-owned and unchanged. Text outside marked blocks and existing file permissions are preserved.
+
+`SIA_CONSENT=yes` explicitly permits new references for automated installs; `SIA_CONSENT=no` declines them.
+`SIA_CONSENT=ask` is the default. `SIA_INTEGRATION=manual` writes only `.ai/`, without touching home configuration.
+Ask your agent to load `.ai/sia.md` from the current Git root before invoking Sia when using manual mode.
+
+These files provide references, not host plugins or configuration discovery. A host must load its user instruction
+file and follow external-file references. Copilot clients vary in their supported instruction-file locations; the
+installer does not configure a client to discover this file. Manual loading remains available for any host that can
+read repository files.
+
+Existing repository instruction files remain untouched. Remove old Sia blocks deliberately if migrating an earlier
+installation; keep other project instructions. The installer does not automatically delete files.
 
 ## Ownership model
 
@@ -50,7 +59,7 @@ Managed refreshes replace reserved paths and marked Sia blocks. Existing project
 | --- | --- | --- |
 | `.ai/` | `.ai/sia.md`; `.ai/{skills,operations,workflows}/sia/` | Each category `INDEX.md` SIA section |
 | `.ai/RULES.md` | None | None; create only when missing |
-| Host instruction files | None | Root `AGENTS.md`; optional `.claude/CLAUDE.md` |
+| Host instruction files | None | Global shared block and consented references |
 
 The intentionally empty host-file/full-replacement cell is important: Sia never takes ownership of a user's whole
 instruction file.
@@ -90,8 +99,9 @@ For local development, run the checkout's `install.sh` script from a target repo
 ## Small, explicit safety boundary
 
 The installer requires POSIX `sh`, `git`, and a Git repository root. It follows existing symlinked `.ai`, category,
-docs, and `.claude` directories, including links outside the checkout; the repository owner is responsible for that
-target. Dangling links and links resolving to non-directories fail before writes. The installer also rejects invalid
+docs and global configuration directories, including links outside the checkout; the
+repository owner is responsible for that target. Dangling links and links resolving to non-directories fail before
+writes. The installer also rejects invalid
 seed paths, missing or duplicate rules boundaries, malformed Sia marker pairs, and a concurrent Sia installer. A shared
 catalog must contain `## CUSTOM` before Sia can insert its section. Before replacing an existing shared file, it checks
 that the content used to prepare the replacement has not changed. This narrows accidental races but cannot lock

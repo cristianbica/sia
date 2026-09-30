@@ -10,6 +10,10 @@ INSTALL=${SIA_INSTALL:-$ROOT/install.sh}
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/sia-installer.XXXXXX") || exit 1
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
+# These tests exercise the repository payload without home configuration.
+SIA_INTEGRATION=manual
+export SIA_INTEGRATION
+
 new_repo() {
   repo=$(mktemp -d "$TMP_ROOT/repo.XXXXXX") || return 1
   git -C "$repo" init -q || return 1
@@ -40,16 +44,14 @@ test_clean_install_creates_the_four_owned_shapes() {
     .ai/workflows/sia/delivery/handoff.md \
     .ai/RULES.md \
     .ai/docs/INDEX.md \
-    .ai/skills/INDEX.md \
-    AGENTS.md \
-    .claude/CLAUDE.md; do
+    .ai/skills/INDEX.md; do
     assert_nonempty "$repo/$path" || return 1
   done
   for category in skills operations workflows; do
     assert_fixed_count "$repo/.ai/$category/INDEX.md" "<!-- sia:$category:start -->" 1 || return 1
     assert_fixed_count "$repo/.ai/$category/INDEX.md" '## CUSTOM' 1 || return 1
   done
-  for path in AGENTS.md .claude/CLAUDE.md .ai/RULES.md .ai/docs/INDEX.md .ai/skills/INDEX.md; do
+  for path in .ai/RULES.md .ai/docs/INDEX.md .ai/skills/INDEX.md; do
     assert_equal '-rw-r--r--' "$(file_permissions "$repo/$path")" \
       "new repository file has unexpected permissions: $path" || return 1
   done
@@ -149,69 +151,17 @@ test_rule_symlink_fails_before_writes() {
   assert_equal 'protocol sentinel' "$(cat "$repo/.ai/sia.md")" 'preflight failure changed protocol'
 }
 
-test_tool_blocks_preserve_surrounding_instructions() {
-  repo=$(new_repo) || return 1
-  printf '# Project instructions\nAGENTS-SENTINEL\n' >"$repo/AGENTS.md"
-  mkdir -p "$repo/.claude" || return 1
-  printf '# Claude instructions\nCLAUDE-SENTINEL\n' >"$repo/.claude/CLAUDE.md"
-
-  run_install "$repo" || return 1
-  assert_contains "$repo/AGENTS.md" 'AGENTS-SENTINEL' || return 1
-  assert_contains "$repo/.claude/CLAUDE.md" 'CLAUDE-SENTINEL' || return 1
-  assert_fixed_count "$repo/AGENTS.md" '<!-- sia:entrypoint:start -->' 1 || return 1
-  assert_fixed_count "$repo/.claude/CLAUDE.md" '<!-- sia:claude:start -->' 1 || return 1
-  assert_equal '-rw-r--r--' "$(file_permissions "$repo/AGENTS.md")" \
-    'install changed existing AGENTS.md permissions' || return 1
-  assert_equal '-rw-r--r--' "$(file_permissions "$repo/.claude/CLAUDE.md")" \
-    'install changed existing Claude instructions permissions'
-}
-
-test_existing_claude_import_is_left_alone() {
-  for import in '@AGENTS.md' '@./AGENTS.md'; do
-    repo=$(new_repo) || return 1
-    printf '%s\nROOT-CLAUDE-SENTINEL\n' "$import" >"$repo/CLAUDE.md"
-    run_install "$repo" || return 1
-    assert_contains "$repo/CLAUDE.md" 'ROOT-CLAUDE-SENTINEL' || return 1
-    [ ! -e "$repo/.claude/CLAUDE.md" ] || fail "created an unnecessary Claude bridge for $import" || return 1
-  done
-
-  repo=$(new_repo) || return 1
-  mkdir -p "$repo/.claude" || return 1
-  printf '@../AGENTS.md\nNESTED-CLAUDE-SENTINEL\n' >"$repo/.claude/CLAUDE.md"
-  run_install "$repo" || return 1
-  assert_contains "$repo/.claude/CLAUDE.md" 'NESTED-CLAUDE-SENTINEL' || return 1
-  assert_not_contains "$repo/.claude/CLAUDE.md" '<!-- sia:claude:start -->'
-}
-
 test_new_files_honor_restrictive_umask() {
   repo=$(new_repo) || return 1
   (umask 077; cd "$repo" && "$INSTALL") >/dev/null 2>&1 || return 1
-  for path in AGENTS.md .claude/CLAUDE.md .ai/sia.md .ai/RULES.md .ai/docs/INDEX.md .ai/skills/INDEX.md; do
+  for path in .ai/sia.md .ai/RULES.md .ai/docs/INDEX.md .ai/skills/INDEX.md; do
     assert_equal '-rw-------' "$(file_permissions "$repo/$path")" \
       "new repository file ignored restrictive umask: $path" || return 1
   done
 }
 
-test_malformed_blocks_refuse_before_installing() {
-  repo=$(new_repo) || return 1
-  printf '<!-- sia:entrypoint:start -->\n' >"$repo/AGENTS.md"
-  if run_install "$repo"; then
-    fail 'accepted an incomplete Sia block'
-    return 1
-  fi
-  [ ! -e "$repo/.ai/sia.md" ] || fail 'wrote managed content after malformed block'
-
-  reversed=$(new_repo) || return 1
-  printf '%s\n' '<!-- sia:entrypoint:end -->' '<!-- sia:entrypoint:start -->' >"$reversed/AGENTS.md"
-  if run_install "$reversed"; then
-    fail 'accepted reversed Sia markers'
-    return 1
-  fi
-  [ ! -e "$reversed/.ai/sia.md" ] || fail 'wrote managed content after reversed markers'
-}
-
 test_symlinked_directories_are_followed() {
-  for linked in ai docs skills operations workflows claude; do
+  for linked in ai docs skills operations workflows; do
     repo=$(new_repo) || return 1
     outside=$(mktemp -d "$TMP_ROOT/symlink-$linked.XXXXXX") || return 1
     case $linked in
@@ -243,11 +193,6 @@ test_symlinked_directories_are_followed() {
         ln -s "$outside" "$repo/.ai/workflows" || return 1
         link_path=$repo/.ai/workflows
         expected=$outside/sia/delivery.md
-        ;;
-      claude)
-        ln -s "$outside" "$repo/.claude" || return 1
-        link_path=$repo/.claude
-        expected=$outside/CLAUDE.md
         ;;
     esac
 
@@ -326,10 +271,7 @@ run_case 'catalog blocks refresh without changing CUSTOM content' \
 run_case 'existing rules and permissions survive regardless of marker layout' \
   test_existing_rule_bytes_survive
 run_case 'symlinked rules fail before writes' test_rule_symlink_fails_before_writes
-run_case 'tool blocks preserve surrounding project instructions' test_tool_blocks_preserve_surrounding_instructions
-run_case 'an existing Claude import is left alone' test_existing_claude_import_is_left_alone
 run_case 'new repository files honor a restrictive umask' test_new_files_honor_restrictive_umask
-run_case 'malformed markers fail before Sia writes' test_malformed_blocks_refuse_before_installing
 run_case 'valid symlinked directories are followed without replacing links' test_symlinked_directories_are_followed
 run_case 'invalid create-once seed layouts fail before Sia writes' test_invalid_seed_layouts_fail_before_installing
 run_case 'a concurrent installer is refused before Sia writes' test_concurrent_install_lock_fails_without_writing

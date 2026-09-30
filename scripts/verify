@@ -17,7 +17,8 @@ run_static() {
 }
 
 run_installer() {
-  sh "$ROOT/tests/installer/install/stage1.sh" &&
+  PYTHONDONTWRITEBYTECODE=1 python3 "$ROOT/tests/installer/install/global.py" &&
+    sh "$ROOT/tests/installer/install/stage1.sh" &&
     sh "$ROOT/tests/installer/github/bootstrap.sh"
 }
 

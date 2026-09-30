@@ -30,8 +30,7 @@ sia/
         workflows/INDEX.md
 
     bridges/
-      agents.block.md
-      claude.block.md
+      global.block.md
 
   tests/
     installer/{install,github}/
@@ -49,7 +48,7 @@ sia/
 - `src/managed/catalogs/` contains complete marker-delimited SIA sections inserted into mixed-ownership indexes.
 - `src/seed/.ai/RULES.md` supplies initial defaults only. Existing rule files belong entirely to the project and are
   never refreshed. Other `src/seed/.ai/` files are also copied only when missing.
-- `src/bridges/` contains marker-delimited blocks, never complete user instruction files.
+- `src/bridges/` contains marker-delimited blocks for the global entrypoint, never complete user instruction files.
 - `.gitattributes` keeps the shell entrypoint and managed text usable when a clone enables automatic line-ending
   conversion.
 - `install.sh` uses adjacent `src/` when run from a checkout. When read from standard input for installation, it

@@ -6,7 +6,7 @@ sia_protocol: 1
 
 Help the developer work with this repository. Use relevant project knowledge and complete the requested task. Sia adds
 no tools or permissions. Host instructions and the user's explicit choices take priority. All `.ai/**` paths are
-relative to the Git root containing the activating `AGENTS.md`.
+relative to the current Git repository root, not the location of a host instruction file.
 
 ## Activation and routing
 

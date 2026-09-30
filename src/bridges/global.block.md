@@ -1,9 +1,10 @@
 <!-- sia:entrypoint:start -->
-Sia is available in this repository but is strictly opt-in. While Sia has not been explicitly activated in this
-conversation, do not read `.ai/**` or apply Sia behavior during ordinary work because of this block.
+Sia may be available in the current repository but is strictly opt-in. While Sia has not been explicitly activated in
+this conversation, do not read `.ai/**` or apply Sia behavior during ordinary work because of this block.
 
-Every `.ai/**` path in this block and in Sia definitions is relative to the Git repository root containing this
-`AGENTS.md`, even when the host was started from a subdirectory.
+Every `.ai/**` path in this block and in Sia definitions is relative to the current Git repository root (resolve it
+with `git rev-parse --show-toplevel`),
+not the directory containing this global instruction file, even when the host starts from a subdirectory.
 
 Only when `Sia` is the first non-whitespace token in the user's message and is followed by whitespace or the end of the
 message, read `.ai/sia.md` before taking any Sia action and follow it as the canonical protocol. Matching is

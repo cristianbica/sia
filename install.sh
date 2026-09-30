@@ -9,8 +9,12 @@ REF=${REF:-}
 SOURCE_DIR=${SOURCE_DIR:-}
 DOWNLOAD_ROOT=
 LOCK_DIR=
+REFERENCE_DIR=
+SIA_INTEGRATION=${SIA_INTEGRATION:-global}
+SIA_CONSENT=${SIA_CONSENT:-ask}
 
 cleanup() {
+  [ -z "$REFERENCE_DIR" ] || rm -rf "$REFERENCE_DIR"
   [ -z "$LOCK_DIR" ] || rmdir "$LOCK_DIR" 2>/dev/null || :
   [ -z "$DOWNLOAD_ROOT" ] || [ ! -d "$DOWNLOAD_ROOT" ] || rm -rf "$DOWNLOAD_ROOT"
 }
@@ -34,6 +38,8 @@ Run from the Git repository that should receive Sia. Re-run to refresh it.
 Optional environment variables:
   REF=<branch-or-tag>      Git ref to download when this script is read from standard input
   SOURCE_DIR=<path>        Local Sia source root; its checked-out files are installed as-is
+  SIA_INTEGRATION=global   global (default) or manual
+  SIA_CONSENT=ask          ask (default), yes, or no for new global host references
 EOF
 }
 
@@ -207,7 +213,7 @@ seed() {
 }
 
 check_layout() {
-  for path in .ai .ai/docs .ai/skills .ai/operations .ai/workflows .claude; do
+  for path in .ai .ai/docs .ai/skills .ai/operations .ai/workflows; do
     if [ -L "$path" ] && [ ! -e "$path" ]; then
       fail "$path must resolve to a directory"
     fi
@@ -269,7 +275,7 @@ check_source() {
   done
   for path in "$seeds/RULES.md" "$seeds/docs/INDEX.md" "$seeds/skills/INDEX.md" \
     "$seeds/operations/INDEX.md" "$seeds/workflows/INDEX.md" \
-    "$bridges/agents.block.md" "$bridges/claude.block.md"; do
+    "$bridges/global.block.md"; do
     source_file "$path"
   done
   check_source_catalog skills "$managed/skills/sia"
@@ -285,13 +291,66 @@ preflight() {
     check_block ".ai/$category/INDEX.md" "<!-- sia:$category:start -->" \
       "<!-- sia:$category:end -->" '## CUSTOM'
   done
-  check_block AGENTS.md '<!-- sia:entrypoint:start -->' '<!-- sia:entrypoint:end -->'
-  check_block .claude/CLAUDE.md '<!-- sia:claude:start -->' '<!-- sia:claude:end -->'
+  if [ "$SIA_INTEGRATION" = global ]; then
+    for global_dir in "$HOME/.config" "$HOME/.config/sia" "$HOME/.codex" "$HOME/.claude" "$HOME/.copilot"; do
+      if [ -L "$global_dir" ] && [ ! -e "$global_dir" ]; then
+        fail "$global_dir must resolve to a directory"
+      fi
+      [ ! -e "$global_dir" ] || [ -d "$global_dir" ] || fail "$global_dir must be a directory"
+    done
+    check_block "$HOME/.config/sia/AGENTS.md" '<!-- sia:entrypoint:start -->' '<!-- sia:entrypoint:end -->'
+    for host_target in "$HOME/.codex/AGENTS.md" "$HOME/.claude/CLAUDE.md" \
+      "$HOME/.copilot/copilot-instructions.md"; do
+      check_block "$host_target" '<!-- sia:global:start -->' '<!-- sia:global:end -->'
+    done
+  fi
 }
 
-has_claude_import() {
-  grep -Eq '^[[:space:]]*@([.]/)?AGENTS[.]md[[:space:]]*$' CLAUDE.md 2>/dev/null || \
-    grep -Eq '^[[:space:]]*@\.\./AGENTS[.]md[[:space:]]*$' .claude/CLAUDE.md 2>/dev/null
+confirm_reference() {
+  case $SIA_CONSENT in
+    yes) return 0 ;;
+    no) return 1 ;;
+  esac
+  printf 'Allow adding a Sia reference to %s? [y/N] ' "$1" >&2
+  answer=
+  if ( : </dev/tty ) 2>/dev/null; then
+    IFS= read -r answer </dev/tty || return 1
+  else
+    printf '\nNo interactive terminal; leaving this file unchanged.\n' >&2
+    return 1
+  fi
+  case $answer in y|Y|yes|YES) return 0 ;; *) return 1 ;; esac
+}
+
+install_global() {
+  global_target=$HOME/.config/sia/AGENTS.md
+  replace_block "$global_target" "$bridges/global.block.md" \
+    '<!-- sia:entrypoint:start -->' '<!-- sia:entrypoint:end -->'
+  REFERENCE_DIR=$(mktemp -d "${TMPDIR:-/tmp}/sia-reference.XXXXXX") || fail 'cannot prepare global reference'
+  for host_target in "$HOME/.codex/AGENTS.md" "$HOME/.claude/CLAUDE.md" \
+    "$HOME/.copilot/copilot-instructions.md"; do
+    marker_state "$host_target" '<!-- sia:global:start -->' '<!-- sia:global:end -->'
+    if [ "$MARKER_STATE" != present ]; then
+      # Respect an existing unmarked reference as user-owned content.
+      if [ -f "$host_target" ] && grep -F '.config/sia/AGENTS.md' "$host_target" >/dev/null; then
+        continue
+      fi
+      if ! confirm_reference "$host_target"; then
+        printf 'Skipped %s. You can load .ai/sia.md manually.\n' "$host_target"
+        continue
+      fi
+    fi
+    {
+      printf '%s\n' '<!-- sia:global:start -->'
+      case $host_target in
+        "$HOME/.claude/CLAUDE.md") printf '%s\n' '@~/.config/sia/AGENTS.md' ;;
+        *) printf '%s\n' 'Read and follow `~/.config/sia/AGENTS.md` for opt-in Sia activation.' ;;
+      esac
+      printf '%s\n' '<!-- sia:global:end -->'
+    } >"$REFERENCE_DIR/block.md"
+    replace_block "$host_target" "$REFERENCE_DIR/block.md" '<!-- sia:global:start -->' '<!-- sia:global:end -->'
+  done
+  rm -rf "$REFERENCE_DIR"
 }
 
 install_sia() {
@@ -316,11 +375,10 @@ install_sia() {
     replace_block ".ai/$category/INDEX.md" "$catalogs/$category.md" \
       "<!-- sia:$category:start -->" "<!-- sia:$category:end -->" '## CUSTOM'
   done
-  replace_block AGENTS.md "$bridges/agents.block.md" '<!-- sia:entrypoint:start -->' '<!-- sia:entrypoint:end -->'
-  marker_state .claude/CLAUDE.md '<!-- sia:claude:start -->' '<!-- sia:claude:end -->'
-  if [ "$MARKER_STATE" = present ] || ! has_claude_import; then
-    replace_block .claude/CLAUDE.md "$bridges/claude.block.md" '<!-- sia:claude:start -->' '<!-- sia:claude:end -->'
+  if [ "$SIA_INTEGRATION" = global ]; then
+    install_global
   fi
+  printf '%s\n' 'Manual alternative: ask your agent to load .ai/sia.md from the current Git repository root, then invoke Sia.'
   printf '%s\n' 'Sia installed. Invoke it explicitly with: Sia load docs'
 }
 
@@ -331,6 +389,9 @@ if [ "${1:-}" = -h ] || [ "${1:-}" = --help ]; then
 fi
 [ "$#" -eq 0 ] || { usage >&2; exit 2; }
 
+case $SIA_INTEGRATION in global|manual) ;; *) fail 'invalid SIA_INTEGRATION' ;; esac
+case $SIA_CONSENT in ask|yes|no) ;; *) fail 'invalid SIA_CONSENT' ;; esac
+[ "$SIA_INTEGRATION" != global ] || [ -n "${HOME:-}" ] || fail 'HOME is required for global integration'
 repository_root
 [ -n "$SOURCE_DIR" ] || source_from_script || download_source
 SOURCE_DIR=$(CDPATH= cd "$SOURCE_DIR" && pwd -P) || fail "cannot read source directory: $SOURCE_DIR"

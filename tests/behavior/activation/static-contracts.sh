@@ -6,8 +6,8 @@ ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 . "$ROOT/tests/lib/test.sh"
 
 PROTOCOL="$ROOT/src/managed/.ai/sia.md"
-AGENTS_BRIDGE="$ROOT/src/bridges/agents.block.md"
-CLAUDE_BRIDGE="$ROOT/src/bridges/claude.block.md"
+AGENTS_BRIDGE="$ROOT/src/bridges/global.block.md"
+
 
 check_agents_bridge() {
   assert_nonempty "$AGENTS_BRIDGE" || return 1
@@ -23,13 +23,6 @@ check_agents_bridge() {
   assert_contains "$AGENTS_BRIDGE" 'Never infer prior activation' || return 1
   assert_contains "$AGENTS_BRIDGE" 'Git repository root' || return 1
   assert_contains "$AGENTS_BRIDGE" 'sia_protocol: 1' || return 1
-}
-
-check_claude_bridge() {
-  assert_nonempty "$CLAUDE_BRIDGE" || return 1
-  assert_fixed_count "$CLAUDE_BRIDGE" '<!-- sia:claude:start -->' 1 || return 1
-  assert_fixed_count "$CLAUDE_BRIDGE" '<!-- sia:claude:end -->' 1 || return 1
-  assert_contains "$CLAUDE_BRIDGE" '@../AGENTS.md' || return 1
 }
 
 check_fail_closed_contract() {
@@ -48,8 +41,17 @@ check_seed_indexes() {
   assert_contains "$ROOT/src/seed/.ai/docs/INDEX.md" 'not-initialized' || return 1
 }
 
-run_case "the root bridge is awareness-only" check_agents_bridge
-run_case "the Claude bridge only imports root instructions" check_claude_bridge
+check_global_bridge() {
+  global_bridge="$ROOT/src/bridges/global.block.md"
+  assert_contains "$global_bridge" 'git rev-parse --show-toplevel' || return 1
+  assert_contains "$global_bridge" 'not the directory containing this global instruction file' || return 1
+  assert_contains "$global_bridge" 'sia_protocol: 1' || return 1
+  assert_contains "$global_bridge" 'installation-integrity error' || return 1
+  assert_contains "$global_bridge" 'After an explicit activation' || return 1
+}
+
+run_case "the global bridge resolves the current project and fails closed" check_global_bridge
+run_case "the global bridge is awareness-only" check_agents_bridge
 run_case "activation fails closed at the bridge" check_fail_closed_contract
 run_case "seed indexes expose project-owned CUSTOM sections" check_seed_indexes
 

@@ -179,11 +179,13 @@ prepare_repo() {
   git -C "$prepare_repo" -c user.name='Sia host harness' -c user.email='sia-host@example.invalid' \
     commit -q -m fixture || return 1
 
-  (cd "$prepare_repo" && "$ROOT/install.sh") \
+  (cd "$prepare_repo" && SIA_INTEGRATION=manual "$ROOT/install.sh") \
     >"$prepare_artifacts/install.stdout" 2>"$prepare_artifacts/install.stderr"
   prepare_exit=$?
   printf '%s\n' "$prepare_exit" >"$prepare_artifacts/install.exit"
   [ "$prepare_exit" -eq 0 ] || return 1
+  cp "$ROOT/src/bridges/global.block.md" "$prepare_repo/AGENTS.md" || return 1
+  printf '%s\n' '@AGENTS.md' >"$prepare_repo/CLAUDE.md"
 
   {
     printf '\n## Host smoke-test canary\n\n'

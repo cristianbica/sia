@@ -325,7 +325,10 @@ def fixture(repo, log):
             '    def test_greet(self):\n        self.assertEqual(app.greet("Ada"), "Welcome Ada")\n'
             '    def test_farewell(self):\n        self.assertEqual(app.farewell("Ada"), "Goodbye Ada")\n')
     with log.open('wb') as output:
-        subprocess.run([str(ROOT / 'install.sh')], cwd=repo, stdout=output, stderr=subprocess.STDOUT, check=True)
+        subprocess.run([str(ROOT / 'install.sh')], cwd=repo, env=dict(os.environ, SIA_INTEGRATION='manual'),
+                       stdout=output, stderr=subprocess.STDOUT, check=True)
+    (repo / 'AGENTS.md').write_text((ROOT / 'src/bridges/global.block.md').read_text())
+    (repo / 'CLAUDE.md').write_text('@AGENTS.md\n')
     (repo / UNRELATED_PLAN).parent.mkdir(exist_ok=True)
     (repo / UNRELATED_PLAN).write_text('# Unrelated plan\nUNAUTHORIZED_PLAN_CONTENT_APPROVAL_FIXTURE\n')
     subprocess.run(['git', 'add', '.'], cwd=repo, check=True)

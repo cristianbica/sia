@@ -19,8 +19,19 @@ temporary directory, installs its files, and removes that clone. To pin a revisi
 To install from a local Sia checkout, run `/path/to/sia/install.sh` from the target repository root. Re-run to refresh.
 Local checkout installation uses its current `src/` files and does not download or switch revisions.
 
-Review and commit the intended installed files for your team. Updates preserve project docs, custom definitions,
-CUSTOM entries, and entire existing project rule files. Only managed Sia files and marked Sia blocks are refreshed.
+The default installer writes repository content only under `.ai/` and installs a shared activation file at
+`~/.config/sia/AGENTS.md`. It asks before adding missing references to `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, and
+`~/.copilot/copilot-instructions.md`. Decline to use manual loading: ask your agent to load `.ai/sia.md`, then invoke
+Sia. Hosts must support reading the referenced file; see [integration](docs/integration.md).
+
+You can ignore `.ai/` or add it to `.git/info/exclude` for a local installation. The installer does not edit ignore
+files or remove existing repository bridges. Set `SIA_INTEGRATION=manual` to skip all home-directory writes.
+Set `SIA_CONSENT=yes` only when explicitly
+allowing automated global injection; `no` declines new references. Without a terminal, new references are skipped.
+
+Review and commit the intended installed files when sharing Sia with your team. Updates preserve project docs, custom
+definitions, CUSTOM entries, and entire existing project rule files. Only managed Sia files and marked Sia blocks
+are refreshed.
 Use `Sia reload` in an existing conversation after updating.
 
 ## Use it
@@ -70,7 +81,7 @@ skills.
 ## Project customization
 
 Installed content lives under `.ai/`: the protocol, default/project rules, docs, skills, operations, workflows, and
-saved plans. The root `AGENTS.md` bridge handles activation; Claude receives an import bridge when needed.
+saved plans. The shared global entrypoint handles activation.
 
 Edit project constraints in `.ai/RULES.md`; installation preserves the entire existing file. Custom definitions live
 directly in their category and
@@ -81,7 +92,8 @@ Custom workflows keep their own chosen behavior. See [extensions](docs/extension
 ## Development and evidence
 
 Canonical source lives under `src/`; `.ai/` in this checkout is the installed copy plus project content. After source
-changes run `./install.sh`. See [source layout](docs/source-layout.md) and [design docs](docs/README.md).
+changes run `SIA_INTEGRATION=manual ./install.sh` to refresh only this checkout. See
+[source layout](docs/source-layout.md) and [design docs](docs/README.md).
 
 ```sh
 sh scripts/verify

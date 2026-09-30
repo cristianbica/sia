@@ -8,6 +8,10 @@ ROOT=$(CDPATH= cd "$(dirname "$0")/../../.." && pwd)
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/sia-github-test.XXXXXX") || exit 1
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
+# These tests exercise the repository payload without home configuration.
+SIA_INTEGRATION=manual
+export SIA_INTEGRATION
+
 new_repo() {
   repo=$(mktemp -d "$TMP_ROOT/repo.XXXXXX") || return 1
   git -C "$repo" init -q || return 1
@@ -44,7 +48,7 @@ test_stdin_install_downloads_and_cleans_up() {
   (cd "$repo" && TMPDIR="$download_tmp" GITHUB_URL="file://$source_repo" \
     sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md" || return 1
-  assert_nonempty "$repo/AGENTS.md" || return 1
+  [ ! -e "$repo/AGENTS.md" ] || return 1
   assert_downloads_cleaned "$download_tmp"
 }
 
@@ -68,7 +72,7 @@ test_autocrlf_checkout_keeps_installer_payload_usable() {
     GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=true \
     sh -s <"$ROOT/install.sh") >/dev/null 2>&1 || return 1
   assert_nonempty "$repo/.ai/sia.md" || return 1
-  assert_nonempty "$repo/AGENTS.md" || return 1
+  [ ! -e "$repo/AGENTS.md" ] || return 1
   assert_downloads_cleaned "$download_tmp"
 }
 

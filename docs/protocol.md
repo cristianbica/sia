@@ -1,7 +1,8 @@
 # Activation protocol
 
 The installed `.ai/sia.md` is canonical for the agent; [source](../src/managed/.ai/sia.md) is canonical for development.
-The root bridge is inert until the user's first non-whitespace token is exactly `Sia`, followed by whitespace or end.
+The global bridge is inert until the user's first non-whitespace token is exactly `Sia`,
+followed by whitespace or end.
 Wrong casing, `Sia:`, and incidental mentions do not activate it. Require the exact protocol header and a nonempty body;
 missing, unreadable, or malformed installations fail without reconstructing instructions from other files.
 
