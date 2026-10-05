@@ -5,7 +5,7 @@
 Sia installs readable source prompts, shared activation bridges, catalog entries, and initial project seeds. The
 installer preserves project content and validates inputs before writing.
 
-The shared protocol requires saved planning and approval for all change requests, including fixes, documentation,
+The shared protocol requires planning and approval for all change requests, including fixes, documentation,
 definitions, natural-language requests, and Forge. Workflows keep their task-specific checks. Read-only requests and
 session directives need no plan. Explicit user exceptions preserve their scope and existing pending approvals.
 Operation names, aliases, CUSTOM resolution, exact activation, and saved-plan compatibility remain supported.

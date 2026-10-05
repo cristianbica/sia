@@ -6,7 +6,7 @@ description: Make the requested code change, check it, and explain the result.
 # Delivery
 
 Follow the protocol's shared planning boundary: inspect relevant code and callers, resolve material scope questions,
-then create and present a saved plan using saved-plan support. Wait for approval before implementation edits.
+then present a plan in the format selected by the protocol. Wait for approval before implementation edits.
 
 After approval, use existing patterns where they fit, make the change, run suitable checks, and review the result
 against the user's request. Continue through in-scope fixes without another approval. Ask when new evidence materially
@@ -20,14 +20,15 @@ skills. Use the testing skill to select checks and decide when verification is s
 
 ## Planning
 
-Planning is read-only except for the plan file. Understand the affected code before proposing how to change it.
+Planning is read-only except when saving a plan file. Understand the affected code before proposing how to change it.
 Ground the approach in repository evidence and resolve or name material unknowns. Use the shared saved-plan support
 for writing guidance. Present the plan and wait for approval before implementation. A clear approval authorizes its
 work; ask again only if its boundary changes.
 
-Save a plan for every change request unless the user explicitly selects an exception. Load saved-plan support for its
-format and approval state. Existing saved plans keep their approval requirements. Unattended saved plans use their
-recorded ceiling. An approved plan's implementation still follows this workflow.
+Display small, simple plans inline by default; save substantial plans or plans explicitly requested as files.
+Inline plans need approval before edits and cannot resume across conversations. Load saved-plan support when saving
+a plan for its format and approval state. Existing saved plans keep their approval requirements. Unattended saved
+plans use their recorded ceiling. An approved plan's implementation still follows this workflow.
 
 ## Review and completion
 

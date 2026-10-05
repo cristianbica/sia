@@ -11,10 +11,20 @@ BASE = 'src/managed/.ai/'
 # keeping these tests green never establishes that a model follows the instructions.
 CONTRACTS = {
     'shared approval': ('sia.md', [
-        r'every request.*requires a saved plan and approval before changes',
+        r'every request.*requires a plan and approval before changes',
         r'named operations.*aliases.*inferred requests.*documentation.*definitions.*forge',
         r'clarification.*resume.*not approval',
         r'boundary applies to custom workflows',
+    ]),
+    'plan format': ('sia.md', [
+        r'display small, simple plans inline by default',
+        r'save substantial plans or plans explicitly requested as files',
+        r'inline plans require approval too and cannot resume across conversations',
+        r'file count alone does not determine the format',
+    ]),
+    'delivery plan format': ('workflows/sia/delivery.md', [
+        r'display small, simple plans inline by default',
+        r'inline plans need approval before edits',
     ]),
     'custom resolution': ('sia.md', [
         r'custom entry.*replaces the shipped',
@@ -63,7 +73,7 @@ CONTRACTS = {
         r'pending.approval.*do not approve it, execute it',
     ]),
     'documentation scope': ('workflows/sia/documentation.md', [
-        r'before documentation writes.*saved.plan and approval',
+        r'before documentation writes.*planning and approval',
         r'write only.*\.ai/docs/.*nearest indexes',
         r'source.code fix.*rather than expanding',
     ]),
@@ -128,6 +138,16 @@ class Contracts(unittest.TestCase):
                 self.assertRegex(body, patterns[0])
                 files[path] = re.sub(patterns[0], '', body)
                 self.assertIn(name, failures(files))
+
+    def test_plan_format_guards_are_individually_required(self):
+        for name in ('plan format', 'delivery plan format'):
+            path, patterns = CONTRACTS[name]
+            body = ' '.join(self.files[path].lower().replace('`', '').split())
+            for pattern in patterns:
+                with self.subTest(contract=name, pattern=pattern):
+                    files = dict(self.files)
+                    files[path] = re.sub(pattern, '', body)
+                    self.assertIn(name, failures(files))
 
     def test_edit_immediately_protocol_is_rejected(self):
         files = dict(self.files, **{'sia.md': '---\nsia_protocol: 1\n---\nEdit immediately.'})

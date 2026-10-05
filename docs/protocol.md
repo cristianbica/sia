@@ -11,8 +11,10 @@ Read its current definitions rather than maintaining a second exhaustive grammar
 skill indexes; docs/skills loading exposes routes without starting work. Side questions do not cancel an active task.
 Stop and reload end orchestration; a new chat has no inferred prior activation.
 
-All change requests create a saved plan and wait for approval before edits. Named operations, aliases, inferred
-requests, non-code changes, and Forge share this rule, including CUSTOM workflows. Explicit user exceptions retain
+All change requests present an inline or saved plan and wait for approval before edits.
+Small, simple plans are inline by default; substantial plans and plans explicitly requested as files are saved. Named
+operations, aliases, inferred requests, non-code changes, and Forge share this rule, including CUSTOM workflows.
+Explicit user exceptions retain
 their scope; read-only requests and session directives need no plan. Existing pending approvals remain binding.
 Saved-plan and worker support load only when needed. Exact plan-content authorization applies in all modes.
 

@@ -4,7 +4,8 @@ The [delivery workflow](../src/managed/.ai/workflows/sia/delivery.md) owns ordin
 relevant code, implements the request, checks the result, and continues through in-scope corrections. There are no
 ordinary trivial/lightweight/standard routes, receipts, phase artifacts, or mandatory handoffs.
 
-Every change request requires discovery, clarification of material requirements, a saved plan, and approval before
+Every change request requires discovery, clarification of material requirements, an inline or saved plan, and approval
+before
 edits. This applies across operations, aliases, inferred requests, and CUSTOM workflows. Explicit unattended mode or
 an instruction to skip planning may select another behavior; neither silently approves an existing pending plan.
 Read-only requests and session directives need no plan. Preserve unrelated changes and host permissions.
@@ -28,9 +29,12 @@ is fulfilled, without adding unrequested work.
 
 ## Saved plans
 
-Save for every change request unless the user explicitly selects an exception. The shared [saved-plan
-support](../src/managed/.ai/workflows/sia/delivery/standard.md) owns naming, approval hashes, states, and resume for
-the actual operation and workflow. Existing compact and valid legacy plans remain supported.
+Display small, simple plans inline by default: bounded work with a clear approach, no unresolved material decisions,
+and straightforward verification. Save substantial plans or plans explicitly requested as files. Multiple dependent
+stages, consequential design choices, or migration and recovery steps call for a saved plan; file count alone does not
+determine the format. Honor explicit inline-only requests. Both formats require approval before edits. The shared
+[saved-plan support](../src/managed/.ai/workflows/sia/delivery/standard.md) owns naming, approval hashes, states, and
+resume for the actual operation and workflow. Existing compact and valid legacy plans remain supported.
 
 Clarification and resume do not approve a plan. Plans are conversation-isolated: read only exact authorized paths,
 including across compaction. Filename inspection is allowed solely to allocate a new name. Never use a plan from a
@@ -45,9 +49,9 @@ An unavailable required check leaves a blocked requirement; report it rather tha
 
 ## Forge mode
 
-`Sia forge on` enables continuous follow-ups. Change requests, including `do:`, still require saved planning and
-approval. Explicit `inline plan` selects an unsaved plan while retaining approval. Saved plans can resume without
-turning Forge off; inline-only work cannot resume across sessions. Read-only requests run directly.
+`Sia forge on` enables continuous follow-ups. Change requests, including `do:`, use the same inline-or-saved planning
+defaults and require approval. Explicit `inline plan` selects an unsaved plan while retaining approval. Saved plans
+can resume without turning Forge off; inline-only work cannot resume across sessions. Read-only requests run directly.
 
 Operation names and aliases stay within Forge. Reserved directives and explicit unattended invocations keep their
 normal routing. See [Forge support](../src/managed/.ai/workflows/sia/delivery/forge.md).

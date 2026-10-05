@@ -1,8 +1,10 @@
 # Saved plans and resume
 
-Use this shared plan lifecycle for change requests across all workflows. Resolve the actual operation, workflow, and
-skills; do not relabel documentation or definition work as implement. CUSTOM workflows keep their task-specific steps
-and any additional gates while preserving the protocol's shared approval boundary.
+Use this shared plan lifecycle for saved change plans across all workflows. Small, simple plans are displayed inline
+by default under the protocol; do not create a file or saved-state metadata for an inline plan. Both formats require
+approval before implementation. Apply the writing guidance below to either format. Resolve the actual operation,
+workflow, and skills; do not relabel documentation or definition work as implement. CUSTOM workflows keep their
+task-specific steps and any additional gates while preserving the protocol's shared approval boundary.
 
 ## Save and approve
 

@@ -7,7 +7,7 @@ description: Create or update scoped repository knowledge from verified evidence
 
 Use the operation's requested scope: initial repository knowledge, a specific subject, or refresh. Read the docs index
 and relevant routes, discover current evidence, and apply the documentation skill. Before documentation writes,
-follow the protocol's shared saved-plan and approval boundary using [shared plan support](delivery/standard.md)
+follow the protocol's shared planning and approval boundary using [shared plan support](delivery/standard.md)
 with this workflow and the actual operation. After approval, write only the requested `.ai/docs/`
 content and nearest indexes. Create directories only when the first useful document needs them.
 

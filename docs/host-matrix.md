@@ -55,7 +55,8 @@ remains unchanged. See [host tests](../tests/hosts/README.md) for long-task scen
 ## Approval-boundary coverage
 
 A separate Codex/Claude runner, `scripts/verify-approval --live --host codex|claude`, exercises writable disposable
-fixtures and exact-session continuation. It checks saved planning before changes across named and inferred requests,
+fixtures and exact-session continuation. It checks planning and approval before changes across named and inferred
+requests,
 non-code operations, and Forge, then approval and completion in the same session. It also checks clarification,
 pending-plan resume, approved continuation, and explicit exceptions. Missing continuation or unclassifiable activity
 is unavailable, never a pass. It does not change the read-only smoke harness.

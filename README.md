@@ -46,8 +46,8 @@ Sia investigate intermittent webhook failures
 Sia investigate the checkout design and save an implementation plan
 ```
 
-Every change request follows the same sequence: inspect, clarify, save a plan, wait for your approval, then change and
-verify. This includes `implement`, `fix`, aliases, natural-language requests, docs, definitions, and one-line edits.
+Every change request follows the same sequence: inspect, clarify, present a plan, wait for your approval, then change
+and verify. This includes `implement`, `fix`, aliases, natural-language requests, docs, definitions, and one-line edits.
 Read-only questions and session directives need no plan. Explicit unattended mode or an instruction to skip planning
 can select another behavior; existing pending approvals remain binding.
 
@@ -57,7 +57,8 @@ remains the authority when documentation is stale. `refresh-docs <subject>` upda
 
 ## Plans and follow-ups
 
-Plans are saved automatically for change requests. Resume one by its exact path:
+Small, simple plans are displayed inline by default. Substantial plans and plans explicitly requested as files are
+saved. Both formats require approval before changes. Resume a saved plan by its exact path:
 
 ```text
 Sia resume .ai/plans/2026-09-13-01-subscription-pausing.md
@@ -67,7 +68,8 @@ Only that exact plan is authorized for reading. Resume preserves its status and 
 Existing compact and valid legacy formats remain supported. Sia does not search unrelated historical plans.
 
 For a continuous session, `Sia forge on` makes the prefix optional for follow-ups. Change requests, including `do:`,
-still require saved planning and approval. `inline plan` explicitly selects an unsaved plan, also requiring approval.
+use the same inline-or-saved planning defaults and require approval. `inline plan` explicitly selects an unsaved plan,
+also requiring approval.
 Saved plans can resume across sessions; inline-only tasks cannot. `Sia forge off` ends the continuous session.
 
 `Sia unattended implement <request>` works within the original request without asking for additional authority.

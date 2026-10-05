@@ -9,12 +9,13 @@ reads files, edits code, runs tools, and controls permissions.
 - Concise, evidence-linked repository documentation, loaded only when relevant.
 - Project-specific constraints and useful reusable skills.
 - Direct implementation, diagnosis, review, and documentation requests.
-- Readable saved plans and approval before changes.
+- Readable inline or saved plans and approval before changes.
 - Portable, explicit activation and safe updates that preserve project-owned content.
 
-Every normal change request creates a saved plan and pauses for approval, regardless of operation or wording.
-Read-only requests need no plan. CUSTOM workflows preserve this shared boundary; only an explicit user choice can
-select an exception. Existing saved plans retain their approval contracts.
+Every normal change request presents a plan and pauses for approval, regardless of operation or wording.
+Small, simple plans are inline by default; substantial plans and plans explicitly requested as files are saved.
+Read-only requests need no plan. CUSTOM workflows preserve this shared boundary; explicit user choices can
+select exceptions. Existing saved plans retain their approval contracts.
 
 ## What does not belong
 

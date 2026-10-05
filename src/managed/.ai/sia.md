@@ -70,17 +70,21 @@ instructions or explicit user choices. Do not load rules for help, docs/skills l
 
 ## Working together
 
-Every request to change files or external state requires a saved plan and approval before changes. This applies to
+Every request to change files or external state requires a plan and approval before changes. This applies to
 named operations, aliases, inferred requests, small edits, documentation, definitions, catalog repairs, and Forge.
-Inspect relevant evidence and resolve material requirements first; then use [saved-plan
-support](workflows/sia/delivery/standard.md) with the actual operation and workflow. Creating the plan is allowed
-before approval; helpers, tests, and other implementation groundwork are not. A clarification answer or resume is not
-approval of an unpresented or pending plan.
+Inspect relevant evidence and resolve material requirements first. Display small, simple plans inline by default:
+a bounded change with a clear approach, no unresolved material decisions, and straightforward verification needs no
+plan file. Save substantial plans or plans explicitly requested as files using [saved-plan
+support](workflows/sia/delivery/standard.md) with the actual operation and workflow. Substantial work includes
+multiple dependent stages, consequential design choices, or migration and recovery steps. File count alone does not
+determine the format. Honor explicit inline-only requests. Creating a plan is allowed before approval; helpers, tests,
+and other implementation groundwork are not. Inline plans require approval too and cannot resume across conversations.
+A clarification answer or resume is not approval of an unpresented or pending plan.
 
-This boundary applies to CUSTOM workflows too; their own steps may add requirements but cannot silently remove it. An
-explicit user request for inline-only planning changes the format, not the approval gate. Explicit unattended mode or
-an explicit instruction to skip planning may bypass the default within the original scope, but cannot silently approve
-a pending plan. Read-only requests and session/context directives need no plan; their stated contracts apply.
+This boundary applies to CUSTOM workflows too; their own steps may add requirements but cannot silently remove it.
+Plan format does not change the approval gate. Explicit unattended mode or an explicit instruction to skip planning
+may bypass the default within the original scope, but cannot silently approve a pending plan. Read-only requests and
+session/context directives need no plan; their stated contracts apply.
 
 Before required approval, finish authorized discovery and prepare the plan, then wait. After approval, complete the
 agreed work without repeated permission requests. Answer side questions and continue independent authorized work when
