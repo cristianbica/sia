@@ -26,6 +26,28 @@ CONTRACTS = {
         r'display small, simple plans inline by default',
         r'inline plans need approval before edits',
     ]),
+    'shared plan substance': ('sia.md', [
+        r'plan.writing guidance for both inline and saved plans',
+        r'show the concrete use and result.*implementation approach and checks',
+        r'saved plans must carry the useful proposal from chat',
+        r'resolve material design questions before asking for implementation approval',
+    ]),
+    'delivery writing guidance': ('workflows/sia/delivery.md', [
+        r'load the shared saved.plan support for writing guidance for both inline and saved plans',
+        r'scope checklist alone is insufficient',
+    ]),
+    'concrete plan': ('workflows/sia/delivery/standard.md', [
+        r'make the proposed result concrete before explaining the work',
+        r'configuration, commands, apis, or output, include a representative input, invocation, and resulting output',
+        r'use the user.s example when available',
+        r'label hypothetical values and proposed behavior',
+        r'connect the affected files and existing functions to the changes needed',
+    ]),
+    'self-contained plan': ('workflows/sia/delivery/standard.md', [
+        r'resolve material design questions before requesting implementation approval',
+        r'saved plan must contain the concrete proposal shown in chat, including examples, decisions, and user corrections',
+        r'if they must ask for the configuration, command, output, or meaning of a central choice, revise the plan',
+    ]),
     'custom resolution': ('sia.md', [
         r'custom entry.*replaces the shipped',
         r'never fall back from an invalid override',
@@ -139,8 +161,9 @@ class Contracts(unittest.TestCase):
                 files[path] = re.sub(patterns[0], '', body)
                 self.assertIn(name, failures(files))
 
-    def test_plan_format_guards_are_individually_required(self):
-        for name in ('plan format', 'delivery plan format'):
+    def test_plan_guards_are_individually_required(self):
+        for name in ('plan format', 'delivery plan format', 'shared plan substance', 'delivery writing guidance',
+                     'concrete plan', 'self-contained plan'):
             path, patterns = CONTRACTS[name]
             body = ' '.join(self.files[path].lower().replace('`', '').split())
             for pattern in patterns:

@@ -16,8 +16,15 @@ approval block. Footer state uses one-line comments; omit empty optional fields.
 
 ## Writing the plan
 
-Help the reader understand the proposed work well enough to judge it. Start by explaining the approach and why it
-fits the problem, using what you found in the repository. Then develop the parts that need explanation.
+Make the proposed result concrete before explaining the work. A plan must let the reader see how the change will
+be used and what it will produce, then explain how the affected code will deliver it. A requirements summary,
+workflow checklist, or list of exclusions is not enough to approve an implementation.
+
+For changes to configuration, commands, APIs, or output, include a representative input, invocation, and resulting
+output wherever those interfaces change. Use the user's example when available, carrying its important relationships
+through the proposal. Label hypothetical values and proposed behavior; do not invent repository facts or operator
+settings. For other tasks, show the relevant before/after behavior. A small fix may make this concrete in one sentence;
+do not manufacture code blocks or interfaces that the task does not need.
 
 Choose the organization for this task. A bug fix may follow cause, correction, and regression check. A new feature
 may need its behavior explained before the implementation. A migration may need ordered stages and recovery points.
@@ -31,9 +38,9 @@ Select detail by asking what it explains:
 
 - State the concrete changes and connect important choices to their reasons. "Add retry handling" is too vague if
   the central problem is that retries can repeat a successful write.
-- Name relevant files and existing code to reuse alongside the change they support. Avoid an unexplained inventory.
-- Use examples to resolve ambiguity. A small before/after result or configuration may explain more than a paragraph.
-  Do not add code samples merely to decorate the plan.
+- Connect the affected files and existing functions to the changes needed, including code to reuse.
+  Naming directories alone is not an approach.
+- Explain the example's consequences: ordering, defaults, identity, or failure behavior when they affect this task.
 - Keep requirements, dependencies, uncertainties, and risks that affect the approach or approval. Explain what they
   mean for this work. Routine execution notes can wait until implementation; unresolved design decisions cannot.
 - State how success will be checked and which actions are authorized. Do not retell the whole proposal as a test list.
@@ -42,10 +49,19 @@ A bullet should carry a point the reader can follow, not a compressed paragraph 
 When a plan grows, look for repeated ideas and incidental detail before shortening sentences. Do not remove necessary
 explanation just to make the document smaller. Do not invent work to make it look comprehensive.
 
-Reread as someone who has not followed the investigation: can they tell what will change, why this approach fits,
-what work it requires, and how they will know it worked? Revise whatever makes those answers difficult to find.
-The chat presentation should preserve that understanding; link the saved plan for detail without hiding consequential
-choices in it. Keep approval hashes and state comments out of the human explanation.
+Resolve material design questions before requesting implementation approval. If the user's choice is needed, explain
+the alternatives and ask that question first. A draft may record an open question, but do not present it as ready to
+build while telling the implementer to confirm the design later. State recommended choices explicitly as the proposal
+being approved; do not ask for redundant confirmation of choices already settled by the user.
+
+Before presenting a plan, compare it with the request and useful proposals already made in conversation. The saved
+plan must contain the concrete proposal shown in chat, including examples, decisions, and user corrections needed to
+understand it. A link to the conversation or a richer chat summary does not repair an incomplete saved plan.
+
+Reread without relying on the conversation: can the reader use the example to predict the result, understand the
+implementation approach, and identify what verifies it? If they must ask for the configuration, command, output, or
+meaning of a central choice, revise the plan before requesting approval. Keep approval hashes, state comments, and
+routine workflow bookkeeping out of the human explanation. Choose headings for the task, not for approval metadata.
 
 A supplied example demonstrates what helped its reader; do not assume its headings suit every task. Reusable examples
 must be fictional. Another project's information shared in conversation is not permission to publish it here.

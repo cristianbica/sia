@@ -21,9 +21,10 @@ skills. Use the testing skill to select checks and decide when verification is s
 ## Planning
 
 Planning is read-only except when saving a plan file. Understand the affected code before proposing how to change it.
-Ground the approach in repository evidence and resolve or name material unknowns. Use the shared saved-plan support
-for writing guidance. Present the plan and wait for approval before implementation. A clear approval authorizes its
-work; ask again only if its boundary changes.
+Ground the approach in repository evidence and resolve material design questions before requesting approval. Load
+the shared saved-plan support for writing guidance for both inline and saved plans. Show the concrete use and result,
+then the implementation approach; a scope checklist alone is insufficient. Present the plan and wait for approval
+before implementation. A clear approval authorizes its work; ask again only if its boundary changes.
 
 Display small, simple plans inline by default; save substantial plans or plans explicitly requested as files.
 Inline plans need approval before edits and cannot resume across conversations. Load saved-plan support when saving

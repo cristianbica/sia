@@ -66,6 +66,54 @@ Assume a fictional application already has a book catalog, a book picker, and se
 Here the user needs to understand the feature before assessing the work. The storage decision includes its reason.
 A full schema or mockup would add little to this particular decision; a task with a disputed schema could need one.
 
+### A configuration and command change
+
+Assume a fictional gallery has a reusable `resize` processor. `config/gallery.yaml` selects processors,
+`gallery/selection.py` resolves them, `gallery/runner.py` creates each processor, and `gallery/report.py` writes output.
+The request is to run that processor twice with different sizes and output names through a named job.
+
+A plan that says “introduce ordered jobs with isolated options, preserve processor identity, update selection and
+reporting, test precedence and compatibility” repeats requirements. The reader still cannot configure or invoke it.
+Instead, make the proposal visible:
+
+> Add a `previews` job containing two uses of `resize`. Each entry names its own output and supplies its width:
+
+```yaml
+default_job: previews
+jobs:
+  previews:
+    - id: small
+      processor: resize
+      options:
+        width: 160
+    - id: wide
+      processor: resize
+      options:
+        width: 960
+```
+
+> The proposed commands are:
+
+```sh
+./gallery render photo.png                  # Run the default previews job.
+./gallery render photo.png --job previews   # Select it explicitly.
+```
+
+> Both commands run `small` then `wide`, writing `out/previews/small.png` and `out/previews/wide.png`.
+> Each entry gets a fresh processor with defaults followed by its options, so the first width cannot leak into the
+> second. This proposal uses the entry ID as the filename; `resize` still identifies the processor to load.
+>
+> In `gallery/selection.py`, resolve the selected job into ordered entries. In `gallery/runner.py`, construct one
+> processor per entry and apply its options. Pass the job and entry IDs to `gallery/report.py` for output naming.
+> Update the CLI in `gallery/cli.py` to forward the job choice, and document the configuration in `config/gallery.yaml`.
+>
+> Check the two output dimensions and filenames, execution order, isolation between entries, default and explicit
+> selection, and an unknown job error. Existing processor-only configurations must still render as before.
+
+This is a proposed interface, not evidence that the commands already work. The example, explanation, and code changes
+belong in the saved plan itself. Approval metadata cannot replace them. The paths and values here are fictional;
+actual plans must use verified repository evidence.
+
 ### A change where order matters
 
 Assume a fictional exporter currently loads every row into memory. Its file format must stay compatible.
@@ -84,11 +132,15 @@ Assume a fictional exporter currently loads every row into memory. Its file form
 > whether the file represents a snapshot before choosing the batching query.
 
 Order helps explain the compatibility check and failure handling. The unresolved question remains visible because
-it can change the implementation. Adding generic rollback and risk sections would not resolve it.
+it can change the implementation. This is a draft for clarification, not a request for implementation approval.
+Resolve that question and complete the proposal before asking to build. Adding generic rollback and risk sections
+would not resolve it.
 
 ### Review the meaning
 
 - Can the reader explain the proposed approach without reconstructing the investigation?
+- Can they follow a representative input through its invocation to the proposed result?
+- Does the saved plan retain the useful examples and decisions already presented in chat?
 - Do the details explain decisions, behavior, or necessary work?
 - Are important assumptions and unresolved questions visible?
 - Does each check establish an outcome that matters?

@@ -81,6 +81,11 @@ determine the format. Honor explicit inline-only requests. Creating a plan is al
 and other implementation groundwork are not. Inline plans require approval too and cannot resume across conversations.
 A clarification answer or resume is not approval of an unpresented or pending plan.
 
+Use the shared plan-writing guidance for both inline and saved plans. Show the concrete use and result of the change,
+then the implementation approach and checks. Saved plans must carry the useful proposal from chat, including the
+examples and decisions needed to understand it independently. Resolve material design questions before asking for
+implementation approval; scope and approval bookkeeping alone do not make a plan ready.
+
 This boundary applies to CUSTOM workflows too; their own steps may add requirements but cannot silently remove it.
 Plan format does not change the approval gate. Explicit unattended mode or an explicit instruction to skip planning
 may bypass the default within the original scope, but cannot silently approve a pending plan. Read-only requests and

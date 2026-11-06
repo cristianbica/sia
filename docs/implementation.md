@@ -14,6 +14,9 @@ Operation names, aliases, CUSTOM resolution, exact activation, and saved-plan co
 
 The contract suite checks selected planning, ownership, read-only, handoff, and skill-loading instructions in source.
 It includes deliberately weakened source variants, so removing the approval boundary or required review skill fails.
+Plan-writing contracts also protect concrete interface examples, carrying chat proposals into saved plans, resolving
+design questions before approval, and loading writing guidance for inline plans. Each requirement is removed in turn
+to check that the guard detects its absence.
 These are textual guardrails: wording changes may require reviewed pattern updates, and matching text cannot prove
 that a model will comply. Offline host shims separately validate trace handling and continuation.
 
@@ -41,3 +44,8 @@ A hidden oracle must not be copied into the candidate workspace. Do not rank sol
 This does not replace the local custom benchmark framework. No live coding comparison is part of the normal
 verifier or authorized merely by installing this change. Practical benefit remains unverified until real outputs
 have been reviewed.
+
+The fictional [concrete-plan scenario](../tests/behavior/workflows/fixtures/concrete-plan.md) separately targets plans
+that repeat requirements while omitting configuration, invocation, output examples, or an implementation approach.
+Review the saved artifact independently of chat and record follow-up corrections. Its authored reference and failure
+example are evaluation aids, not live results or a mandatory document layout.

@@ -16,8 +16,14 @@ A plan explains the approach, the concrete work, and how success will be checked
 task and the user's preferences. A short fix may need one explanation; a migration may need ordered stages. There
 are no prescribed section names. The shared saved-plan support owns the writing guidance.
 
-Use short sentences and focused bullets. Connect decisions to their reasons and include examples when they clarify
-the design. Preserve important requirements without repeating them. See [writing examples](writing-examples.md) for
+Show the concrete use and result before explaining the implementation. For changed configuration, commands, APIs,
+or output, include representative examples of the affected interfaces and explain their consequences. Carry useful
+examples and settled decisions from chat into the saved plan; it must be understandable without the conversation.
+Resolve material design questions before asking for implementation approval. A scope checklist cannot substitute
+for the proposal. These requirements apply to inline and saved plans without prescribing section names.
+
+Use short sentences and focused bullets. Connect decisions to their reasons and preserve important requirements
+without repeating them. See [writing examples](writing-examples.md) for
 different ways to explain different tasks. Reusable examples must be fictional; information from another project
 shared in conversation is not permission to publish it.
 
