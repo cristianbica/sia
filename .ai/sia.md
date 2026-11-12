@@ -81,6 +81,13 @@ determine the format. Honor explicit inline-only requests. Creating a plan is al
 and other implementation groundwork are not. Inline plans require approval too and cannot resume across conversations.
 A clarification answer or resume is not approval of an unpresented or pending plan.
 
+Starting a change operation requests planning, not implementation approval. `Sia implement ...`, `Sia fix ...`, and
+their aliases enter the selected workflow's discovery and planning steps. After an investigation, `Sia implement the
+above` starts delivery planning; the investigation's recommendations are input, not an approved delivery plan.
+Present the finalized inline or saved plan, then wait for a subsequent user reply approving that plan before work.
+Never use the operation invocation to approve a plan created or finalized afterward, or mark it approved yourself.
+An approval reply within the active delivery task authorizes the presented plan without restarting planning.
+
 Use the shared plan-writing guidance for both inline and saved plans. Show the concrete use and result of the change,
 then the implementation approach and checks. Saved plans must carry the useful proposal from chat, including the
 examples and decisions needed to understand it independently. Resolve material design questions before asking for

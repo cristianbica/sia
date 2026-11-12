@@ -86,8 +86,12 @@ For a retry bug, the reason is essential:
 ## Approval and saved state
 
 Present the plan and wait for approval before any non-plan change. A clarification answer, resume alone, or an earlier
-generic imperative
-is not approval. A clear reply referring to the presented plan is sufficient; do not ask again for routine steps.
+generic imperative is not approval. A change-operation invocation starts planning, including `Sia implement the above`
+after an investigation; it cannot approve a plan created or finalized afterward. Create new interactive saved plans
+with `pending-approval` status and no approval marker. Present the finalized plan and wait for a subsequent user reply
+approving it before recording approval or changing status to `build`. Never manufacture approval from your own summary
+or interpretation of the earlier invocation. A clear reply referring to the presented plan is sufficient; do not ask
+again for routine steps. Explicit unattended and skip-planning exceptions follow the protocol's scoped rules.
 Compute lowercase SHA-256 of UTF-8 content between the unique approval markers, excluding the markers: normalize CRLF
 and CR to LF, preserve all other whitespace. Append `<!-- sia:approved <sha256> -->` only after approval; set status to
 `build`. Changing the approved boundary removes that approval and returns to `pending-approval` before further work.

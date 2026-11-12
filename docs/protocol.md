@@ -18,6 +18,11 @@ Explicit user exceptions retain
 their scope; read-only requests and session directives need no plan. Existing pending approvals remain binding.
 Saved-plan and worker support load only when needed. Exact plan-content authorization applies in all modes.
 
+`Sia implement ...`, `Sia fix ...`, and their aliases start discovery and planning. For example, `Sia implement the
+above` after an investigation uses its recommendations to prepare the delivery plan. Present the finalized plan and
+wait for a subsequent user approval before implementation; the invocation cannot approve a plan finalized afterward.
+An approval reply in the active delivery task proceeds with the presented plan without restarting planning.
+
 The eight live smoke prompts check activation, help, context loading, reload, and exact-plan isolation. They are
 separate from the offline verifier; see [host testing](../tests/hosts/README.md). Plain text instructions are not a
 runtime permission boundary, and passing string checks is not evidence of model compliance.

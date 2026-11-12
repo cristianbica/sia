@@ -8,6 +8,10 @@ description: Make the requested code change, check it, and explain the result.
 Follow the protocol's shared planning boundary: inspect relevant code and callers, resolve material scope questions,
 then present a plan in the format selected by the protocol. Wait for approval before implementation edits.
 
+An invocation such as `Sia implement the above` or `Sia fix this` starts this workflow's planning steps, even after an
+investigation recommended an approach. Resolve its remaining material decisions and present the finalized plan;
+wait for a subsequent approval reply. Do not reinterpret the invocation as approval while preparing that plan.
+
 After approval, use existing patterns where they fit, make the change, run suitable checks, and review the result
 against the user's request. Continue through in-scope fixes without another approval. Ask when new evidence materially
 changes the agreed scope or an action requires permission. No route classification, receipt, or worker is required.

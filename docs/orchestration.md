@@ -12,6 +12,11 @@ Read-only requests and session directives need no plan. Preserve unrelated chang
 
 ## Planning
 
+Starting a change operation starts planning, including `Sia implement the above` after an investigation. Investigation
+recommendations supply evidence and possible approaches; they do not authorize implementation. Resolve material
+decisions, present the finalized delivery plan, and wait for a subsequent approval reply. New interactive saved plans
+start pending approval without an approval marker. Do not retroactively approve them using the operation invocation.
+
 A plan explains the approach, the concrete work, and how success will be checked. Choose the organization to suit the
 task and the user's preferences. A short fix may need one explanation; a migration may need ordered stages. There
 are no prescribed section names. The shared saved-plan support owns the writing guidance.

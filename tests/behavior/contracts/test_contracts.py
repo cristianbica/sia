@@ -26,6 +26,26 @@ CONTRACTS = {
         r'display small, simple plans inline by default',
         r'inline plans need approval before edits',
     ]),
+    'operation entry approval': ('sia.md', [
+        r'starting a change operation requests planning, not implementation approval',
+        r'sia implement.*sia fix.*aliases enter.*discovery and planning',
+        r'after an investigation.*sia implement the above.*starts delivery planning',
+        r'present the finalized inline or saved plan.*subsequent user reply approving that plan before work',
+        r'never use the operation invocation to approve a plan created or finalized afterward',
+        r'approval reply within the active delivery task.*without restarting planning',
+    ]),
+    'delivery entry approval': ('workflows/sia/delivery.md', [
+        r'invocation such as sia implement the above or sia fix this starts.*planning steps',
+        r'wait for a subsequent approval reply',
+        r'do not reinterpret the invocation as approval',
+    ]),
+    'new saved plan approval': ('workflows/sia/delivery/standard.md', [
+        r'change.operation invocation starts planning.*after an investigation',
+        r'cannot approve a plan created or finalized afterward',
+        r'create new interactive saved plans with pending-approval status and no approval marker',
+        r'wait for a subsequent user reply approving it before recording approval or changing status to build',
+        r'never manufacture approval from your own summary or interpretation of the earlier invocation',
+    ]),
     'shared plan substance': ('sia.md', [
         r'plan.writing guidance for both inline and saved plans',
         r'show the concrete use and result.*implementation approach and checks',
@@ -163,7 +183,8 @@ class Contracts(unittest.TestCase):
 
     def test_plan_guards_are_individually_required(self):
         for name in ('plan format', 'delivery plan format', 'shared plan substance', 'delivery writing guidance',
-                     'concrete plan', 'self-contained plan'):
+                     'concrete plan', 'self-contained plan', 'operation entry approval', 'delivery entry approval',
+                     'new saved plan approval'):
             path, patterns = CONTRACTS[name]
             body = ' '.join(self.files[path].lower().replace('`', '').split())
             for pattern in patterns:
