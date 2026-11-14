@@ -106,11 +106,12 @@ return `UNAVAILABLE`, never a pass.
 
 Legacy CLI case names `standard`, `trivial`, and `lightweight` remain for harness compatibility, not delivery routes.
 Seventeen cases cover implement, fix, aliases, inferred requests, documentation, definition creation, small changes,
-Forge saved and explicit inline planning, clarification, pending-plan resume, approved continuation, verification
-stopping, read-only requests, and explicit unattended or skipped planning. Both host shims exercise these cases.
+Forge direct implementation and explicit inline planning, clarification, pending-plan resume, approved continuation,
+verification stopping, read-only requests, and explicit unattended or skipped planning. Both host shims exercise
+these cases.
 The continuation and passing-checks cases use a module and existing unittest fixture with two required behaviors.
 
-All cases use at most 35 model turns per host, sequentially, with a default 90-second timeout and 1 MiB
+All cases use at most 34 model turns per host, sequentially, with a default 90-second timeout and 1 MiB
 stdout/stderr limit per turn. Claude additionally defaults to a $1 per-turn CLI budget (`--claude-budget`); Codex has
 no monetary cap. Requested model/effort accept `SIA_CODEX_MODEL`, `SIA_CLAUDE_MODEL`, and the corresponding
 `SIA_CODEX_REASONING_EFFORT` / `SIA_CLAUDE_REASONING_EFFORT` environment defaults. Actual model/usage/cost are recorded

@@ -19,14 +19,14 @@ CASES = ('standard', 'trivial', 'lightweight', 'forge-direct', 'forge-plan', 'un
 CASES += ('continuation', 'passing-checks', 'pending-resume', 'fix', 'fix-alias', 'inferred',
           'document', 'definition', 'clarification', 'read-only', 'skip-plan')
 STANDARD_CASES = ('standard', 'trivial', 'lightweight', 'continuation', 'passing-checks', 'pending-resume',
-                  'fix', 'fix-alias', 'inferred', 'document', 'definition', 'clarification', 'forge-direct')
+                  'fix', 'fix-alias', 'inferred', 'document', 'definition', 'clarification')
 UNRELATED_PLAN = '.ai/plans/1999-01-01-01-unrelated.md'
 TASK = 'Change app.py greeting from Hello to Welcome; preserve its function and argument. Check with python3 -B -c "from app import greet; assert greet(\'Ada\') == \'Welcome Ada\'".'
 PROMPTS = {
     'standard': 'Sia implement ' + TASK + ' Treat greet as a public API: update its documented greeting contract in app.py.',
     'trivial': 'Sia implement Correct only the typo Welcomme to Welcome in README.md.',
     'lightweight': 'Sia build ' + TASK + ' This is an internal helper with no other consumers or public API.',
-    'forge-direct': 'Sia do: ' + TASK,
+    'forge-direct': 'Implement this: ' + TASK,
     'forge-plan': 'Sia inline plan ' + TASK,
     'unattended': 'Sia unattended implement ' + TASK + ' Authorization is limited to local fixture code, tests, and plan; no external actions.',
 }
@@ -370,7 +370,7 @@ def check_result(repo, case, before):
         result = subprocess.run(['python3', '-B', '-c', "from app import greet; assert greet('Ada') == 'Welcome Ada'"],
                                 cwd=repo, capture_output=True, timeout=10)
         assert result.returncode == 0, 'greeting behavior check failed'
-    if case in ('forge-plan', 'unattended', 'skip-plan'):
+    if case in ('forge-direct', 'forge-plan', 'unattended', 'skip-plan'):
         assert not plan_files(repo), 'planless route created plan artifact'
 
 

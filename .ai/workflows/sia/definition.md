@@ -10,7 +10,9 @@ this workflow owns shared validation and writes. Shipped `sia/` definitions and 
 
 Follow the protocol's shared planning and approval boundary before writing definitions or catalog entries. Use
 [shared plan support](delivery/standard.md) with this workflow and the actual operation. Perform the checks below
-read-only to prepare the plan, then apply and validate approved changes.
+read-only to prepare the plan when required, then apply and validate authorized changes. Forge imperative requests
+implement directly without a plan or separate approval unless planning was requested or an existing pending plan
+requires approval.
 
 Before writing, resolve the requested category and check its index and direct project paths:
 

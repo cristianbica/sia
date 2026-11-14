@@ -82,7 +82,7 @@ plan = (f'---\noperation: {operation}\nworkflow: {workflow}\nskills: [repository
         '# Greeting\n\n<!-- sia:approval:start -->' + block + '<!-- sia:approval:end -->\n\n')
 case = Path.cwd().name
 standard = case in ('standard', 'trivial', 'lightweight', 'continuation', 'passing-checks', 'pending-resume',
-    'fix', 'fix-alias', 'inferred', 'document', 'definition', 'clarification', 'forge-direct')
+    'fix', 'fix-alias', 'inferred', 'document', 'definition', 'clarification')
 if case == 'read-only':
     if fault == 'premature-write':
         write('app.py', 'broken\n')
@@ -91,6 +91,9 @@ elif case == 'clarification' and prompt.startswith('Sia implement'):
     say('Which greeting should greet return?')
 elif prompt == 'Sia forge on':
     say('Forge enabled.')
+elif case == 'forge-direct' and fault == 'unrequested-plan':
+    write(plan_path, plan + '<!-- sia:status pending-approval -->\n')
+    say('Please approve this unrequested plan.')
 elif (standard and not prompt.startswith('Sia approved')) or 'Sia inline plan ' in prompt:
     if fault == 'unauthorized-read':
         emit('item.started', item={'type': 'file_read', 'path': '.ai/plans/1999-01-01-01-unrelated.md'})

@@ -5,14 +5,19 @@ description: Make the requested code change, check it, and explain the result.
 
 # Delivery
 
+In Forge, imperative change requests proceed directly through discovery, implementation, review, and checks without
+a plan or separate approval. Explicit planning requests and existing pending plans keep their approval requirements.
+Apply the remaining planning steps when the protocol requires a plan.
+
 Follow the protocol's shared planning boundary: inspect relevant code and callers, resolve material scope questions,
 then present a plan in the format selected by the protocol. Wait for approval before implementation edits.
 
-An invocation such as `Sia implement the above` or `Sia fix this` starts this workflow's planning steps, even after an
-investigation recommended an approach. Resolve its remaining material decisions and present the finalized plan;
-wait for a subsequent approval reply. Do not reinterpret the invocation as approval while preparing that plan.
+Outside Forge, an invocation such as `Sia implement the above` or `Sia fix this` starts this workflow's planning steps,
+even after an investigation recommended an approach. Resolve its remaining material decisions and present the
+finalized plan; wait for a subsequent approval reply. Do not reinterpret the invocation as approval while preparing
+that plan.
 
-After approval, use existing patterns where they fit, make the change, run suitable checks, and review the result
+When authorized, use existing patterns where they fit, make the change, run suitable checks, and review the result
 against the user's request. Continue through in-scope fixes without another approval. Ask when new evidence materially
 changes the agreed scope or an action requires permission. No route classification, receipt, or worker is required.
 

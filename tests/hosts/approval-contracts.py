@@ -76,11 +76,18 @@ class ApprovalHarness(unittest.TestCase):
                 self.exercise(fault)
 
     def test_default_implementation_requires_saved_approval(self):
-        for case in ('standard', 'trivial', 'lightweight', 'fix', 'fix-alias', 'inferred', 'document', 'definition', 'forge-direct'):
+        for case in ('standard', 'trivial', 'lightweight', 'fix', 'fix-alias', 'inferred', 'document', 'definition'):
             self.assertNotIn('plan', runner.PROMPTS[case].lower())
             for fault in ('premature-write', 'reverted-attempt', 'missing-plan'):
                 with self.subTest(case=case, fault=fault):
                     self.exercise(fault, case=case)
+
+    def test_forge_planning_is_opt_in(self):
+        for host in ('codex', 'claude'):
+            with self.subTest(host=host):
+                self.exercise(case='forge-direct', expected=0, host=host)
+                self.exercise('unrequested-plan', case='forge-direct', host=host)
+                self.exercise('premature-write', case='forge-plan', host=host)
 
     def test_clarification_and_non_source_edits(self):
         for host in ('codex', 'claude'):

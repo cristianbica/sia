@@ -11,10 +11,22 @@ BASE = 'src/managed/.ai/'
 # keeping these tests green never establishes that a model follows the instructions.
 CONTRACTS = {
     'shared approval': ('sia.md', [
-        r'every request.*requires a plan and approval before changes',
-        r'named operations.*aliases.*inferred requests.*documentation.*definitions.*forge',
+        r'outside forge, every request.*requires a plan and approval before changes',
+        r'named operations.*aliases.*inferred requests.*documentation.*definitions',
         r'clarification.*resume.*not approval',
         r'boundary applies to custom workflows',
+    ]),
+    'forge direct implementation': ('sia.md', [
+        r'with forge on, imperative change requests authorize implementation.*without a plan or separate approval',
+        r'planning in forge is opt.in',
+        r'questions remain read.only',
+        r'existing pending plans still require approval',
+    ]),
+    'forge opt-in planning': ('workflows/sia/delivery/forge.md', [
+        r'imperative change requests authorize implementation.*without a plan or separate approval',
+        r'planning is opt.in.*explicit planning request.*waits for approval',
+        r'questions about feasibility, alternatives, or earlier choices do not authorize implementation',
+        r'imperative request does not silently approve or bypass an existing pending plan',
     ]),
     'plan format': ('sia.md', [
         r'display small, simple plans inline by default',
@@ -182,7 +194,8 @@ class Contracts(unittest.TestCase):
                 self.assertIn(name, failures(files))
 
     def test_plan_guards_are_individually_required(self):
-        for name in ('plan format', 'delivery plan format', 'shared plan substance', 'delivery writing guidance',
+        for name in ('forge direct implementation', 'forge opt-in planning', 'plan format', 'delivery plan format',
+                     'shared plan substance', 'delivery writing guidance',
                      'concrete plan', 'self-contained plan', 'operation entry approval', 'delivery entry approval',
                      'new saved plan approval'):
             path, patterns = CONTRACTS[name]

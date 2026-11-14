@@ -1,5 +1,8 @@
 # Saved plans and resume
 
+Forge imperative requests do not use this lifecycle unless the user requests planning or resumes an existing plan.
+Existing pending plans retain their approval requirements in Forge.
+
 Use this shared plan lifecycle for saved change plans across all workflows. Small, simple plans are displayed inline
 by default under the protocol; do not create a file or saved-state metadata for an inline plan. Both formats require
 approval before implementation. Apply the writing guidance below to either format. Resolve the actual operation,

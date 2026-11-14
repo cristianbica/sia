@@ -33,7 +33,8 @@ documentation, and deterministic verification. The root `README.md` is the publi
   zero-padded sequence so plan directories sort chronologically.
 - **Inline planning:** small, simple plans are displayed inline by default and require approval before changes;
   substantial plans and plans explicitly requested as files are saved. Inline plans cannot resume with `Sia resume`.
-- **Forge mode:** `Sia forge on` enables conversation-scoped follow-ups using the same planning and approval defaults;
+- **Forge mode:** `Sia forge on` enables direct implementation for imperative follow-ups; planning is opt-in,
+  requested plans require approval, and questions remain read-only;
   `Sia forge off`, `Sia stop`, `Sia reload`, or a new
   conversation ends it.
 - **Installer ownership:** Sia replaces only its reserved paths and marked blocks; project content survives refreshes.

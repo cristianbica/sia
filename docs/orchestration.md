@@ -4,15 +4,16 @@ The [delivery workflow](../src/managed/.ai/workflows/sia/delivery.md) owns ordin
 relevant code, implements the request, checks the result, and continues through in-scope corrections. There are no
 ordinary trivial/lightweight/standard routes, receipts, phase artifacts, or mandatory handoffs.
 
-Every change request requires discovery, clarification of material requirements, an inline or saved plan, and approval
-before
-edits. This applies across operations, aliases, inferred requests, and CUSTOM workflows. Explicit unattended mode or
+Outside Forge, change requests require discovery, clarification of material requirements, an inline or saved plan,
+and approval before edits. This applies across operations, aliases, inferred requests, and CUSTOM workflows.
+Explicit unattended mode or
 an instruction to skip planning may select another behavior; neither silently approves an existing pending plan.
 Read-only requests and session directives need no plan. Preserve unrelated changes and host permissions.
 
 ## Planning
 
-Starting a change operation starts planning, including `Sia implement the above` after an investigation. Investigation
+Outside Forge, starting a change operation starts planning, including `Sia implement the above` after an investigation.
+Investigation
 recommendations supply evidence and possible approaches; they do not authorize implementation. Resolve material
 decisions, present the finalized delivery plan, and wait for a subsequent approval reply. New interactive saved plans
 start pending approval without an approval marker. Do not retroactively approve them using the operation invocation.
@@ -60,8 +61,9 @@ An unavailable required check leaves a blocked requirement; report it rather tha
 
 ## Forge mode
 
-`Sia forge on` enables continuous follow-ups. Change requests, including `do:`, use the same inline-or-saved planning
-defaults and require approval. Explicit `inline plan` selects an unsaved plan while retaining approval. Saved plans
+`Sia forge on` enables continuous follow-ups. Imperative requests, including `do:`, implement directly without a plan
+or separate approval. Planning is opt-in through an explicit request, `plan:`, or `inline plan`; requested plans wait
+for approval. Questions remain read-only, and pending plans cannot be silently approved or bypassed. Saved plans
 can resume without turning Forge off; inline-only work cannot resume across sessions. Read-only requests run directly.
 
 Operation names and aliases stay within Forge. Reserved directives and explicit unattended invocations keep their

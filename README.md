@@ -46,8 +46,9 @@ Sia investigate intermittent webhook failures
 Sia investigate the checkout design and save an implementation plan
 ```
 
-Every change request follows the same sequence: inspect, clarify, present a plan, wait for your approval, then change
-and verify. This includes `implement`, `fix`, aliases, natural-language requests, docs, definitions, and one-line edits.
+Outside Forge, every change request follows the same sequence: inspect, clarify, present a plan, wait for your
+approval, then change and verify. This includes `implement`, `fix`, aliases, natural-language requests, docs,
+definitions, and one-line edits.
 Read-only questions and session directives need no plan. Explicit unattended mode or an instruction to skip planning
 can select another behavior; existing pending approvals remain binding.
 
@@ -67,9 +68,10 @@ Sia resume .ai/plans/2026-09-13-01-subscription-pausing.md
 Only that exact plan is authorized for reading. Resume preserves its status and approval; it does not approve a draft.
 Existing compact and valid legacy formats remain supported. Sia does not search unrelated historical plans.
 
-For a continuous session, `Sia forge on` makes the prefix optional for follow-ups. Change requests, including `do:`,
-use the same inline-or-saved planning defaults and require approval. `inline plan` explicitly selects an unsaved plan,
-also requiring approval.
+For a continuous session, `Sia forge on` makes the prefix optional for follow-ups. Imperative requests such as
+`do this`, `implement that`, `change that`, and `do:` implement directly without a plan or separate approval.
+Planning is opt-in: ask for a plan, use `plan:`, or use `inline plan` for an unsaved plan. Requested plans require
+approval before implementation. Questions remain read-only, and existing pending plans still require approval.
 Saved plans can resume across sessions; inline-only tasks cannot. `Sia forge off` ends the continuous session.
 
 `Sia unattended implement <request>` works within the original request without asking for additional authority.

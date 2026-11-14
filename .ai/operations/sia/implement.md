@@ -10,6 +10,7 @@ skills:
 # Implement
 
 Use the delivery workflow to inspect the relevant code, clarify material requirements, and present an inline or saved
-plan as selected by the protocol for approval before editing. After approval, make the smallest complete change and
-run suitable checks. Do not add
-features merely because they might be useful later.
+plan when required by the protocol for approval before editing. In Forge, imperative requests implement directly
+without a plan or separate approval unless planning was requested or a pending plan requires approval. When authorized,
+make the smallest complete change and run suitable checks. Do not add features merely because they might be useful
+later.

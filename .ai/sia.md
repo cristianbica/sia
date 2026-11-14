@@ -70,10 +70,14 @@ instructions or explicit user choices. Do not load rules for help, docs/skills l
 
 ## Working together
 
-Every request to change files or external state requires a plan and approval before changes. This applies to
-named operations, aliases, inferred requests, small edits, documentation, definitions, catalog repairs, and Forge.
-Inspect relevant evidence and resolve material requirements first. Display small, simple plans inline by default:
-a bounded change with a clear approach, no unresolved material decisions, and straightforward verification needs no
+Outside Forge, every request to change files or external state requires a plan and approval before changes. This
+applies to named operations, aliases, inferred requests, small edits, documentation, definitions, and catalog repairs.
+With Forge on, imperative change requests authorize implementation within their scope without a plan or separate
+approval. Planning in Forge is opt-in: an explicit planning request uses the planning and approval rules below.
+Questions remain read-only; enabling Forge alone authorizes no edits. Existing pending plans still require approval.
+Inspect relevant evidence and resolve material requirements first. When planning is required, display small, simple
+plans inline by default: a bounded change with a clear approach, no unresolved material decisions, and
+straightforward verification needs no
 plan file. Save substantial plans or plans explicitly requested as files using [saved-plan
 support](workflows/sia/delivery/standard.md) with the actual operation and workflow. Substantial work includes
 multiple dependent stages, consequential design choices, or migration and recovery steps. File count alone does not
@@ -81,9 +85,10 @@ determine the format. Honor explicit inline-only requests. Creating a plan is al
 and other implementation groundwork are not. Inline plans require approval too and cannot resume across conversations.
 A clarification answer or resume is not approval of an unpresented or pending plan.
 
-Starting a change operation requests planning, not implementation approval. `Sia implement ...`, `Sia fix ...`, and
-their aliases enter the selected workflow's discovery and planning steps. After an investigation, `Sia implement the
-above` starts delivery planning; the investigation's recommendations are input, not an approved delivery plan.
+Outside Forge, starting a change operation requests planning, not implementation approval.
+`Sia implement ...`, `Sia fix ...`, and their aliases enter the selected workflow's discovery and planning steps.
+After an investigation, `Sia implement the above` starts delivery planning; the investigation's recommendations are
+input, not an approved delivery plan.
 Present the finalized inline or saved plan, then wait for a subsequent user reply approving that plan before work.
 Never use the operation invocation to approve a plan created or finalized afterward, or mark it approved yourself.
 An approval reply within the active delivery task authorizes the presented plan without restarting planning.
@@ -94,7 +99,8 @@ examples and decisions needed to understand it independently. Resolve material d
 implementation approval; scope and approval bookkeeping alone do not make a plan ready.
 
 This boundary applies to CUSTOM workflows too; their own steps may add requirements but cannot silently remove it.
-Plan format does not change the approval gate. Explicit unattended mode or an explicit instruction to skip planning
+Plan format does not change the approval gate for requested plans. Forge imperative requests follow the direct
+implementation rule above. Explicit unattended mode or an explicit instruction to skip planning
 may bypass the default within the original scope, but cannot silently approve a pending plan. Read-only requests and
 session/context directives need no plan; their stated contracts apply.
 
