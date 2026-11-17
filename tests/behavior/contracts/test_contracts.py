@@ -11,45 +11,41 @@ BASE = 'src/managed/.ai/'
 # keeping these tests green never establishes that a model follows the instructions.
 CONTRACTS = {
     'shared approval': ('sia.md', [
-        r'outside forge, every request.*requires a plan and approval before changes',
-        r'named operations.*aliases.*inferred requests.*documentation.*definitions',
-        r'clarification.*resume.*not approval',
-        r'boundary applies to custom workflows',
+        r'by default, every request to change files or external state requires a plan and approval',
+        r'including inferred requests, aliases, and custom workflows',
+        r'read.only requests and session directives need no plan',
+        r'before approval, only discovery and plan preparation are authorized',
+        r'resume and clarification alone do not approve a plan',
     ]),
-    'forge direct implementation': ('sia.md', [
-        r'with forge on, imperative change requests authorize implementation.*without a plan or separate approval',
-        r'planning in forge is opt.in',
-        r'questions remain read.only',
-        r'existing pending plans still require approval',
+    'mode exceptions': ('sia.md', [
+        r'follow the loaded forge rules when forge is on',
+        r'explicit unattended mode or an explicit instruction to skip planning may bypass the default within the original scope',
+        r'these exceptions cannot approve or bypass a pending plan',
+        r'an explicit planning.only request stays in planning',
     ]),
     'forge opt-in planning': ('workflows/sia/delivery/forge.md', [
         r'imperative change requests authorize implementation.*without a plan or separate approval',
         r'planning is opt.in.*explicit planning request.*waits for approval',
+        r'enabling forge alone authorizes no edits',
         r'questions about feasibility, alternatives, or earlier choices do not authorize implementation',
         r'imperative request does not silently approve or bypass an existing pending plan',
     ]),
     'plan format': ('sia.md', [
         r'display small, simple plans inline by default',
-        r'save substantial plans or plans explicitly requested as files',
-        r'inline plans require approval too and cannot resume across conversations',
-        r'file count alone does not determine the format',
+        r'for substantial work.*or when a plan file is requested, load the \[saved-plan guidance\]',
+        r'inline plans cannot resume across conversations',
+        r'honor explicit inline.only requests',
+        r'judge complexity by the work involved, not file count',
     ]),
-    'delivery plan format': ('workflows/sia/delivery.md', [
-        r'display small, simple plans inline by default',
-        r'inline plans need approval before edits',
+    'delivery follows shared approval': ('workflows/sia/delivery.md', [
+        r'follow the protocol.s change approval rules',
+        r'using its inline plan guidance or loading saved.plan support as directed',
+        r'once authorized, implement, check, and review the change',
     ]),
     'operation entry approval': ('sia.md', [
-        r'starting a change operation requests planning, not implementation approval',
-        r'sia implement.*sia fix.*aliases enter.*discovery and planning',
-        r'after an investigation.*sia implement the above.*starts delivery planning',
-        r'present the finalized inline or saved plan.*subsequent user reply approving that plan before work',
-        r'never use the operation invocation to approve a plan created or finalized afterward',
-        r'approval reply within the active delivery task.*without restarting planning',
-    ]),
-    'delivery entry approval': ('workflows/sia/delivery.md', [
-        r'invocation such as sia implement the above or sia fix this starts.*planning steps',
-        r'wait for a subsequent approval reply',
-        r'do not reinterpret the invocation as approval',
+        r'an invocation such as sia fix this or sia implement the above starts planning, including after an investigation',
+        r'wait for a subsequent user reply approving the presented plan before implementation',
+        r'an approval reply in the active task starts execution of that plan without restarting planning',
     ]),
     'new saved plan approval': ('workflows/sia/delivery/standard.md', [
         r'change.operation invocation starts planning.*after an investigation',
@@ -59,14 +55,8 @@ CONTRACTS = {
         r'never manufacture approval from your own summary or interpretation of the earlier invocation',
     ]),
     'shared plan substance': ('sia.md', [
-        r'for a simple inline plan, show the concrete use and result, where the change belongs, and how to check it',
-        r'for saved plans, load the saved-plan writing guidance',
-        r'carry the useful proposal from chat',
-        r'resolve material design questions before asking for implementation approval',
-    ]),
-    'delivery writing guidance': ('workflows/sia/delivery.md', [
-        r'use the protocol.s guidance for inline plans',
-        r'load saved-plan support when saving a plan',
+        r'show the concrete use and result, where the change belongs, and how to check it',
+        r'inspect evidence, resolve material design questions, and present the finalized plan',
     ]),
     'concrete plan': ('workflows/sia/delivery/standard.md', [
         r'make the proposed result concrete before explaining the work',
@@ -97,9 +87,9 @@ CONTRACTS = {
         r'load it for concrete risks that warrant deeper review, when the user requests deeper review, or when a custom override is selected',
     ]),
     'approved persistence': ('sia.md', [
-        r'before required approval.*prepare the plan, then wait',
         r'after approval.*complete the agreed work without repeated permission requests',
-        r'continue independent authorized work.*question does not block',
+        r'answer side questions and continue independent authorized work',
+        r'material scope changes need renewed approval',
         r'stop when the request is fulfilled',
     ]),
     'completion evidence': ('workflows/sia/delivery.md', [
@@ -195,10 +185,9 @@ class Contracts(unittest.TestCase):
                 self.assertIn(name, failures(files))
 
     def test_plan_guards_are_individually_required(self):
-        for name in ('forge direct implementation', 'forge opt-in planning', 'plan format', 'delivery plan format',
-                     'shared plan substance', 'delivery writing guidance',
-                     'concrete plan', 'self-contained plan', 'operation entry approval', 'delivery entry approval',
-                     'new saved plan approval'):
+        for name in ('shared approval', 'mode exceptions', 'forge opt-in planning', 'plan format',
+                     'delivery follows shared approval', 'shared plan substance', 'concrete plan',
+                     'self-contained plan', 'operation entry approval', 'new saved plan approval'):
             path, patterns = CONTRACTS[name]
             body = ' '.join(self.files[path].lower().replace('`', '').split())
             for pattern in patterns:

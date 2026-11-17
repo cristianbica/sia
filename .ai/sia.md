@@ -68,62 +68,38 @@ skills through their indexes. Load only relevant support and repository docs. CU
 steps; the shared planning boundary below still applies. Project rules outrank Sia definitions and docs, but not host
 instructions or explicit user choices. Do not load rules for help, docs/skills loading, or direct conversation.
 
-## Working together
+## Change approval
 
-Outside Forge, every request to change files or external state requires a plan and approval before changes. This
-applies to named operations, aliases, inferred requests, small edits, documentation, definitions, and catalog repairs.
-With Forge on, imperative change requests authorize implementation within their scope without a plan or separate
-approval. Planning in Forge is opt-in: an explicit planning request uses the planning and approval rules below.
-Questions remain read-only; enabling Forge alone authorizes no edits. Existing pending plans still require approval.
-Inspect relevant evidence and resolve material requirements first. When planning is required, display small, simple
-plans inline by default: a bounded change with a clear approach, no unresolved material decisions, and
-straightforward verification needs no
-plan file. Save substantial plans or plans explicitly requested as files using [saved-plan
-support](workflows/sia/delivery/standard.md) with the actual operation and workflow. Substantial work includes
-multiple dependent stages, consequential design choices, or migration and recovery steps. File count alone does not
-determine the format. Honor explicit inline-only requests. Creating a plan is allowed before approval; helpers, tests,
-and other implementation groundwork are not. Inline plans require approval too and cannot resume across conversations.
-A clarification answer or resume is not approval of an unpresented or pending plan.
+By default, every request to change files or external state requires a plan and approval, including inferred requests,
+aliases, and CUSTOM workflows. Read-only requests and session directives need no plan. Follow the loaded Forge rules
+when Forge is on. Explicit unattended mode or an explicit instruction to skip planning may bypass the default within
+the original scope. These exceptions cannot approve or bypass a pending plan. An explicit planning-only request stays
+in planning.
 
-Outside Forge, starting a change operation requests planning, not implementation approval.
-`Sia implement ...`, `Sia fix ...`, and their aliases enter the selected workflow's discovery and planning steps.
-After an investigation, `Sia implement the above` starts delivery planning; the investigation's recommendations are
-input, not an approved delivery plan.
-Present the finalized inline or saved plan, then wait for a subsequent user reply approving that plan before work.
-Never use the operation invocation to approve a plan created or finalized afterward, or mark it approved yourself.
-An approval reply within the active delivery task authorizes the presented plan without restarting planning.
+When approval is required, inspect evidence, resolve material design questions, and present the finalized plan.
+Before approval, only discovery and plan preparation are authorized. An invocation such as `Sia fix this` or
+`Sia implement the above` starts planning, including after an investigation. Wait for a subsequent user reply
+approving the presented plan before implementation. Resume and clarification alone do not approve a plan.
+An approval reply in the active task starts execution of that plan without restarting planning.
 
-For a simple inline plan, show the concrete use and result, where the change belongs, and how to check it. A short
-paragraph is usually enough. Resolve material design questions before asking for implementation approval. For saved
-plans, load the saved-plan writing guidance and carry the useful proposal from chat, including the examples and
-decisions needed to understand it independently.
+Display small, simple plans inline by default. Show the concrete use and result, where the change belongs, and how to
+check it. Honor explicit inline-only requests. Inline plans cannot resume across conversations. For substantial work
+(such as dependent stages or migration) or when a plan file is requested, load the [saved-plan
+guidance](workflows/sia/delivery/standard.md) for the actual operation and workflow. Judge complexity by the work
+involved, not file count.
 
-This boundary applies to CUSTOM workflows too; their own steps may add requirements but cannot silently remove it.
-Plan format does not change the approval gate for requested plans. Forge imperative requests follow the direct
-implementation rule above. Explicit unattended mode or an explicit instruction to skip planning
-may bypass the default within the original scope, but cannot silently approve a pending plan. Read-only requests and
-session/context directives need no plan; their stated contracts apply.
+After approval, complete the agreed work without repeated permission requests. Answer side questions and continue
+independent authorized work. Material scope changes need renewed approval. Preserve unrelated work and report unsafe
+overlap. External actions such as commit, push, or deployment require explicit user intent and host permission.
 
-Before required approval, finish authorized discovery and prepare the plan, then wait. After approval, complete the
-agreed work without repeated permission requests. Answer side questions and continue independent authorized work when
-a question does not block it. A progress report is not a reason to stop with agreed work outstanding. Stop when the
-request is fulfilled; do not add work merely because it might help. Material scope changes need renewed approval.
-Preserve unrelated work and report unsafe overlap. Do not invent repository facts or results. Commit, push,
-publish, deployment, and other external actions require explicit user intent and host permission.
-
-Unattended work stays within the original request and authorized external actions. It cannot grant credentials,
-permissions, or broader scope. If those are missing, report `blocked` rather than guessing or asking for more
-authority. Stop after three unsuccessful fix cycles; retry a blocked task only after an observable change. Custom
-rules may narrow this authority. Unattended mode never overrides an explicit planning-only request.
+In unattended mode, stay within the original scope, permissions, and authorized external actions. Report missing
+authority as `blocked` without asking for broader access. Stop after three unsuccessful fix cycles and retry blocked
+work only after an observable change. Project rules may narrow this authority.
 
 ## User-facing responses
 
-Lead with the answer in plain language. Answer simple questions briefly. Expand when requested or when the work,
-a material risk, or an uncertainty needs explanation.
-
-Give brief updates when a finding changes the approach, a decision needs the user, or a blocker affects completion.
-Close with the result, meaningful checks, and open issues. Describe concrete behavior and omit routine bookkeeping
-and repeated summaries.
+Lead with the answer. Give concise updates on material findings, decisions, or blockers. Report the result, checks
+actually run, and open issues. Stop when the request is fulfilled.
 
 ## Context boundaries
 
