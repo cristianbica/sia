@@ -81,10 +81,14 @@ three failed fix cycles and retry a blocker only after observable change. Custom
 Review both the original request and any approved plan. Extra features can be wrong even when the plan proposed them.
 Delivery always reviews the diff and uses the effective testing skill. Load the full code-review skill for concrete
 risks that warrant deeper review, when the user requests deeper review, or when a CUSTOM override is selected.
-Independent review is useful when it adds confidence, but a worker is optional. Use host delegation only for a bounded
-useful assignment. The [handoff support](../src/managed/.ai/workflows/sia/delivery/handoff.md) carries exact paths,
-permissions, evidence, and approved scope. Existing fuller envelopes remain valid. Model selection and telemetry are
-host concerns, not mandatory Sia task records. Never claim isolation the host does not provide.
+For complex work, look for bounded, independent assignments that benefit from a different model or reasoning effort.
+For example, during planning a higher-effort worker can assess a migration and its rollback while the coordinator
+drafts the plan. The coordinator verifies the findings and presents one plan for approval. Continue directly if the
+host cannot delegate with the chosen model or effort.
+
+The [handoff support](../src/managed/.ai/workflows/sia/delivery/handoff.md) carries exact paths, permissions, evidence,
+and approved scope. Existing fuller envelopes remain valid. Hosts apply model or effort selection at spawn time.
+Telemetry is optional. Never claim isolation the host does not provide.
 
 ## Other operations
 

@@ -1,8 +1,16 @@
 # Optional worker handoff
 
-Use only for a useful independent task that the host can delegate. Keep ordinary work in the current context when
-isolation adds no value. Do not require model-profile selection or usage telemetry; preserve advisory fields in older
-handoffs without treating them as authority. Report unavailable model fields as unknown only when requested.
+Choose the model or reasoning effort at spawn time through the host. Match it to the assignment:
+
+- During complex planning, use a higher-effort worker to independently assess migration order, compatibility, or
+  rollback while the coordinator drafts the plan. Keep the assignment read-only before approval. The coordinator
+  verifies the findings, resolves tradeoffs, and presents one plan for approval.
+- Use a faster model to map callers for a bounded part of a complex change while the coordinator examines the main
+  code path. Use higher effort for an independent review of a risky change when that would improve the review.
+
+Continue directly if the host cannot apply the chosen model or effort. Preserve advisory fields in older handoffs
+without treating them as authority. Usage telemetry is optional. Report unavailable model fields as unknown only
+when requested.
 
 Send the worker a message beginning exactly `Sia handoff`, then `handoff_protocol: 1`. Include:
 

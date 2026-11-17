@@ -111,5 +111,8 @@ inspection is allowed solely to allocate a new plan name. Never infer permission
 Reuse loaded context. After compaction preserve the request, corrections, approved scope, execution mode and ceiling,
 exact authorized plan paths, effective definition paths, relevant evidence, checks, and next action. Reload only those
 exact needed files; do not scan catalogs or historical plans to reconstruct missing authorization. If it cannot be
-recovered, stop and ask for the exact plan. Delegate only when useful and supported, using worker support; lack of
-delegation never blocks work.
+recovered, stop and ask for the exact plan.
+
+For complex work, including planning, look for bounded, independent subtasks that benefit from a different model or
+reasoning effort. Delegate them through [worker support](workflows/sia/delivery/handoff.md) when the host permits
+delegation and can apply that choice. Otherwise continue directly.

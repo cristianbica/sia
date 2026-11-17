@@ -133,6 +133,17 @@ CONTRACTS = {
         r'reject missing.*permission.expanding',
         r'cannot coordinate approval or broaden scope',
     ]),
+    'worker selection': ('sia.md', [
+        r'for complex work, including planning, look for bounded, independent subtasks that benefit from a different model or reasoning effort',
+        r'when the host permits delegation and can apply that choice',
+        r'otherwise continue directly',
+    ]),
+    'planning worker': ('workflows/sia/delivery/handoff.md', [
+        r'choose the model or reasoning effort at spawn time through the host',
+        r'during complex planning, use a higher.effort worker to independently assess',
+        r'keep the assignment read.only before approval',
+        r'the coordinator verifies the findings, resolves tradeoffs, and presents one plan for approval',
+    ]),
     'saved approval': ('workflows/sia/delivery/standard.md', [
         r'present the plan and wait for approval before any non.plan change',
         r'append.*sia:approved.*only after approval',
