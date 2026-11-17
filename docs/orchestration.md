@@ -20,7 +20,7 @@ start pending approval without an approval marker. Do not retroactively approve 
 
 A plan explains the approach, the concrete work, and how success will be checked. Choose the organization to suit the
 task and the user's preferences. A short fix may need one explanation; a migration may need ordered stages. There
-are no prescribed section names. The shared saved-plan support owns the writing guidance.
+are no prescribed section names. The protocol gives the inline guidance. Saved plans use the full writing guide.
 
 Show the concrete use and result before explaining the implementation. For changed configuration, commands, APIs,
 or output, include representative examples of the affected interfaces and explain their consequences. Carry useful
@@ -79,7 +79,8 @@ three failed fix cycles and retry a blocker only after observable change. Custom
 ## Review and workers
 
 Review both the original request and any approved plan. Extra features can be wrong even when the plan proposed them.
-Delivery resolves the effective code-review and testing skills before final review, honoring CUSTOM overrides.
+Delivery always reviews the diff and uses the effective testing skill. Load the full code-review skill for concrete
+risks that warrant deeper review, when the user requests deeper review, or when a CUSTOM override is selected.
 Independent review is useful when it adds confidence, but a worker is optional. Use host delegation only for a bounded
 useful assignment. The [handoff support](../src/managed/.ai/workflows/sia/delivery/handoff.md) carries exact paths,
 permissions, evidence, and approved scope. Existing fuller envelopes remain valid. Model selection and telemetry are

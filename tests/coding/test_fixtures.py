@@ -12,9 +12,16 @@ HERE = Path(__file__).resolve().parent
 
 
 class Fixtures(unittest.TestCase):
-    def run_check(self, task, workspace):
-        return subprocess.run([sys.executable, "-B", str(HERE / "evaluate.py"), task, str(workspace)],
-                              capture_output=True, text=True, timeout=10)
+    def run_check(self, task, workspace, *options):
+        return subprocess.run(
+            [sys.executable, "-B", str(HERE / "evaluate.py"), task, str(workspace), *options],
+            capture_output=True, text=True, timeout=10,
+        )
+
+    def add_currency(self, workspace):
+        receipts = workspace / "receipts.py"
+        receipts.write_text(receipts.read_text().replace("    return {", "    receipt = {") +
+            '    if "currency" in order:\n        receipt["currency"] = order["currency"]\n    return receipt\n')
 
     def test_each_task_has_a_real_behavior_gap(self):
         for task in json.loads((HERE / "tasks.json").read_text()):
@@ -29,8 +36,7 @@ class Fixtures(unittest.TestCase):
                 receipts = workspace / "receipts.py"
                 orders = workspace / "orders.py"
                 if task == "currency":
-                    receipts.write_text(receipts.read_text().replace("    return {", "    receipt = {") +
-                        '    if "currency" in order:\n        receipt["currency"] = order["currency"]\n    return receipt\n')
+                    self.add_currency(workspace)
                 elif task == "duplicate":
                     text = orders.read_text()
                     debit = '    stock[order["item"]] -= order["quantity"]\n'
@@ -47,6 +53,37 @@ class Fixtures(unittest.TestCase):
                 existing = subprocess.run([sys.executable, '-B', '-m', 'unittest', 'discover', '-v'],
                                           cwd=workspace, capture_output=True, text=True, timeout=10)
                 self.assertEqual(existing.returncode, 0, existing.stderr)
+
+    def test_scope_flags_extra_edits_even_when_behavior_passes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "work"
+            shutil.copytree(HERE / "workspace", workspace)
+            notes = workspace / "notes.txt"
+            notes.write_text("Pre-existing user notes.\n")
+            subprocess.run(["git", "init", "-q"], cwd=workspace, check=True)
+            subprocess.run(["git", "add", "."], cwd=workspace, check=True)
+            subprocess.run(
+                ["git", "-c", "user.name=Sia fixture", "-c", "user.email=fixture@example.invalid",
+                 "-c", "commit.gpgsign=false", "commit", "-qm", "Fixture baseline"],
+                cwd=workspace, check=True,
+            )
+            self.add_currency(workspace)
+            clean = self.run_check("currency", workspace, "--scope-from", "HEAD")
+            self.assertEqual(clean.returncode, 0, clean.stderr)
+
+            notes.write_text("Unrelated staged edit.\n")
+            subprocess.run(["git", "add", "notes.txt"], cwd=workspace, check=True)
+            notes.write_text("Pre-existing user notes.\n")
+            orders = workspace / "orders.py"
+            orders.write_text(orders.read_text() + "\n# Unrelated cleanup.\n")
+            (workspace / "currency_converter.py").write_text("# Unrequested module.\n")
+
+            result = self.run_check("currency", workspace, "--scope-from", "HEAD")
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("behavior checks passed", result.stdout)
+            self.assertIn("'notes.txt'", result.stderr)
+            self.assertIn("'orders.py'", result.stderr)
+            self.assertIn("'currency_converter.py'", result.stderr)
 
 
 if __name__ == "__main__":

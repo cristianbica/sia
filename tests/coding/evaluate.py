@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
-"""Evaluator stays outside candidate workspaces. No model calls or dependencies."""
+"""Offline evaluator that stays outside candidate workspaces."""
 import argparse
+import os
 from pathlib import Path
+import subprocess
 import sys
+
+EXPECTED_PATHS = {
+    "currency": {"receipts.py", "test_existing.py"},
+    "duplicate": {"orders.py", "test_existing.py"},
+    "sku-plan": {"orders.py", "receipts.py", "test_existing.py"},
+}
 
 
 def evaluate(task, workspace):
@@ -38,10 +46,38 @@ def evaluate(task, workspace):
         raise ValueError(task)
 
 
+def unexpected_paths(task, workspace, base):
+    # Check the index and worktree separately. An unstaged edit can cancel a staged edit.
+    commands = (
+        ["diff", "--cached", "--name-only", "--no-renames", "-z", "--end-of-options", base],
+        ["diff", "--name-only", "--no-renames", "-z"],
+        ["ls-files", "--others", "--exclude-standard", "-z"],
+    )
+    paths = set()
+    for command in commands:
+        output = subprocess.check_output(
+            ["git", *command, "--", ".", ":(exclude,top).ai/plans/**"],
+            cwd=workspace, timeout=10,
+        )
+        paths.update(os.fsdecode(path) for path in output.split(b"\0") if path)
+    return sorted(paths - EXPECTED_PATHS[task])
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("task", choices=("currency", "duplicate", "sku-plan"))
+    parser.add_argument("task", choices=EXPECTED_PATHS)
     parser.add_argument("workspace", type=Path)
+    parser.add_argument("--scope-from", metavar="COMMIT", help="scope baseline after candidate setup")
     args = parser.parse_args()
     evaluate(args.task, args.workspace)
-    print(args.task + ": behavior checks passed; scope and simplicity still need human review")
+    print(f"{args.task}: behavior checks passed")
+    if args.scope_from:
+        outside = unexpected_paths(args.task, args.workspace, args.scope_from)
+        if outside:
+            print("Paths outside the expected scope:", file=sys.stderr)
+            for path in outside:
+                print(f"  {path!r}", file=sys.stderr)
+            sys.exit(1)
+        print("Changed paths fit the fixture; inspect the hunks for unnecessary changes.")
+    else:
+        print("Scope and simplicity still need human review.")

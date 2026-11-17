@@ -17,24 +17,45 @@ check instruction. Use fresh sessions for each task; for `sku-plan`, deliver its
 once its plan has been inspected and captured. A plan response must explain the affected code and approach, not just
 repeat the goal. Verify no source edits happened before approval.
 
-Candidates run `python3 -B -m unittest discover -v` inside their own workspace. After each candidate exits, the
-coordinator runs `python3 -B tests/coding/evaluate.py TASK /absolute/candidate/path` from this Sia checkout. Run
-candidate
-code only in the same approved disposable environment. Keep sibling solutions, evaluator, manifests, and later Git
-history outside candidate access. This document is instructions for the evaluator, not candidate context.
+To measure a change in Sia, use the previous and revised Sia in the two arms instead. Hold client settings and Sia mode
+fixed. Start with the short question below, `currency` in Forge, and `sku-plan` outside Forge. Record the host version,
+model, effort, Sia revision, and exact prompts for each run.
 
-Keep exact prompts/settings, source revision and dirty patch, outputs, diffs, test results, and corrective user turns.
-Record whether requested behavior works, whether unrelated behavior changed, and whether new files, abstractions,
-options, or features were necessary. Each task is solvable by editing existing functions; additional machinery needs
-a task-specific reason. Count corrections and manual edits rather than awarding points for Sia terminology or brevity.
-Inspect both results, including ties and regressions. Repeat separately for each authorized model/effort pair rather
-than assuming matching effort names are equivalent. Record premature progress-only stopping, skipped or unavailable
-checks, unnecessary repeated verification, and extra work alongside correctness. Mid-task steering and background-result
-scenarios need the separately authorized [continuation evaluation](../behavior/routing/fixtures/model-continuation.md);
-these three coding fixtures alone do not certify them. These small tasks can reveal problems, not certify all coding.
+> What does `format_receipt` return for an order with no currency?
+
+The answer should name `item` and the two-decimal `amount`. Confirm that the question leaves the workspace untouched.
+
+Candidates run `python3 -B -m unittest discover -v` inside their own workspace. After each candidate exits, the
+coordinator runs the command below from this Sia checkout. `BASE` is the candidate's commit hash after setup and before
+the first prompt, including any seeded changes. Run candidate code only in the same approved disposable environment.
+Keep sibling solutions, evaluator, manifests, and later Git history outside candidate access.
+
+```sh
+python3 -B tests/coding/evaluate.py TASK /absolute/candidate/path --scope-from BASE
+```
+
+The evaluator checks behavior and flags staged, unstaged, and unignored new paths outside the expected fixture paths.
+Inspect flagged paths for a concrete need. Inspect allowed hunks for unnecessary helpers, fallbacks, or unrelated edits
+within the same file. For `currency`, a new converter is out of scope and regression coverage for missing currency
+supports the existing contract. Generated or ignored artifacts that matter to the request need separate inspection.
+The approval check covers plan artifacts separately from the path check.
+
+Capture the assistant's task messages, command output, and diff. Score each task using these observations.
+
+- For prose, count words and mark repeated summaries or routine narration across progress, plan, and final messages.
+  Record user turns spent correcting scope or asking the assistant to finish. Check that decisions and errors are clear.
+- For tool output, record repeated reads and unnecessarily broad commands. Capture command output and, if available,
+  what the client displayed.
+- For the diff, record changed paths and count unrelated edits and unnecessary mechanisms after reviewing the hunks.
+  Record behavior checks, approval timing, and any skipped, repeated, or unavailable checks. Reject a shorter result
+  that loses required information, verification, or correctness.
+
+Keep ties and regressions in the comparison. Mid-task steering and background-result scenarios have their own
+[continuation evaluation](../behavior/routing/fixtures/model-continuation.md).
 
 ## Offline readiness
 
 `python3 -B tests/coding/test_fixtures.py` verifies that each original task fails its new behavior checks and that a
-small working change passes those checks and the existing tests. It invokes no model. The full verifier includes it.
+small working change passes those checks and the existing tests. It also verifies that a behavior-passing change
+fails the path check when unrelated staged, unstaged, or new files are present. The verifier runs this without models.
 Live comparisons are separate and currently unverified; no API calls are authorized by fixture readiness checks.

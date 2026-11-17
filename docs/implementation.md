@@ -14,9 +14,9 @@ Operation names, aliases, CUSTOM resolution, exact activation, and saved-plan co
 ## Local checks
 
 The contract suite checks selected planning, ownership, read-only, handoff, and skill-loading instructions in source.
-It includes deliberately weakened source variants, so removing the approval boundary or required review skill fails.
+It includes deliberately weakened source variants, so removing the approval boundary or a required review trigger fails.
 Plan-writing contracts also protect concrete interface examples, carrying chat proposals into saved plans, resolving
-design questions before approval, and loading writing guidance for inline plans. Each requirement is removed in turn
+design questions before approval, and using the protocol's inline plan guidance. Each requirement is removed in turn
 to check that the guard detects its absence.
 These are textual guardrails: wording changes may require reviewed pattern updates, and matching text cannot prove
 that a model will comply. Offline host shims separately validate trace handling and continuation.

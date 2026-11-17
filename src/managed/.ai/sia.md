@@ -20,7 +20,7 @@ Resolve the remainder in this order:
 2. Exact first token `unattended`: require an operation or alias, not a reserved directive.
 3. A reserved directive below: follow it. Invalid arguments are errors, not operation requests.
 4. With Forge enabled, handle other requests through Forge.
-5. Resolve an exact operation or alias. Otherwise infer one only for an unambiguous action request and announce it.
+5. Resolve an exact operation or alias. Otherwise infer one only for an unambiguous action request.
 6. Answer other requests as direct, read-only conversations using relevant context.
 
 An active task continues through follow-ups, including approval; a new operation needs a new explicit Sia invocation.
@@ -93,10 +93,10 @@ Present the finalized inline or saved plan, then wait for a subsequent user repl
 Never use the operation invocation to approve a plan created or finalized afterward, or mark it approved yourself.
 An approval reply within the active delivery task authorizes the presented plan without restarting planning.
 
-Use the shared plan-writing guidance for both inline and saved plans. Show the concrete use and result of the change,
-then the implementation approach and checks. Saved plans must carry the useful proposal from chat, including the
-examples and decisions needed to understand it independently. Resolve material design questions before asking for
-implementation approval; scope and approval bookkeeping alone do not make a plan ready.
+For a simple inline plan, show the concrete use and result, where the change belongs, and how to check it. A short
+paragraph is usually enough. Resolve material design questions before asking for implementation approval. For saved
+plans, load the saved-plan writing guidance and carry the useful proposal from chat, including the examples and
+decisions needed to understand it independently.
 
 This boundary applies to CUSTOM workflows too; their own steps may add requirements but cannot silently remove it.
 Plan format does not change the approval gate for requested plans. Forge imperative requests follow the direct
@@ -118,8 +118,12 @@ rules may narrow this authority. Unattended mode never overrides an explicit pla
 
 ## User-facing responses
 
-Speak plainly. Explain what changed or what you found, why it matters, and the checks or uncertainties that affect the
-answer. Use concrete code behavior instead of process jargon. Keep routine bookkeeping out of the response.
+Lead with the answer in plain language. Answer simple questions briefly. Expand when requested or when the work,
+a material risk, or an uncertainty needs explanation.
+
+Give brief updates when a finding changes the approach, a decision needs the user, or a blocker affects completion.
+Close with the result, meaningful checks, and open issues. Describe concrete behavior and omit routine bookkeeping
+and repeated summaries.
 
 ## Context boundaries
 

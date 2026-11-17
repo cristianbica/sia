@@ -16,7 +16,7 @@ class Context(unittest.TestCase):
     def test_optional_support_is_separate(self):
         uses = report.support_map(report.read(report.WORKFLOW))
         self.assertEqual(set(uses), {'coding', 'saved-plan', 'forge', 'worker'})
-        self.assertEqual(uses['coding'], uses['saved-plan'])
+        self.assertEqual(uses['coding'], [])
         self.assertEqual([Path(p).name for p in uses['saved-plan']], ['standard.md'])
         self.assertEqual([Path(p).name for p in uses['worker']], ['handoff.md'])
         self.assertEqual([Path(p).name for p in uses['forge']], ['forge.md'])
@@ -29,21 +29,20 @@ class Context(unittest.TestCase):
         body = report.read(report.WORKFLOW)
         for broken in (body + '\n| coding | none |\n',
                        body.replace('delivery/standard.md', '../standard.md'),
-                       body.replace('| coding | [saved plans](delivery/standard.md) |', '| coding | missing |'), ''):
+                       body.replace('| coding | none |', '| coding | missing |'), ''):
             with self.subTest(broken=broken), self.assertRaises(ValueError):
                 report.support_map(broken)
 
     def test_counts_include_later_and_total_files_without_duplicates(self):
         values = report.measure()
-        self.assertLess(values['coding']['words'], values['coding-complete']['words'])
+        self.assertEqual(values['coding'], values['coding-complete'])
         self.assertLess(values['coding-complete']['words'], values['all-delivery-support']['words'])
         self.assertGreater(values['all-shipped-markdown']['words'], values['all-delivery-support']['words'])
         for entry in values.values():
             self.assertEqual(len(entry['paths']), len(set(entry['paths'])))
             self.assertEqual(entry['words'], sum(len(report.read(p).split()) for p in entry['paths']))
-        self.assertTrue(any(p.endswith('/delivery/standard.md') for p in values['coding-complete']['paths']))
-        for path in values['coding-complete']['paths']:
-            self.assertNotIn('/delivery/handoff.md', path)
+        for suffix in ('/delivery/standard.md', '/delivery/handoff.md', '/code-review/SKILL.md'):
+            self.assertFalse(any(path.endswith(suffix) for path in values['coding-complete']['paths']))
 
     def test_protocol_header_and_skill_schemas(self):
         protocol = report.read('src/managed/.ai/sia.md')

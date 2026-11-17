@@ -59,14 +59,14 @@ CONTRACTS = {
         r'never manufacture approval from your own summary or interpretation of the earlier invocation',
     ]),
     'shared plan substance': ('sia.md', [
-        r'plan.writing guidance for both inline and saved plans',
-        r'show the concrete use and result.*implementation approach and checks',
-        r'saved plans must carry the useful proposal from chat',
+        r'for a simple inline plan, show the concrete use and result, where the change belongs, and how to check it',
+        r'for saved plans, load the saved-plan writing guidance',
+        r'carry the useful proposal from chat',
         r'resolve material design questions before asking for implementation approval',
     ]),
     'delivery writing guidance': ('workflows/sia/delivery.md', [
-        r'load the shared saved.plan support for writing guidance for both inline and saved plans',
-        r'scope checklist alone is insufficient',
+        r'use the protocol.s guidance for inline plans',
+        r'load saved-plan support when saving a plan',
     ]),
     'concrete plan': ('workflows/sia/delivery/standard.md', [
         r'make the proposed result concrete before explaining the work',
@@ -91,9 +91,10 @@ CONTRACTS = {
         r'filename.only inspection.*solely to allocate',
     ]),
     'delivery review': ('workflows/sia/delivery.md', [
-        r'before final review.*resolve and load.*code-review.*testing.*catalog',
-        r'honor custom overrides.*reuse already loaded',
         r'review is required',
+        r'use the effective testing skill and reuse it if already loaded',
+        r'resolve code-review through the skills catalog',
+        r'load it for concrete risks that warrant deeper review, when the user requests deeper review, or when a custom override is selected',
     ]),
     'approved persistence': ('sia.md', [
         r'before required approval.*prepare the plan, then wait',
@@ -210,11 +211,14 @@ class Contracts(unittest.TestCase):
         files = dict(self.files, **{'sia.md': '---\nsia_protocol: 1\n---\nEdit immediately.'})
         self.assertIn('shared approval', failures(files))
 
-    def test_missing_review_skill_is_rejected(self):
-        files = dict(self.files)
-        path = 'workflows/sia/delivery.md'
-        files[path] = files[path].replace('`code-review`', '')
-        self.assertIn('delivery review', failures(files))
+    def test_review_skill_triggers_are_required(self):
+        path, patterns = CONTRACTS['delivery review']
+        body = ' '.join(self.files[path].lower().replace('`', '').split())
+        for pattern in patterns:
+            with self.subTest(pattern=pattern):
+                files = dict(self.files)
+                files[path] = re.sub(pattern, '', body)
+                self.assertIn('delivery review', failures(files))
 
     def test_missing_and_duplicate_dependencies_are_rejected(self):
         for operation, skill in (('fix', 'testing'), ('review', 'code-review'), ('document', 'documentation')):

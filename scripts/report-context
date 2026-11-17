@@ -46,7 +46,9 @@ def measure(ref=None):
     review = ['src/managed/.ai/skills/sia/code-review/SKILL.md']
     ordinary = supports.get('coding', supports.get('standard-plan', []))
     later = [] if 'coding' in supports else supports.get('standard-execute', [])
-    result['coding-complete'] = count(common + ordinary + later + review)
+    # Earlier source revisions required the review skill for every delivery.
+    ordinary_review = [] if supports.get('coding') == [] else review
+    result['coding-complete'] = count(common + ordinary + later + ordinary_review)
     result['all-delivery-support'] = count(common + [p for ps in supports.values() for p in ps] + review)
     if ref:
         shipped = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', ref, '--', 'src'],
@@ -73,7 +75,7 @@ def main():
             row += [before['words'], values['words'] - before['words']] if before else ['n/a', 'n/a']
         print('\t'.join(map(str, row)))
     print('Static words/bytes, not model tokens, cost, or proof of behavior. Includes common intake definitions.')
-    print('coding-complete includes later execution and review loads; all-delivery-support counts their union once.')
+    print('coding-complete includes mandatory later loads; all-delivery-support includes optional support and review.')
     print('Old coding baseline is standard-plan; all-shipped-markdown includes every Markdown file under src.')
     print('Excludes host instructions, project overrides/docs/code and conversation history.')
     return 0
